@@ -78,7 +78,8 @@ class Objectif(db.Model):
 
 @app.route("/")
 def home():
-    return "Budgeometre avec BD (CATEGORIE, TRANSACTION, OBJECTIF) ✅"
+    # Affiche le fichier `templates/index.html`
+    return render_template("index.html")
 
 
 @app.route("/init-test")
