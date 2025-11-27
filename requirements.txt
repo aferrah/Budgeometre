@@ -1,0 +1,6 @@
+# Dependencies for Budgeometre (no pinned versions)
+# Core packages (latest available will be installed)
+Flask
+Flask-SQLAlchemy
+SQLAlchemy
+datetime

@@ -2,28 +2,33 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="../static/css/base.css">
-    <title>Budgeomètre</title>
+    <title>Page d'accueil</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
 </head>
 <body>
-    <h1>Budgeomètre</h1>
+    <header>
+        <h1>Page d'accueil</h1>
+    </header>
+
     <main>
-        <div class="center">
-            <div class="pie-chart" id="pieChart"></div>
-        </div>
-        <div class="budget-info" id="budgetInfo">
-        </div>
         <section class="content-row">
             <div class="left">
                 <h2>Ajouter un objectif</h2>
             </div>
+
+            <div class="center">
+                <div class="pie-chart"></div>
+            </div>
+
             <div class="right">
                 <h2>Argent épargné</h2>
             </div>
         </section>
+
         <div class="add-expense-container">
             <button class="add-expense-btn">Ajouter une dépense</button>
         </div>
+
         <section class="recent-expenses">
             <h2>Dernières dépenses</h2>
             <table>
@@ -55,31 +60,10 @@
         </section>
     </main>
     <div class="add-expense-container">
-        <a href="#">Accéder à mes dépenses</a>
+        <a href="">Accéder à mes dépenses</a>
     </div>
-    <footer></footer>
+    <footer>
 
-    <script>
-    const data = {
-        argentInitial: 200,
-        argentActuel: 150,
-        objectifEpargne: 100
-    };
-
-    const pourcentageRestant = Math.min(100, Math.max(0, (data.argentActuel / data.argentInitial) * 100));
-    const couleur = data.argentActuel >= data.argentInitial ? '#0bb67c' : '#ff4d4d';
-
-    const pieChart = document.getElementById('pieChart');
-    pieChart.style.background = `conic-gradient(${couleur} 0% ${pourcentageRestant}%, transparent ${pourcentageRestant}% 100%)`;
-
-    const budgetInfo = document.getElementById('budgetInfo');
-    budgetInfo.innerHTML = `
-        <p>Argent rentrant : ${data.argentInitial} €</p>
-        <p>Argent actuel : ${data.argentActuel} €</p>
-        <p>Dépensé : ${data.argentInitial - data.argentActuel} € (${100 - pourcentageRestant.toFixed(1)}%)</p>
-        <p>Objectif d'épargne : ${data.objectifEpargne} €</p>
-    `;
-
-    </script>
+    </footer>
 </body>
 </html>
