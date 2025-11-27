@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, render_template, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 
@@ -119,6 +119,44 @@ def list_transactions():
     for t in transactions:
         lignes.append(f"{t.dateTransaction} - {t.titre} : {t.montant}€ (cat: {t.categorie.nom})")
     return "<br>".join(lignes) if lignes else "Aucune transaction pour l'instant."
+
+@app.route("/mes-depenses", methods=["GET", "POST"])
+def mes_depenses():
+    # --- 1) Traitement du formulaire d'ajout de dépense ---
+    if request.method == "POST":
+        titre = request.form.get("titre")
+        montant = request.form.get("montant")
+        categorie_id = request.form.get("idCategorie")
+
+        if not titre or not montant or not categorie_id:
+            return "Erreur : tous les champs sont obligatoires.", 400
+
+        # Création de la transaction
+        nouvelle_transaction = Transaction(
+            titre=titre,
+            montant=montant,
+            idCategorie=categorie_id
+        )
+        db.session.add(nouvelle_transaction)
+        db.session.commit()
+
+        # Évite le repost lors d'un refresh (bonne pratique)
+        return redirect(url_for("mes_depenses"))
+
+    # --- 2) Si GET : on renvoie les données pour affichage ---
+    transactions = (
+        Transaction.query
+        .order_by(Transaction.dateTransaction.desc())
+        .all()
+    )
+    categories = Categorie.query.order_by(Categorie.nom).all()
+
+    return render_template(
+        "mes_depenses.html",
+        transactions=transactions,
+        categories=categories
+    )
+
 
 
 # --- LANCEMENT DE L'APP ---
