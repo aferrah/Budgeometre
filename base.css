@@ -94,7 +94,7 @@ body {
 footer {
     text-align: center;
     padding: 20px;
-    background-color: #f0f0f0;
+    background: linear-gradient(60deg,#1C6D08, #003483, #830048);
 }
 
 footer a {
