@@ -1,6 +1,6 @@
 header {
     width: 100%;
-    background-color: #4CAF50;
+    background: linear-gradient(60deg,#1C6D08, #003483, #830048);
     color: white;
     padding: 20px;
     text-align: center;
@@ -36,7 +36,7 @@ body {
     width: 200px;
     height: 200px;
     border-radius: 50%;
-    background: conic-gradient(#4CAF50 0% 60%, #ddd 60% 100%);
+    background: conic-gradient(#1C6D08 0% 60%, #afc5e6 60% 100%);
 }
 
 .add-expense-container {
@@ -45,7 +45,7 @@ body {
 }
 
 .add-expense-btn {
-    background-color: #4CAF50;
+    background-color: #003483;
     color: white;
     padding: 10px 25px;
     border: none;
@@ -55,10 +55,10 @@ body {
 }
 
 .add-expense-btn:hover {
-    background-color: #45a049;
+    background-color: #afc5e6;
 }
-a {
-    background-color: #4CAF50;
+.add-expense-container a {
+    background-color: #003483;
     color: white;
     padding: 10px 25px;
     border: none;
@@ -66,6 +66,11 @@ a {
     cursor: pointer;
     font-size: 16px;
 }
+
+.add-expense-container a:hover {
+    background-color: #afc5e6;
+}
+
 .recent-expenses {
     max-width: 1200px;
     margin: 0 auto 40px;
@@ -93,7 +98,7 @@ footer {
 }
 
 footer a {
-    color: #4CAF50;
+    background: linear-gradient(60deg,#1C6D08, #003483, #830048);
     text-decoration: none;
     font-weight: bold;
 }
