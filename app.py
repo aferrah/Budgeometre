@@ -34,6 +34,7 @@ class Transaction(db.Model):
     montant = db.Column(db.Numeric(15, 2), nullable=False)
     dateTransaction = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     titre = db.Column(db.String(100), nullable=False)
+    commentaire = db.Column(db.String(255))
 
     idCategorie = db.Column(
         db.Integer,
@@ -49,7 +50,7 @@ class Transaction(db.Model):
     )
 
     def __repr__(self):
-        return f"<Transaction {self.titre} {self.montant}>"
+        return f"<Transaction {self.titre} {self.montant} {self.commentaire}>"
 
 
 class Objectif(db.Model):
@@ -78,38 +79,79 @@ class Objectif(db.Model):
 
 @app.route("/")
 def home():
-    # Affiche le fichier `templates/index.html`
-    return render_template("index.html")
+    # Récupère des données depuis la base et les envoie au template
+    # - dernières transactions (10)
+    transactions = (
+        Transaction.query.order_by(Transaction.dateTransaction.desc()).limit(10).all()
+    )
+
+    # - solde total (somme des montants)
+    total_balance = db.session.query(db.func.coalesce(db.func.sum(Transaction.montant), 0)).scalar()
+
+    # - totaux par catégorie (nom, somme)
+    category_totals = (
+        db.session.query(Categorie.nom, db.func.coalesce(db.func.sum(Transaction.montant), 0))
+        .join(Transaction)
+        .group_by(Categorie.idCategorie)
+        .all()
+    )
+
+    # - objectifs
+    objectifs = Objectif.query.all()
+
+    return render_template(
+        "index.html",
+        transactions=transactions,
+        total_balance=total_balance,
+        category_totals=category_totals,
+        objectifs=objectifs,
+    )
 
 
 @app.route("/init-test")
 def init_test():
-    """Crée une catégorie + transaction + objectif pour tester."""
-    # 1) créer une catégorie
-    cat = Categorie(nom="Alimentation", description="Courses, restos, etc.")
-    db.session.add(cat)
+    """Crée plusieurs catégories, transactions et objectifs pour tester."""
+    # 1) Créer les catégories
+    cat_alimentation = Categorie(nom="Alimentation", description="Courses, restos, etc.")
+    cat_transport = Categorie(nom="Transport", description="Essence, transports publics")
+    cat_loisirs = Categorie(nom="Loisirs", description="Cinéma, activités")
+    
+    db.session.add_all([cat_alimentation, cat_transport, cat_loisirs])
     db.session.commit()
 
-    # 2) créer une transaction liée à cette catégorie
-    tr = Transaction(
-        montant=-25.50,
-        titre="Courses",
-        categorie=cat,
-    )
-    db.session.add(tr)
+    # 2) Créer plusieurs transactions
+    transactions_data = [
+        Transaction(titre="Courses supermarché", montant=-45.30, categorie=cat_alimentation, commentaire="Courses hebdo"),
+        Transaction(titre="Restaurant", montant=-28.50, categorie=cat_alimentation, commentaire="Déjeuner en famille"),
+        Transaction(titre="Essence", montant=-60.00, categorie=cat_transport, commentaire="Plein d'essence"),
+        Transaction(titre="Ticket bus", montant=-15.00, categorie=cat_transport, commentaire="Abonnement mensuel"),
+        Transaction(titre="Cinéma", montant=-12.00, categorie=cat_loisirs, commentaire="Film avec amis"),
+        Transaction(titre="Courses Leclerc", montant=-38.75, categorie=cat_alimentation, commentaire="Courses principales"),
+        Transaction(titre="Café", montant=-5.50, categorie=cat_alimentation, commentaire="Pause café au travail"),
+    ]
+    
+    for tr in transactions_data:
+        db.session.add(tr)
     db.session.commit()
 
-    # 3) créer un objectif lié à cette catégorie
-    obj = Objectif(
-        montant=200,
-        description="Budget courses mensuel",
+    # 3) Créer des objectifs
+    obj_alimentation = Objectif(
+        montant=250,
+        description="Budget alimentation mensuel",
         frequence="mensuel",
-        categorie=cat,
+        categorie=cat_alimentation,
     )
-    db.session.add(obj)
+    obj_transport = Objectif(
+        montant=150,
+        description="Budget transport mensuel",
+        frequence="mensuel",
+        categorie=cat_transport,
+    )
+    
+    db.session.add_all([obj_alimentation, obj_transport])
     db.session.commit()
 
-    return "Données de test ajoutées ✅"
+    return "Données de test ajoutées ✅ (3 catégories, 7 transactions, 2 objectifs)"
 
 
 @app.route("/transactions")

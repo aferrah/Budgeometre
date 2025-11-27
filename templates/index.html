@@ -13,7 +13,7 @@
     <main>
         <section class="content-row">
             <div class="left">
-                <h2>Ajouter un objectif</h2>
+                <h2><button>Ajouter un objectif</button></h2>
             </div>
 
             <div class="center">
@@ -21,7 +21,7 @@
             </div>
 
             <div class="right">
-                <h2>Argent épargné</h2>
+                <h2><buttton>Argent épargné</buttton></h2>
             </div>
         </section>
 
@@ -31,32 +31,28 @@
 
         <section class="recent-expenses">
             <h2>Dernières dépenses</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Libellé</th>
-                        <th>Commentaire</th>
-                        <th>Montant</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Achat supermarché</td>
-                        <td>Courses hebdomadaires</td>
-                        <td>45 €</td>
-                    </tr>
-                    <tr>
-                        <td>Essence</td>
-                        <td>Voiture</td>
-                        <td>60 €</td>
-                    </tr>
-                    <tr>
-                        <td>Café</td>
-                        <td>Pause déjeuner</td>
-                        <td>3 €</td>
-                    </tr>
-                </tbody>
-            </table>
+            {% if transactions %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Libellé</th>
+                            <th>Commentaire</th>
+                            <th>Montant</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for t in transactions %}
+                            <tr>
+                                <td>{{ t.titre }}</td>
+                                <td>{{ t.commentaire or '' }}</td>
+                                <td>{{ '%.2f'|format(t.montant) }} €</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p>Aucune dépense enregistrée pour l'instant.</p>
+            {% endif %}
         </section>
     </main>
     <div class="add-expense-container">
