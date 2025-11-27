@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 
@@ -78,7 +78,8 @@ class Objectif(db.Model):
 
 @app.route("/")
 def home():
-    return "Budgeometre avec BD (CATEGORIE, TRANSACTION, OBJECTIF) ✅"
+    # Affiche le fichier `templates/index.html`
+    return render_template("index.html")
 
 
 @app.route("/init-test")
