@@ -123,14 +123,22 @@ def list_transactions():
 
 @app.route("/mes-depenses", methods=["GET", "POST"])
 def mes_depenses():
-    # --- 1) Traitement du formulaire d'ajout de dépense ---
+    # --- 1) Traitement du formulaire (POST) ---
     if request.method == "POST":
         titre = request.form.get("titre")
         montant = request.form.get("montant")
         categorie_id = request.form.get("idCategorie")
 
+        # Vérification basique
         if not titre or not montant or not categorie_id:
             return "Erreur : tous les champs sont obligatoires.", 400
+
+        # Validation des types
+        try:
+            montant = float(montant)
+            categorie_id = int(categorie_id)
+        except ValueError:
+            return "Erreur : montant ou catégorie invalide.", 400
 
         # Création de la transaction
         nouvelle_transaction = Transaction(
@@ -141,10 +149,10 @@ def mes_depenses():
         db.session.add(nouvelle_transaction)
         db.session.commit()
 
-        # Évite le repost lors d'un refresh (bonne pratique)
+        # Redirection après ajout
         return redirect(url_for("mes_depenses"))
 
-    # --- 2) Si GET : on renvoie les données pour affichage ---
+    # --- 2) Affichage (GET) ---
     transactions = (
         Transaction.query
         .order_by(Transaction.dateTransaction.desc())
@@ -157,6 +165,7 @@ def mes_depenses():
         transactions=transactions,
         categories=categories
     )
+
 
 
 
