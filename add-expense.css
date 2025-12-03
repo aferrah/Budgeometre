@@ -1,0 +1,148 @@
+/* Page globale */
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f5f6fb;
+}
+
+/* On réutilise le style du header dégradé */
+.header-gradient {
+    width: 100%;
+    padding: 40px;
+    text-align: center;
+    background: linear-gradient(60deg,#1C6D08, #003483, #830048);
+    color: white;
+    border-bottom-left-radius: 20px;
+    border-bottom-right-radius: 20px;
+    margin-bottom: 40px;
+}
+
+.header-gradient h1 {
+    margin: 0;
+    font-size: 32px;
+    font-weight: 700;
+}
+
+/* Conteneur principal */
+.add-expense-page {
+    min-height: calc(100vh - 160px);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+/* Carte formulaire */
+.form-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    padding: 30px 40px;
+    max-width: 600px;
+    width: 90%;
+    margin-bottom: 60px;
+}
+
+.form-card h2 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-size: 24px;
+}
+
+/* Lignes de formulaire */
+.form-row {
+    margin-bottom: 18px;
+    display: flex;
+    flex-direction: column;
+}
+
+.form-row label {
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+.form-row input,
+.form-row select,
+.form-row textarea {
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid #d0d4e4;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    font-family: inherit;
+}
+
+.form-row input:focus,
+.form-row select:focus,
+.form-row textarea:focus {
+    border-color: #6c5ce7;
+    box-shadow: 0 0 0 2px rgba(108, 92, 231, 0.2);
+}
+
+.form-row.two-columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.hint {
+    margin: 4px 0 0;
+    font-size: 12px;
+    color: #777;
+}
+
+/* Boutons */
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 10px;
+}
+
+.btn-primary,
+.btn-secondary {
+    padding: 10px 20px;
+    border-radius: 8px;
+    border: none;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-primary {
+    background: #6c5ce7;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #5946d9;
+}
+
+.btn-secondary {
+    background: #e5e7f3;
+    color: #333;
+}
+
+.btn-secondary:hover {
+    background: #d1d4eb;
+}
+
+/* Message de confirmation */
+.form-message {
+    margin-top: 16px;
+    font-size: 14px;
+    color: #1C6D08;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    .form-card {
+        padding: 20px;
+    }
+
+    .form-row.two-columns {
+        grid-template-columns: 1fr;
+    }
+}

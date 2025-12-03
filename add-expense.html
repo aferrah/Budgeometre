@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Ajouter une dépense - Budgéomètre</title>
+
+    <!-- CSS global (header, couleurs générales) -->
+    <link rel="stylesheet" href="base.css">
+
+    <!-- CSS spécifique à cette page -->
+    <link rel="stylesheet" href="add-expense.css">
+</head>
+<body>
+
+<header class="header-gradient">
+    <h1>Ajouter une dépense</h1>
+</header>
+
+<main class="add-expense-page">
+
+    <section class="form-card">
+        <h2>Nouvelle dépense</h2>
+
+        <form id="expense-form">
+            <div class="form-row">
+                <label for="label">Libellé</label>
+                <input type="text" id="label" name="label" placeholder="Ex : Courses, Loyer..." required>
+            </div>
+
+            <div class="form-row">
+                <label for="amount">Montant (€)</label>
+                <input type="number" id="amount" name="amount" step="0.01" placeholder="Ex : 45.90" required>
+                <p class="hint">Utilise un montant positif pour une entrée (salaire) et négatif pour une dépense.</p>
+            </div>
+
+            <div class="form-row two-columns">
+                <div>
+                    <label for="category">Catégorie</label>
+                    <select id="category" name="category" required>
+                        <option value="" disabled selected>Choisir une catégorie</option>
+                        <option value="alimentation">Alimentation</option>
+                        <option value="logement">Logement</option>
+                        <option value="transport">Transport</option>
+                        <option value="loisirs">Loisirs</option>
+                        <option value="salaire">Salaire</option>
+                        <option value="autre">Autre</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="date">Date</label>
+                    <input type="date" id="date" name="date" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <label for="comment">Commentaire</label>
+                <textarea id="comment" name="comment" rows="3"
+                          placeholder="Optionnel : détails de la dépense..."></textarea>
+            </div>
+
+            <div class="form-actions">
+                <a href="index.html" class="btn-secondary">Annuler</a>
+                <button type="submit" class="btn-primary">Enregistrer la dépense</button>
+            </div>
+
+            <p id="form-message" class="form-message" hidden>
+                ✅ Dépense enregistrée (pour l’instant seulement côté front 😉)
+            </p>
+        </form>
+    </section>
+</main>
+
+<script>
+    // Petit JS pour afficher un message de confirmation (pas encore connecté à une API)
+    const form = document.getElementById('expense-form');
+    const message = document.getElementById('form-message');
+
+    form.addEventListener('submit', function (event) {
+        event.preventDefault(); // on bloque l'envoi réel pour l’instant
+
+        // plus tard : ici on enverra la dépense à l’API
+        message.hidden = false;
+
+        // on peut aussi réinitialiser le formulaire
+        form.reset();
+    });
+</script>
+
+</body>
+</html>
