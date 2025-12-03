@@ -79,14 +79,18 @@ class Objectif(db.Model):
 
 @app.route("/")
 def home():
+    argentInitial = 2000
     # Récupère des données depuis la base et les envoie au template
     # - dernières transactions (10)
     transactions = (
         Transaction.query.order_by(Transaction.dateTransaction.desc()).limit(10).all()
     )
 
-    # - solde total (somme des montants)
-    total_balance = db.session.query(db.func.coalesce(db.func.sum(Transaction.montant), 0)).scalar()
+    # - somme totale des transactions (montants négatifs = dépenses)
+    total_transactions = db.session.query(db.func.coalesce(db.func.sum(Transaction.montant), 0)).scalar()
+    
+    # - argentActuel = argentInitial + somme des transactions
+    argentActuel = float(argentInitial) + float(total_transactions) if total_transactions is not None else float(argentInitial)
 
     # - totaux par catégorie (nom, somme)
     category_totals = (
@@ -99,10 +103,15 @@ def home():
     # - objectifs
     objectifs = Objectif.query.all()
 
+    # - somme des objectifs (pour l'UI)
+    objectif_total = db.session.query(db.func.coalesce(db.func.sum(Objectif.montant), 0)).scalar()
+
     return render_template(
         "index.html",
         transactions=transactions,
-        total_balance=total_balance,
+        argentInitial=argentInitial,
+        argentActuel=argentActuel,
+        objectifEpargne=float(objectif_total) if objectif_total is not None else 0.0,
         category_totals=category_totals,
         objectifs=objectifs,
     )
