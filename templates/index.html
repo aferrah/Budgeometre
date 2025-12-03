@@ -1,68 +1,84 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Budgeomètre</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Budgeomètre</h1>
+    </header>
 
-{% block title %}Budgeomètre - Accueil{% endblock %}
+    <main>
+        <div class="center">
+            <div class="pie-chart" id="pieChart"></div>
+        </div>
+        <div class="budget-info" id="budgetInfo">
+            <!-- Les infos seront affichées ici par JavaScript -->
+        </div>
+        <section class="content-row">
+            <div class="left">
+                <h2>Ajouter un objectif</h2>
+            </div>
+            <div class="right">
+                <h2>Argent épargné</h2>
+            </div>
+        </section>
+        <div class="add-expense-container">
+            <button class="add-expense-btn">Ajouter une dépense</button>
+        </div>
 
-{% block content %}
-    <div class="center glass-card" style="margin-bottom: 20px;">
-        <div class="pie-chart" id="pieChart"></div>
-    </div>
-    
-    <div class="budget-info glass-card" id="budgetInfo" style="padding: 15px; margin-bottom: 30px;">
-    </div>
-    
-    <div class="add-expense-container">
-        <button class="add-expense-btn">Ajouter une dépense</button>
-    </div>
-
-    <section class="recent-expenses glass-card" style="padding: 30px;">
-        <h2>Dernières dépenses</h2>
-        {% if transactions %}
-            <table>
-                <thead>
-                    <tr>
-                        <th>Libellé</th>
-                        <th>Commentaire</th>
-                        <th>Montant</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for t in transactions %}
+        <section class="recent-expenses">
+            <h2>Dernières dépenses</h2>
+            {% if transactions %}
+                <table>
+                    <thead>
                         <tr>
-                            <td>{{ t.titre }}</td>
-                            <td>{{ t.commentaire or '' }}</td>
-                            <td>{{ '%.2f'|format(t.montant) }} €</td>
+                            <th>Libellé</th>
+                            <th>Commentaire</th>
+                            <th>Montant</th>
                         </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        {% else %}
-            <p style="color: rgba(255, 255, 255, 0.7);">Aucune dépense enregistrée pour l'instant.</p>
-        {% endif %}
-    </section>
+                    </thead>
+                    <tbody>
+                        {% for t in transactions %}
+                            <tr>
+                                <td>{{ t.titre }}</td>
+                                <td>{{ t.commentaire or '' }}</td>
+                                <td>{{ '%.2f'|format(t.montant) }} €</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p>Aucune dépense enregistrée pour l'instant.</p>
+            {% endif %}
+        </section>
+        <div class="add-expense-container">
+            <a href="{{ url_for('mes_depenses') }}">Accéder à mes dépenses</a>
+        </div>
+    </main>
 
-    <div class="add-expense-container">
-        <a href="{{ url_for('budget_dashboard') }}">Accéder à mes dépenses</a>
-    </div>
-{% endblock %}
+    <footer></footer>
 
-{% block scripts %}
-    <script>
+      <script>
         var argentInitial = {{ argentInitial }};
         var argentActuel = {{ argentActuel }};
         var objectifEpargne = {{ objectifEpargne }};
 
         const pourcentageRestant = Math.min(100, Math.max(0, (argentActuel / (argentInitial || 1)) * 100));
-        const couleur = argentActuel >= argentInitial ? '#0bb67c' : '#ef4444';
+        const couleur = argentActuel >= argentInitial ? '#0bb67c' : '#ff4d4d';
 
         const pieChart = document.getElementById('pieChart');
         pieChart.style.background = `conic-gradient(${couleur} 0% ${pourcentageRestant}%, transparent ${pourcentageRestant}% 100%)`;
 
         const budgetInfo = document.getElementById('budgetInfo');
         budgetInfo.innerHTML = `
-            <p style="font-size: 1.1rem; font-weight: 600;">Argent initial : ${argentInitial} €</p>
-            <p style="font-size: 1.5rem; font-weight: 700; color: ${couleur};">Argent actuel : ${argentActuel.toFixed(2)} €</p>
-            <p style="font-size: 0.9rem; color: rgba(255, 255, 255, 0.7);">Dépensé : ${(argentInitial - argentActuel).toFixed(2)} € (${(100 - pourcentageRestant).toFixed(1)}%)</p>
-            <p style="font-size: 1.1rem; margin-top: 10px;">Objectif d'épargne : ${objectifEpargne.toFixed(2)} €</p>
+            <p>Argent initial : ${argentInitial} €</p>
+            <p>Argent actuel : ${argentActuel} €</p>
+            <p>Dépensé : ${argentInitial - argentActuel} € (${(100 - pourcentageRestant).toFixed(1)}%)</p>
+            <p>Objectif d'épargne : ${objectifEpargne} €</p>
         `;
-    </script>
-{% endblock %}
+      </script>
+</body>
+</html>
