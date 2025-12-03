@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Budgeomètre - Analytics</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="stylesheet" href="../static/css/budget-dashboard.css">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Budgeomètre</h1>
+            <p class="subtitle">Votre tableau de bord financier</p>
+        </header>
+
+        <div class="period-selector">
+            <button class="period-btn active" onclick="changePeriod('month')">Mois</button>
+            <button class="period-btn" onclick="changePeriod('quarter')">Trimestre</button>
+            <button class="period-btn" onclick="changePeriod('year')">Année</button>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="stats-grid">
+            <div class="glass-card stat-card">
+                <div class="stat-label">Dépenses</div>
+                <div class="stat-value" id="totalExpenses">3 607,90€</div>
+                <div class="stat-change down">
+                    <span>↑ 12%</span>
+                    <span style="color: rgba(255,255,255,0.6);">vs mois dernier</span>
+                </div>
+            </div>
+
+            <div class="glass-card stat-card">
+                <div class="stat-label">Revenus</div>
+                <div class="stat-value" id="totalIncome">2 700,00€</div>
+                <div class="stat-change up">
+                    <span>↑ 5%</span>
+                    <span style="color: rgba(255,255,255,0.6);">vs mois dernier</span>
+                </div>
+            </div>
+
+            <div class="glass-card stat-card">
+                <div class="stat-label">Solde</div>
+                <div class="stat-value" id="balance" style="color: #ef4444;">-907,90€</div>
+                <div class="stat-change down">
+                    <span>Déficit ce mois</span>
+                </div>
+            </div>
+
+            <div class="glass-card stat-card">
+                <div class="stat-label">Objectifs</div>
+                <div class="stat-value" id="goals">2/5</div>
+                <div class="stat-change" style="color: rgba(255,255,255,0.8);">
+                    <span>40% respectés</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="charts-grid">
+            <div class="glass-card chart-container">
+                <h3 class="chart-title">Évolution 6 mois</h3>
+                <canvas id="lineChart"></canvas>
+            </div>
+
+            <div class="glass-card chart-container">
+                <h3 class="chart-title">Dépenses par catégorie</h3>
+                <canvas id="barChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Alerts -->
+        <div class="alerts-container">
+            <div class="alert danger">
+                <div class="alert-content">
+                    <h4>Objectif Loisirs dépassé</h4>
+                    <p>Vous avez dépensé 395,50€ sur un objectif de 150€ (264%)</p>
+                    <div class="progress-bar">
+                        <div class="progress-fill danger" style="width: 100%;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="alert warning">
+                <div class="alert-content">
+                    <h4>Attention Transport</h4>
+                    <p>336,20€ dépensés sur 200€ d'objectif (168%)</p>
+                    <div class="progress-bar">
+                        <div class="progress-fill warning" style="width: 100%;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="alert warning">
+                <div class="alert-content">
+                    <h4>Budget Vêtements dépassé</h4>
+                    <p>259,90€ sur 100€ d'objectif (260%)</p>
+                    <div class="progress-bar">
+                        <div class="progress-fill warning" style="width: 100%;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Données factices basées sur ton schéma BDD
+        const mockData = {
+            categories: [
+                { id: 1, nom: 'Alimentation', description: 'Courses, restaurants', color: '#10b981' },
+                { id: 2, nom: 'Transport', description: 'Essence, transports', color: '#3b82f6' },
+                { id: 3, nom: 'Loisirs', description: 'Sorties, hobbies', color: '#f59e0b' },
+                { id: 4, nom: 'Logement', description: 'Loyer, charges', color: '#8b5cf6' },
+                { id: 5, nom: 'Santé', description: 'Médecin, pharmacie', color: '#ec4899' },
+                { id: 6, nom: 'Vêtements', description: 'Habits, chaussures', color: '#14b8a6' },
+                { id: 7, nom: 'Éducation', description: 'Livres, formations', color: '#f97316' },
+                { id: 8, nom: 'Épargne', description: 'Économies', color: '#06b6d4' },
+                { id: 9, nom: 'Autres', description: 'Divers', color: '#64748b' }
+            ],
+            depensesParCategorie: {
+                'Logement': 1045.00,
+                'Alimentation': 669.30,
+                'Épargne': 450.00,
+                'Loisirs': 395.50,
+                'Transport': 336.20,
+                'Vêtements': 259.90,
+                'Santé': 208.50,
+                'Éducation': 155.00,
+                'Autres': 88.50
+            },
+            evolutionMensuelle: {
+                mois: ['Juin', 'Juillet', 'Août', 'Sept', 'Oct', 'Nov'],
+                depenses: [2503, 2341, 3260, 3454, 2991, 3608],
+                revenus: [2500, 2500, 2500, 2700, 2500, 2700]
+            }
+        };
+
+        // Graphique d'évolution
+        function createLineChart() {
+            const ctx = document.getElementById('lineChart').getContext('2d');
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: mockData.evolutionMensuelle.mois,
+                    datasets: [
+                        {
+                            label: 'Dépenses',
+                            data: mockData.evolutionMensuelle.depenses,
+                            borderColor: '#ef4444',
+                            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                            borderWidth: 3,
+                            tension: 0.4,
+                            fill: true,
+                            pointRadius: 5,
+                            pointHoverRadius: 7,
+                            pointBackgroundColor: '#ef4444',
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 2
+                        },
+                        {
+                            label: 'Revenus',
+                            data: mockData.evolutionMensuelle.revenus,
+                            borderColor: '#10b981',
+                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                            borderWidth: 3,
+                            tension: 0.4,
+                            fill: true,
+                            pointRadius: 5,
+                            pointHoverRadius: 7,
+                            pointBackgroundColor: '#10b981',
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 2
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    interaction: {
+                        intersect: false,
+                        mode: 'index'
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            labels: {
+                                color: '#fff',
+                                font: {
+                                    size: 13,
+                                    weight: '600'
+                                },
+                                padding: 15,
+                                usePointStyle: true,
+                                pointStyle: 'circle'
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                            titleColor: '#fff',
+                            bodyColor: '#fff',
+                            borderColor: 'rgba(255, 255, 255, 0.1)',
+                            borderWidth: 1,
+                            padding: 12,
+                            titleFont: {
+                                size: 14,
+                                weight: '600'
+                            },
+                            bodyFont: {
+                                size: 13
+                            },
+                            callbacks: {
+                                label: function(context) {
+                                    return ` ${context.dataset.label}: ${context.parsed.y.toFixed(2)}€`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)',
+                                drawBorder: false
+                            },
+                            ticks: {
+                                color: 'rgba(255, 255, 255, 0.7)',
+                                font: {
+                                    size: 12
+                                },
+                                callback: function(value) {
+                                    return value + '€';
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                color: 'rgba(255, 255, 255, 0.7)',
+                                font: {
+                                    size: 12,
+                                    weight: '600'
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Graphique en barres
+        function createBarChart() {
+            const ctx = document.getElementById('barChart').getContext('2d');
+            const labels = Object.keys(mockData.depensesParCategorie);
+            const data = Object.values(mockData.depensesParCategorie);
+            const colors = labels.map(label => {
+                const cat = mockData.categories.find(c => c.nom === label);
+                return cat ? cat.color : '#64748b';
+            });
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Dépenses',
+                        data: data,
+                        backgroundColor: colors,
+                        borderRadius: 8,
+                        borderSkipped: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                            titleColor: '#fff',
+                            bodyColor: '#fff',
+                            borderColor: 'rgba(255, 255, 255, 0.1)',
+                            borderWidth: 1,
+                            padding: 12,
+                            titleFont: {
+                                size: 14,
+                                weight: '600'
+                            },
+                            bodyFont: {
+                                size: 13
+                            },
+                            callbacks: {
+                                label: function(context) {
+                                    return ` ${context.parsed.y.toFixed(2)}€`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)',
+                                drawBorder: false
+                            },
+                            ticks: {
+                                color: 'rgba(255, 255, 255, 0.7)',
+                                font: {
+                                    size: 12
+                                },
+                                callback: function(value) {
+                                    return value + '€';
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                color: 'rgba(255, 255, 255, 0.7)',
+                                font: {
+                                    size: 12,
+                                    weight: '600'
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Changer de période
+        function changePeriod(period) {
+            document.querySelectorAll('.period-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Ici tu pourras filtrer les données selon la période
+            console.log('Période changée:', period);
+        }
+
+        // Initialisation
+        window.addEventListener('load', () => {
+            createLineChart();
+            createBarChart();
+        });
+    </script>
+</body>
+</html>
