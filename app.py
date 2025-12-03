@@ -93,6 +93,60 @@ def home():
     )
 
 
+@app.route("/add-expense", methods=["GET", "POST"])
+def add_expense():
+    if request.method == "GET":
+        # fournir la liste des catégories pour le select
+        categories = Categorie.query.order_by(Categorie.nom).all()
+        return render_template("add-expense.html", categories=categories)
+
+    # POST : créer une transaction depuis le formulaire
+    titre = request.form.get("label") or "Dépense"
+    montant_raw = request.form.get("amount") or "0"
+    try:
+        montant = float(montant_raw)
+    except ValueError:
+        montant = 0.0
+
+    commentaire = request.form.get("comment")
+    date_str = request.form.get("date")
+    if date_str:
+        try:
+            date_tx = datetime.fromisoformat(date_str)
+        except Exception:
+            date_tx = datetime.utcnow()
+    else:
+        date_tx = datetime.utcnow()
+
+    cat_id = request.form.get("category")
+    categorie = None
+    if cat_id:
+        try:
+            categorie = Categorie.query.get(int(cat_id))
+        except Exception:
+            categorie = None
+
+    # Si aucune catégorie sélectionnée ou trouvée, créer/attribuer une catégorie 'Autre'
+    if not categorie:
+        categorie = Categorie.query.filter_by(nom="Autre").first()
+        if not categorie:
+            categorie = Categorie(nom="Autre", description="Catégorie par défaut")
+            db.session.add(categorie)
+            db.session.commit()
+
+    tr = Transaction(
+        montant=montant,
+        titre=titre,
+        commentaire=commentaire,
+        dateTransaction=date_tx,
+        categorie=categorie,
+    )
+    db.session.add(tr)
+    db.session.commit()
+
+    return redirect(url_for("home"))
+
+
 @app.route("/dashboard")
 def budget_dashboard():
     return render_template("budget-dashboard.html")
