@@ -9,7 +9,6 @@
     <link rel="stylesheet" href="../static/css/budget-dashboard.css">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-
 </head>
 <body>
     <div class="container">
@@ -36,7 +35,6 @@
             </div>
 
             <div class="glass-card stat-card">
-                <!-- class doit être égale à "stat-icon" pour ajouter une icone -->
                 <div class="stat-label">Revenus</div>
                 <div class="stat-value" id="totalIncome">2 700,00€</div>
                 <div class="stat-change up">
@@ -65,20 +63,14 @@
         <!-- Charts -->
         <div class="charts-grid">
             <div class="glass-card chart-container">
-                <h3 class="chart-title">Répartition par catégorie</h3>
-                <canvas id="pieChart"></canvas>
-                <div class="categories-pills" id="categoriesPills"></div>
-            </div>
-
-            <div class="glass-card chart-container">
                 <h3 class="chart-title">Évolution 6 mois</h3>
                 <canvas id="lineChart"></canvas>
             </div>
-        </div>
 
-        <div class="glass-card chart-container chart-full">
-            <h3 class="chart-title">Dépenses par catégorie</h3>
-            <canvas id="barChart"></canvas>
+            <div class="glass-card chart-container">
+                <h3 class="chart-title">Dépenses par catégorie</h3>
+                <canvas id="barChart"></canvas>
+            </div>
         </div>
 
         <!-- Alerts -->
@@ -146,84 +138,6 @@
                 revenus: [2500, 2500, 2500, 2700, 2500, 2700]
             }
         };
-
-        // Créer les pills de catégories
-        function createCategoryPills() {
-            const container = document.getElementById('categoriesPills');
-            const categories = Object.keys(mockData.depensesParCategorie);
-            
-            categories.forEach((cat, index) => {
-                const categoryData = mockData.categories.find(c => c.nom === cat);
-                const color = categoryData ? categoryData.color : '#64748b';
-                const amount = mockData.depensesParCategorie[cat];
-                
-                const pill = document.createElement('div');
-                pill.className = 'category-pill';
-                pill.innerHTML = `
-                    <div class="category-dot" style="background: ${color}"></div>
-                    <span style="font-weight: 600;">${cat}</span>
-                    <span style="opacity: 0.7;">${amount.toFixed(2)}€</span>
-                `;
-                container.appendChild(pill);
-            });
-        }
-
-        // Graphique Camembert
-        function createPieChart() {
-            const ctx = document.getElementById('pieChart').getContext('2d');
-            const labels = Object.keys(mockData.depensesParCategorie);
-            const data = Object.values(mockData.depensesParCategorie);
-            const colors = labels.map(label => {
-                const cat = mockData.categories.find(c => c.nom === label);
-                return cat ? cat.color : '#64748b';
-            });
-
-            new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        data: data,
-                        backgroundColor: colors,
-                        borderWidth: 0,
-                        borderRadius: 4,
-                        spacing: 2
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    plugins: {
-                        legend: {
-                            display: false
-                        },
-                        tooltip: {
-                            backgroundColor: 'rgba(15, 23, 42, 0.95)',
-                            titleColor: '#fff',
-                            bodyColor: '#fff',
-                            borderColor: 'rgba(255, 255, 255, 0.1)',
-                            borderWidth: 1,
-                            padding: 12,
-                            titleFont: {
-                                size: 14,
-                                weight: '600'
-                            },
-                            bodyFont: {
-                                size: 13
-                            },
-                            callbacks: {
-                                label: function(context) {
-                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                    const percentage = ((context.parsed / total) * 100).toFixed(1);
-                                    return ` ${context.parsed.toFixed(2)}€ (${percentage}%)`;
-                                }
-                            }
-                        }
-                    },
-                    cutout: '70%'
-                }
-            });
-        }
 
         // Graphique d'évolution
         function createLineChart() {
@@ -437,8 +351,6 @@
 
         // Initialisation
         window.addEventListener('load', () => {
-            createCategoryPills();
-            createPieChart();
             createLineChart();
             createBarChart();
         });

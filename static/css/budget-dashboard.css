@@ -18,7 +18,7 @@
 
         body {
             font-family: 'Outfit', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #0D112C;
             min-height: 100vh;
             padding: 2rem;
             position: relative;
@@ -89,12 +89,16 @@
         }
 
         h1 {
-            font-size: clamp(2.5rem, 5vw, 4rem);
-            font-weight: 700;
-            color: white;
-            margin-bottom: 0.5rem;
-            letter-spacing: -0.02em;
-            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            font-size: 5rem;
+            font-family: "Gill Sans MT", cursive;
+            background: linear-gradient(90deg, #00FBA6, #1D889D);
+            background-clip: border-box;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1;
+            margin: 0;
+            padding: 20px 10px 40px;
         }
 
         .subtitle {
@@ -163,7 +167,7 @@
 
         .period-btn.active {
             background: white;
-            color: var(--primary);
+            color: #10bda1;
             box-shadow: 0 4px 20px rgba(255, 255, 255, 0.3);
         }
 
@@ -301,6 +305,7 @@
         /* Alerts */
         .alerts-container {
             animation: fadeInUp 0.8s ease-out 1s both;
+            margin-top: 40px;
         }
 
         .alert {
