@@ -1,19 +1,66 @@
-body {
-
+* {
     margin: 0;
-    padding: 20px;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --primary: #667eea;
+    --secondary: #764ba2;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --dark: #1e1b4b;
+    --light: #f8fafc;
+    --glass-bg: rgba(255, 255, 255, 0.05);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --text-color: #dcdde4;
+}
+
+body {
+    margin: 0;
+    padding: 2rem;
     min-height: 100vh;
     display: flex;
-    background: #0D112C;
     flex-direction: column;
-    background-attachment: fixed;
-    font-family: Arial, sans-serif;
+    background: #0D112C;
+    font-family: 'Outfit', sans-serif;
+    position: relative;
+    overflow-x: hidden;
 }
+
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        radial-gradient(circle at 20% 30%, rgba(102, 126, 234, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 80% 70%, rgba(118, 75, 162, 0.3) 0%, transparent 50%);
+    animation: gradient 15s ease infinite;
+    pointer-events: none;
+}
+
+@keyframes gradient {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+    width: 100%;
+}
+
 h1 {
     text-align: center;
     font-size: 5rem;
     font-family: "Gill Sans MT", cursive;
-    background: linear-gradient(90deg, #00FBA6, #1D889D);
+    background: linear-gradient(90deg, var(--success), #1D889D);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     line-height: 1;
@@ -22,8 +69,27 @@ h1 {
 }
 h2 {
     font-family: "Gill Sans MT", cursive;
-    color: #afc5e6;
+    color: var(--text-color);
+    margin-bottom: 20px;
 }
+
+.glass-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.glass-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.2);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
 .content-row {
     display: flex;
     justify-content: space-between;
@@ -31,14 +97,13 @@ h2 {
     max-width: 1200px;
     margin: 40px auto 0;
     padding: 0 20px;
-    color: #dcdde4;
+    color: var(--text-color);
 }
 .left, .right {
     flex: 1;
     text-align: center;
 }
 .center {
-    flex: 1;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -46,77 +111,89 @@ h2 {
 .pie-chart {
     position: relative;
     z-index: 1;
-    margin-top: 40px;
     width: 200px;
     height: 200px;
     border-radius: 50%;
-    background: conic-gradient(#0bb67c 0% 60%, transparent 60% 100%);
-    border: 1px solid #afc5e6;
+    border: 1px solid var(--glass-border);
+}
+.budget-info {
+    text-align: center;
+    color: var(--text-color);
+    margin: 20px 0;
+    font-family: 'Outfit', sans-serif;
 }
 .add-expense-container {
     text-align: center;
     margin: 20px 0;
 }
 .add-expense-btn {
-    background-color: #151B3F;
-    color: #afc5e6;
+    background-color: var(--dark);
+    color: var(--text-color);
     padding: 10px 25px;
-    border-radius: 5px;
+    border-radius: 12px;
     cursor: pointer;
     font-size: 16px;
-    box-shadow: 0 -3px 0 0 #00FBA6;
-    border: 1px solid #afc5e6;
+    box-shadow: 0 -3px 0 0 var(--success);
+    border: 1px solid var(--glass-border);
+    transition: all 0.3s ease;
 }
 .add-expense-btn:hover {
-    background-color: #afc5e6;
-    color: #151B3F;
+    background-color: var(--glass-border);
+    color: var(--success);
 }
+
 .add-expense-container a {
-    background-color: #151B3F;
-    color: #afc5e6;
+    background-color: var(--dark);
+    color: var(--text-color);
     padding: 10px 25px;
-    border-radius: 5px;
+    border-radius: 12px;
     cursor: pointer;
     font-size: 16px;
-    box-shadow: 0 -3px 0 0 #00FBA6;
-    border: 1px solid #afc5e6;
+    box-shadow: 0 -3px 0 0 var(--primary);
+    border: 1px solid var(--glass-border);
     text-decoration: none;
     display: inline-block;
+    transition: all 0.3s ease;
 }
 .add-expense-container a:hover {
-    background-color: #afc5e6;
-    color: #151B3F;
+    background-color: var(--glass-border);
+    color: var(--primary);
 }
+
 .recent-expenses {
     max-width: 1200px;
     margin: 0 auto 40px;
-    padding: 20px;
-    border: 1px solid #afc5e6;
-    border-radius: 10px;
-    background-color: #151B3F;
-    box-shadow: 0 -3px 0 0 #00FBA6;
 }
 .recent-expenses table {
     width: 100%;
     border-collapse: collapse;
 }
 th {
-    color: #afc5e6;
+    color: var(--text-color);
+    font-weight: 600;
 }
 .recent-expenses th, .recent-expenses td {
-    padding: 10px;
-    border: 1px solid #ccc;
+    padding: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
     text-align: left;
 }
 td {
-    color: #afc5e6;
+    color: var(--text-color);
+    font-family: 'JetBrains Mono', monospace;
 }
 footer a:hover {
     text-decoration: underline;
 }
-.budget-info {
-    text-align: center;
-    color: #afc5e6;
-    margin: 20px 0;
-    font-family: "Gill Sans MT", cursive;
+
+.recent-expenses p {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+@media (max-width: 768px) {
+    body {
+        padding: 1rem;
+    }
+    h1 {
+        font-size: 3rem;
+    }
 }
