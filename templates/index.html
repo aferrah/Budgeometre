@@ -3,18 +3,18 @@
 {% block title %}Budgeomètre - Accueil{% endblock %}
 
 {% block content %}
-    <div class="center glass-card" style="margin-bottom: 20px;">
+    <div class="center glass-card" style="margin-bottom: 20px; animation-delay: 0.2s;">
         <div class="pie-chart" id="pieChart"></div>
     </div>
-    
-    <div class="budget-info glass-card" id="budgetInfo" style="padding: 15px; margin-bottom: 30px;">
+
+    <div class="budget-info glass-card" id="budgetInfo" style="padding: 15px 32px; margin-bottom: 30px; animation-delay: 0.4s;">
     </div>
-    
-    <div class="add-expense-container">
+
+    <div class="add-expense-container" style="animation-delay: 0.6s;">
         <button class="add-expense-btn">Ajouter une dépense</button>
     </div>
 
-    <section class="recent-expenses glass-card" style="padding: 30px;">
+    <section class="recent-expenses glass-card" style="animation-delay: 0.8s;">
         <h2>Dernières dépenses</h2>
         {% if transactions %}
             <table>
@@ -40,7 +40,7 @@
         {% endif %}
     </section>
 
-    <div class="add-expense-container">
+    <div class="add-expense-container" style="animation-delay: 1.0s;">
         <a href="{{ url_for('budget_dashboard') }}">Accéder à mes dépenses</a>
     </div>
 {% endblock %}
@@ -52,14 +52,15 @@
         var objectifEpargne = {{ objectifEpargne }};
 
         const pourcentageRestant = Math.min(100, Math.max(0, (argentActuel / (argentInitial || 1)) * 100));
-        const couleur = argentActuel >= argentInitial ? '#0bb67c' : '#ef4444';
+
+        const couleur = argentActuel >= argentInitial ? '#10b981' : '#ef4444'; // --success ou --danger
 
         const pieChart = document.getElementById('pieChart');
         pieChart.style.background = `conic-gradient(${couleur} 0% ${pourcentageRestant}%, transparent ${pourcentageRestant}% 100%)`;
 
         const budgetInfo = document.getElementById('budgetInfo');
         budgetInfo.innerHTML = `
-            <p style="font-size: 1.1rem; font-weight: 600;">Argent initial : ${argentInitial} €</p>
+            <p style="font-size: 1.1rem; font-weight: 600;">Argent initial : ${argentInitial.toFixed(2)} €</p>
             <p style="font-size: 1.5rem; font-weight: 700; color: ${couleur};">Argent actuel : ${argentActuel.toFixed(2)} €</p>
             <p style="font-size: 0.9rem; color: rgba(255, 255, 255, 0.7);">Dépensé : ${(argentInitial - argentActuel).toFixed(2)} € (${(100 - pourcentageRestant).toFixed(1)}%)</p>
             <p style="font-size: 1.1rem; margin-top: 10px;">Objectif d'épargne : ${objectifEpargne.toFixed(2)} €</p>

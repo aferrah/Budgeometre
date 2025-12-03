@@ -15,6 +15,11 @@
     --glass-bg: rgba(255, 255, 255, 0.05);
     --glass-border: rgba(255, 255, 255, 0.1);
     --text-color: #dcdde4;
+    --sidebar-bg: var(--dark);
+    --sidebar-fg: var(--text-color);
+    --sidebar-border-color: var(--glass-border);
+    --sidebar-rad: 12px;
+    --sidebar-summary-bg: var(--glass-bg);
 }
 
 body {
@@ -29,6 +34,7 @@ body {
     overflow-x: hidden;
 }
 
+
 body::before {
     content: '';
     position: fixed;
@@ -36,7 +42,7 @@ body::before {
     left: 0;
     right: 0;
     bottom: 0;
-    background: 
+    background:
         radial-gradient(circle at 20% 30%, rgba(102, 126, 234, 0.3) 0%, transparent 50%),
         radial-gradient(circle at 80% 70%, rgba(118, 75, 162, 0.3) 0%, transparent 50%);
     animation: gradient 15s ease infinite;
@@ -48,12 +54,47 @@ body::before {
     50% { opacity: 0.7; }
 }
 
+body::after {
+    content: '';
+    position: fixed;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    border-radius: 50%;
+    top: -200px;
+    right: -200px;
+    animation: float 20s ease-in-out infinite;
+    pointer-events: none;
+}
+
+@keyframes float {
+    0%, 100% { transform: translate(0, 0); }
+    50% { transform: translate(-50px, 50px); }
+}
+
+
 .container {
     max-width: 1200px;
     margin: 0 auto;
     position: relative;
     z-index: 1;
     width: 100%;
+}
+
+header {
+    margin-bottom: 3rem;
+    animation: fadeInDown 0.8s ease-out;
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 h1 {
@@ -72,6 +113,11 @@ h2 {
     color: var(--text-color);
     margin-bottom: 20px;
 }
+.subtitle {
+    font-size: 1.2rem;
+    color: rgba(255, 255, 255, 0.8);
+    font-weight: 300;
+}
 
 .glass-card {
     background: var(--glass-bg);
@@ -82,12 +128,149 @@ h2 {
     padding: 2rem;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
+    animation: fadeInUp 0.8s ease-out both;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .glass-card:hover {
     transform: translateY(-5px);
     box-shadow: 0 12px 48px rgba(0, 0, 0, 0.2);
     border-color: rgba(255, 255, 255, 0.2);
+}
+
+
+details {
+    position: fixed;
+    top: 40px;
+    left: 40px;
+    z-index: 1000;
+    margin: 0;
+}
+summary {
+    writing-mode: vertical-lr;
+    text-align: center;
+    padding: 12px 10px;
+    width: 23px;
+    height: 17px;
+    background-color: var(--sidebar-summary-bg);
+    backdrop-filter: blur(10px);
+    border: 2px solid var(--sidebar-border-color);
+    border-radius: var(--sidebar-rad);
+    color: var(--sidebar-fg);
+    cursor: pointer;
+    user-select: none;
+    outline: none;
+    transition: transform 200ms ease-in-out 0s;
+}
+summary::before,
+summary::after {
+    position: static;
+    top: 0;
+    left: 0;
+}
+summary::before {
+    content: "";
+}
+summary::after {
+    content: "III";
+    letter-spacing: -1px;
+}
+summary:hover {
+    transform: scale(1.1);
+}
+summary::marker {
+    font-size: 0;
+}
+summary::-webkit-details-marker {
+    display: none;
+}
+details[open] .menu {
+    animation-name: menuAnim;
+}
+details[open] summary::before {
+    content: "X";
+}
+details[open] summary::after {
+    content: "";
+}
+.menu {
+    height: 0;
+    width: fit-content;
+    border-radius: var(--sidebar-rad);
+    background-color: var(--sidebar-bg);
+    border: 1px solid var(--sidebar-border-color);
+    box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.4);
+    margin-top: 8px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow: hidden;
+    animation: closeMenu 300ms ease-in-out forwards;
+}
+.menu a {
+    padding: 12px 24px;
+    margin: 0 16px;
+    color: var(--sidebar-fg);
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+    text-decoration: none;
+    text-align: center;
+    transition: filter 200ms linear 0s, color 200ms linear 0s;
+}
+.menu a:nth-of-type(1) {
+    padding-top: 24px;
+}
+.menu a:nth-last-of-type(1) {
+    border-bottom: none;
+}
+.menu a:hover {
+    filter: brightness(150%);
+    color: var(--primary);
+}
+details::before {
+    content: "← Click This Button";
+    color: var(--sidebar-fg);
+    position: absolute;
+    margin-left: 80px;
+    padding: 10px 10px;
+    opacity: 0.4;
+    top: 0;
+}
+details[open]::before {
+    animation: fadeMe 300ms linear forwards;
+}
+@keyframes menuAnim {
+    0% {
+        height: 0;
+    }
+    100% {
+        height: 312px;
+    }
+}
+@keyframes fadeMe {
+    0% {
+        opacity: 0.4;
+    }
+    100% {
+        opacity: 0;
+    }
+}
+@keyframes closeMenu {
+    0% {
+        height: 312px;
+    }
+    100% {
+        height: 0;
+    }
 }
 
 .content-row {
@@ -189,11 +372,16 @@ footer a:hover {
     color: rgba(255, 255, 255, 0.7);
 }
 
+
 @media (max-width: 768px) {
     body {
         padding: 1rem;
     }
     h1 {
         font-size: 3rem;
+    }
+    details {
+        top: 20px;
+        left: 20px;
     }
 }
