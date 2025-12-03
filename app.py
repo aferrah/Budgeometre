@@ -1,6 +1,7 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
+from sqlalchemy import func
 
 app = Flask(__name__)
 
@@ -148,6 +149,131 @@ def list_transactions():
     for t in transactions:
         lignes.append(f"{t.dateTransaction} - {t.titre} : {t.montant}€ (cat: {t.categorie.nom})")
     return "<br>".join(lignes) if lignes else "Aucune transaction pour l'instant."
+
+'''@app.route("/mes-depenses", methods=["GET", "POST"])
+def mes_depenses():
+    # --- 1) Traitement du formulaire (POST) ---
+    if request.method == "POST":
+        titre = request.form.get("titre")
+        montant = request.form.get("montant")
+        categorie_id = request.form.get("idCategorie")
+
+        # Vérification basique
+        if not titre or not montant or not categorie_id:
+            return "Erreur : tous les champs sont obligatoires.", 400
+
+        # Validation des types
+        try:
+            montant = float(montant)
+            categorie_id = int(categorie_id)
+        except ValueError:
+            return "Erreur : montant ou catégorie invalide.", 400
+
+        # Création de la transaction
+        nouvelle_transaction = Transaction(
+            titre=titre,
+            montant=montant,
+            idCategorie=categorie_id
+        )
+        db.session.add(nouvelle_transaction)
+        db.session.commit()
+
+        # Redirection après ajout
+        return redirect(url_for("mes_depenses"))
+
+    # --- 2) Affichage (GET) ---
+    transactions = (
+        Transaction.query
+        .order_by(Transaction.dateTransaction.desc())
+        .all()
+    )
+    categories = Categorie.query.order_by(Categorie.nom).all()
+
+    return render_template(
+        "mes_depenses.html",
+        transactions=transactions,
+        categories=categories
+    )'''
+
+@app.route("/mes-depenses")
+def mes_depenses():
+    now = datetime.utcnow()
+    start_of_month = datetime(now.year, now.month, 1)
+
+    # Total dépenses (montants négatifs) du mois
+    total_depenses_raw = db.session.query(
+        func.coalesce(func.sum(Transaction.montant), 0)
+    ).filter(
+        Transaction.montant < 0,
+        Transaction.dateTransaction >= start_of_month
+    ).scalar()
+
+    # Total revenus (montants positifs) du mois
+    total_revenus_raw = db.session.query(
+        func.coalesce(func.sum(Transaction.montant), 0)
+    ).filter(
+        Transaction.montant > 0,
+        Transaction.dateTransaction >= start_of_month
+    ).scalar()
+
+    total_depenses = float(-total_depenses_raw)  # on affiche un nombre positif
+    total_revenus = float(total_revenus_raw)
+    solde = total_revenus - total_depenses
+
+    # Dépenses par catégorie pour le mois courant
+    depenses_par_categorie = (
+        db.session.query(
+            Categorie.nom,
+            func.coalesce(func.sum(Transaction.montant), 0)
+        )
+        .join(Transaction)
+        .filter(
+            Transaction.montant < 0,
+            Transaction.dateTransaction >= start_of_month
+        )
+        .group_by(Categorie.idCategorie)
+        .all()
+    )
+
+    # On transforme en dict { "Logement": 1045.0, ... } avec valeurs positives
+    depenses_par_categorie_dict = {
+        nom: float(-montant) for nom, montant in depenses_par_categorie
+    }
+
+    # Objectifs (très simple : on regarde si les dépenses de la catégorie dépassent l'objectif mensuel)
+    objectifs = Objectif.query.all()
+    nb_objectifs = len(objectifs)
+    objectifs_respectes = 0
+
+    for obj in objectifs:
+        depense_cat_raw = db.session.query(
+            func.coalesce(func.sum(Transaction.montant), 0)
+        ).filter(
+            Transaction.idCategorie == obj.idCategorie,
+            Transaction.montant < 0,
+            Transaction.dateTransaction >= start_of_month
+        ).scalar()
+
+        depense_cat = float(-depense_cat_raw)
+        if depense_cat <= float(obj.montant):
+            objectifs_respectes += 1
+
+    ratio_objectifs = int(
+        round(100 * objectifs_respectes / nb_objectifs)
+    ) if nb_objectifs > 0 else 0
+
+    return render_template(
+        "budget-dashboard.html",
+        total_depenses=total_depenses,
+        total_revenus=total_revenus,
+        solde=solde,
+        objectifs_respectes=objectifs_respectes,
+        nb_objectifs=nb_objectifs,
+        ratio_objectifs=ratio_objectifs,
+        depenses_par_categorie_dict=depenses_par_categorie_dict,
+    )
+
+
 
 
 if __name__ == "__main__":
