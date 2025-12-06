@@ -2,26 +2,158 @@
 
 {% block title %}Budgeomètre - Accueil{% endblock %}
 
+{% block head_extra %}
+<style>
+    .solde-card {
+        text-align: center;
+        padding: 30px;
+    }
+
+    .solde-circle {
+        width: 180px;
+        height: 180px;
+        border-radius: 50%;
+        margin: 0 auto 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        border: 8px solid;
+    }
+
+    .solde-circle.positif {
+        border-color: #10b981;
+        background: rgba(16, 185, 129, 0.1);
+    }
+
+    .solde-circle.negatif {
+        border-color: #ef4444;
+        background: rgba(239, 68, 68, 0.1);
+    }
+
+    .solde-circle .montant {
+        font-size: 1.8rem;
+        font-weight: 700;
+    }
+
+    .solde-circle.positif .montant {
+        color: #10b981;
+    }
+
+    .solde-circle.negatif .montant {
+        color: #ef4444;
+    }
+
+    .solde-circle .label {
+        font-size: 0.9rem;
+        color: rgba(255, 255, 255, 0.7);
+    }
+
+    .stats-row {
+        display: flex;
+        justify-content: center;
+        gap: 30px;
+        margin-top: 20px;
+        flex-wrap: wrap;
+    }
+
+    .stat-item {
+        text-align: center;
+    }
+
+    .stat-item .value {
+        font-size: 1.3rem;
+        font-weight: 700;
+    }
+
+    .stat-item .value.revenus {
+        color: #10b981;
+    }
+
+    .stat-item .value.depenses {
+        color: #ef4444;
+    }
+
+    .stat-item .label {
+        font-size: 0.85rem;
+        color: rgba(255, 255, 255, 0.6);
+    }
+
+    .recent-expenses h2 {
+        margin-bottom: 15px;
+        color: white;
+    }
+
+    .recent-expenses table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .recent-expenses th,
+    .recent-expenses td {
+        padding: 12px 15px;
+        text-align: left;
+    }
+
+    .recent-expenses th {
+        color: rgba(255, 255, 255, 0.7);
+        font-weight: 600;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .recent-expenses td {
+        color: white;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .recent-expenses tr:last-child td {
+        border-bottom: none;
+    }
+
+    .montant-cell.positif {
+        color: #10b981;
+    }
+
+    .montant-cell.negatif {
+        color: #ef4444;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-    <div class="center glass-card" style="margin-bottom: 20px; animation-delay: 0.2s;">
-        <div class="pie-chart" id="pieChart"></div>
+    <!-- Carte solde principal -->
+    <div class="solde-card glass-card" style="margin-bottom: 20px;">
+        <div class="solde-circle {{ 'positif' if argentActuel >= 0 else 'negatif' }}">
+            <span class="montant">{{ '%.2f'|format(argentActuel) }} €</span>
+            <span class="label">Solde actuel</span>
+        </div>
+
+        <div class="stats-row">
+            <div class="stat-item">
+                <div class="value revenus">+{{ '%.2f'|format(total_revenus) }} €</div>
+                <div class="label">Revenus</div>
+            </div>
+            <div class="stat-item">
+                <div class="value depenses">-{{ '%.2f'|format(total_depenses) }} €</div>
+                <div class="label">Dépenses</div>
+            </div>
+        </div>
     </div>
 
-    <div class="budget-info glass-card" id="budgetInfo" style="padding: 15px 32px; margin-bottom: 30px; animation-delay: 0.4s;">
+    <!-- Bouton ajouter -->
+    <div class="add-expense-container" style="margin-bottom: 30px;">
+        <a class="add-expense-btn" href="{{ url_for('add_expense') }}">Ajouter une transaction</a>
     </div>
 
-    <div class="add-expense-container" style="animation-delay: 0.6s;">
-        <a class="add-expense-btn" href="{{ url_for('add_expense') }}">Ajouter une dépense</a>
-    </div>
-
-    <section class="recent-expenses glass-card" style="animation-delay: 0.8s;">
-        <h2>Dernières dépenses</h2>
+    <!-- Dernières transactions -->
+    <section class="recent-expenses glass-card" style="margin-bottom: 20px;">
+        <h2>Dernières transactions</h2>
         {% if transactions %}
             <table>
                 <thead>
                     <tr>
                         <th>Libellé</th>
-                        <th>Commentaire</th>
+                        <th>Catégorie</th>
                         <th>Montant</th>
                     </tr>
                 </thead>
@@ -29,41 +161,23 @@
                     {% for t in transactions %}
                         <tr>
                             <td>{{ t.titre }}</td>
-                            <td>{{ t.commentaire or '' }}</td>
-                            <td>{{ '%.2f'|format(t.montant) }} €</td>
+                            <td>{{ t.categorie.nom }}</td>
+                            <td class="montant-cell {{ 'positif' if t.montant >= 0 else 'negatif' }}">
+                                {{ '+' if t.montant >= 0 else '' }}{{ '%.2f'|format(t.montant) }} €
+                            </td>
                         </tr>
                     {% endfor %}
                 </tbody>
             </table>
         {% else %}
-            <p style="color: rgba(255, 255, 255, 0.7);">Aucune dépense enregistrée pour l'instant.</p>
+            <p style="color: rgba(255, 255, 255, 0.7); text-align: center; padding: 20px;">
+                Aucune transaction enregistrée pour l'instant.
+            </p>
         {% endif %}
     </section>
 
-    <div class="add-expense-container" style="animation-delay: 1.0s;">
-        <a href="{{ url_for('budget_dashboard') }}">Accéder à mes dépenses</a>
+    <!-- Lien vers dashboard -->
+    <div class="add-expense-container">
+        <a href="{{ url_for('budget_dashboard') }}" style="opacity: 0.8;">Accéder au dashboard</a>
     </div>
-{% endblock %}
-
-{% block scripts %}
-    <script>
-        var argentInitial = {{ argentInitial }};
-        var argentActuel = {{ argentActuel }};
-        var objectifEpargne = {{ objectifEpargne }};
-
-        const pourcentageRestant = Math.min(100, Math.max(0, (argentActuel / (argentInitial || 1)) * 100));
-
-        const couleur = argentActuel >= argentInitial ? '#10b981' : '#ef4444'; // --success ou --danger
-
-        const pieChart = document.getElementById('pieChart');
-        pieChart.style.background = `conic-gradient(${couleur} 0% ${pourcentageRestant}%, transparent ${pourcentageRestant}% 100%)`;
-
-        const budgetInfo = document.getElementById('budgetInfo');
-        budgetInfo.innerHTML = `
-            <p style="font-size: 1.1rem; font-weight: 600;">Argent initial : ${argentInitial.toFixed(2)} €</p>
-            <p style="font-size: 1.5rem; font-weight: 700; color: ${couleur};">Argent actuel : ${argentActuel.toFixed(2)} €</p>
-            <p style="font-size: 0.9rem; color: rgba(255, 255, 255, 0.7);">Dépensé : ${(argentInitial - argentActuel).toFixed(2)} € (${(100 - pourcentageRestant).toFixed(1)}%)</p>
-            <p style="font-size: 1.1rem; margin-top: 10px;">Objectif d'épargne : ${objectifEpargne.toFixed(2)} €</p>
-        `;
-    </script>
 {% endblock %}

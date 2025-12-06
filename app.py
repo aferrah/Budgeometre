@@ -66,30 +66,30 @@ class Objectif(db.Model):
 
 @app.route("/")
 def home():
-    argentInitial = 0
     transactions = (
         Transaction.query.order_by(Transaction.dateTransaction.desc()).limit(10).all()
     )
-    total_transactions = db.session.query(db.func.coalesce(db.func.sum(Transaction.montant), 0)).scalar()
-    argentActuel = float(argentInitial) + float(total_transactions) if total_transactions is not None else float(
-        argentInitial)
-    category_totals = (
-        db.session.query(Categorie.nom, db.func.coalesce(db.func.sum(Transaction.montant), 0))
-        .join(Transaction)
-        .group_by(Categorie.idCategorie)
-        .all()
-    )
-    objectifs = Objectif.query.all()
-    objectif_total = db.session.query(db.func.coalesce(db.func.sum(Objectif.montant), 0)).scalar()
+
+    # Total des revenus (montants positifs)
+    total_revenus = db.session.query(
+        db.func.coalesce(db.func.sum(Transaction.montant), 0)
+    ).filter(Transaction.montant > 0).scalar()
+
+    # Total des dépenses (montants négatifs, on prend la valeur absolue)
+    total_depenses_raw = db.session.query(
+        db.func.coalesce(db.func.sum(Transaction.montant), 0)
+    ).filter(Transaction.montant < 0).scalar()
+
+    total_revenus = float(total_revenus)
+    total_depenses = float(-total_depenses_raw)  # Valeur positive pour l'affichage
+    argentActuel = total_revenus - total_depenses
 
     return render_template(
         "index.html",
         transactions=transactions,
-        argentInitial=argentInitial,
         argentActuel=argentActuel,
-        objectifEpargne=float(objectif_total) if objectif_total is not None else 0.0,
-        category_totals=category_totals,
-        objectifs=objectifs,
+        total_revenus=total_revenus,
+        total_depenses=total_depenses,
     )
 
 
