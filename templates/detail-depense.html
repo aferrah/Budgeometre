@@ -1,0 +1,307 @@
+{% extends "base.html" %}
+
+{% block title %}Dépenses - {{ categorie.nom }} - Budgeomètre{% endblock %}
+
+{% block head_extra %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+    .depenses-cat-page {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+    }
+
+    .page-header h2 {
+        margin: 0;
+        color: white;
+    }
+
+    .btn-back {
+        padding: 10px 20px;
+        background: rgba(255, 255, 255, 0.1);
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-radius: 8px;
+        color: white;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+
+    .btn-back:hover {
+        background: rgba(255, 255, 255, 0.2);
+        border-color: rgba(255, 255, 255, 0.5);
+    }
+
+    /* Card total */
+    .total-card {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 12px;
+        padding: 25px;
+        margin-bottom: 30px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        text-align: center;
+    }
+
+    .total-card .label {
+        font-size: 1rem;
+        color: rgba(255, 255, 255, 0.7);
+        margin-bottom: 10px;
+    }
+
+    .total-card .value {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #ef4444;
+    }
+
+    /* Sélecteur de période */
+    .period-selector {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-bottom: 30px;
+    }
+
+    .period-btn {
+        padding: 12px 24px;
+        background: transparent;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-radius: 8px;
+        color: rgba(255, 255, 255, 0.7);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: 600;
+    }
+
+    .period-btn:hover {
+        border-color: rgba(255, 255, 255, 0.5);
+        color: white;
+    }
+
+    .period-btn.active {
+        background: linear-gradient(135deg, #8b5cf6, #6366f1);
+        border-color: transparent;
+        color: white;
+    }
+
+    /* Graphique */
+    .chart-container {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 12px;
+        padding: 25px;
+        margin-bottom: 30px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .chart-container h3 {
+        margin: 0 0 20px 0;
+        color: white;
+        text-align: center;
+    }
+
+    .chart-wrapper {
+        position: relative;
+        height: 300px;
+    }
+
+    /* Dernières transactions */
+    .transactions-section {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 12px;
+        padding: 25px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .transactions-section h3 {
+        margin: 0 0 20px 0;
+        color: white;
+    }
+
+    .transaction-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 8px;
+        margin-bottom: 10px;
+    }
+
+    .transaction-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .transaction-info {
+        flex: 1;
+    }
+
+    .transaction-titre {
+        font-weight: 600;
+        color: white;
+        margin-bottom: 5px;
+    }
+
+    .transaction-date {
+        font-size: 0.85rem;
+        color: rgba(255, 255, 255, 0.5);
+    }
+
+    .transaction-montant {
+        font-weight: 700;
+        font-size: 1.1rem;
+        color: #ef4444;
+    }
+
+    .no-data {
+        text-align: center;
+        color: rgba(255, 255, 255, 0.5);
+        padding: 20px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="depenses-cat-page">
+
+    <div class="page-header">
+        <h2>Dépenses : {{ categorie.nom }}</h2>
+        <a href="{{ url_for('budget_dashboard') }}" class="btn-back">← Retour au dashboard</a>
+    </div>
+
+    <!-- Total des dépenses -->
+    <div class="total-card">
+        <div class="label">Total des dépenses dans cette catégorie</div>
+        <div class="value">{{ '%.2f'|format(total_depenses) }} €</div>
+    </div>
+
+    <!-- Sélecteur de période -->
+    <div class="period-selector">
+        <button class="period-btn active" onclick="showChart('mois', this)">Par mois</button>
+        <button class="period-btn" onclick="showChart('trimestre', this)">Par trimestre</button>
+        <button class="period-btn" onclick="showChart('annee', this)">Par année</button>
+    </div>
+
+    <!-- Graphique -->
+    <div class="chart-container">
+        <h3 id="chart-title">Évolution mensuelle</h3>
+        <div class="chart-wrapper">
+            <canvas id="depensesChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Dernières transactions -->
+    <div class="transactions-section">
+        <h3>Dernières transactions</h3>
+        {% if transactions %}
+            {% for t in transactions %}
+                <div class="transaction-item">
+                    <div class="transaction-info">
+                        <div class="transaction-titre">{{ t.titre }}</div>
+                        <div class="transaction-date">{{ t.dateTransaction.strftime('%d/%m/%Y') }}</div>
+                    </div>
+                    <div class="transaction-montant">{{ '%.2f'|format(t.montant) }} €</div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="no-data">Aucune transaction dans cette catégorie</div>
+        {% endif %}
+    </div>
+
+</main>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Données depuis Flask
+    const moisLabels = {{ mois_labels | tojson }};
+    const moisData = {{ mois_data | tojson }};
+    const trimestreLabels = {{ trimestre_labels | tojson }};
+    const trimestreData = {{ trimestre_data | tojson }};
+    const anneeLabels = {{ annee_labels | tojson }};
+    const anneeData = {{ annee_data | tojson }};
+
+    let currentChart = null;
+
+    function createChart(labels, data, label) {
+        const ctx = document.getElementById('depensesChart').getContext('2d');
+
+        if (currentChart) {
+            currentChart.destroy();
+        }
+
+        currentChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: label,
+                    data: data,
+                    backgroundColor: 'rgba(239, 68, 68, 0.7)',
+                    borderColor: '#ef4444',
+                    borderWidth: 2,
+                    borderRadius: 8,
+                    borderSkipped: false
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            color: '#fff',
+                            callback: function(value) {
+                                return value + ' €';
+                            }
+                        },
+                        grid: { color: 'rgba(255,255,255,0.1)' }
+                    },
+                    x: {
+                        ticks: { color: '#fff' },
+                        grid: { display: false }
+                    }
+                }
+            }
+        });
+    }
+
+    function showChart(period, btn) {
+        // Mettre à jour les boutons
+        document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        const titleEl = document.getElementById('chart-title');
+
+        if (period === 'mois') {
+            titleEl.textContent = 'Évolution mensuelle';
+            createChart(moisLabels, moisData, 'Dépenses par mois');
+        } else if (period === 'trimestre') {
+            titleEl.textContent = 'Évolution trimestrielle';
+            createChart(trimestreLabels, trimestreData, 'Dépenses par trimestre');
+        } else if (period === 'annee') {
+            titleEl.textContent = 'Évolution annuelle';
+            createChart(anneeLabels, anneeData, 'Dépenses par année');
+        }
+    }
+
+    // Initialiser avec le graphique mensuel
+    window.addEventListener('load', () => {
+        createChart(moisLabels, moisData, 'Dépenses par mois');
+    });
+</script>
+{% endblock %}

@@ -4,7 +4,8 @@
 
 {% block head_extra %}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/add-expense.css') }}">
-    <style>.toggle-group {
+    <style>
+        .toggle-group {
             display: flex;
             gap: 10px;
             margin-top: 8px;
@@ -45,6 +46,51 @@
             color: white;
             box-shadow: 0 0 12px rgba(16, 185, 129, 0.5);
         }
+
+        /* Validation du montant */
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper input {
+            width: 100%;
+        }
+
+        .input-wrapper .error-message {
+            display: none;
+            color: #ef4444;
+            font-size: 0.85rem;
+            margin-top: 6px;
+        }
+
+        .input-wrapper.error input {
+            border-color: #ef4444 !important;
+            background: rgba(239, 68, 68, 0.1) !important;
+        }
+
+        .input-wrapper.error .error-message {
+            display: block;
+        }
+
+        .input-wrapper.valid input {
+            border-color: #10b981 !important;
+        }
+
+        .input-wrapper .validation-icon {
+            position: absolute;
+            right: 12px;
+            top: 12px;
+            font-size: 1.2rem;
+            display: none;
+        }
+
+        .input-wrapper.error .validation-icon.icon-error {
+            display: block;
+        }
+
+        .input-wrapper.valid .validation-icon.icon-valid {
+            display: block;
+        }
     </style>
 {% endblock %}
 
@@ -74,7 +120,12 @@
 
             <div class="form-row">
                 <label for="amount">Montant (€)</label>
-                <input type="number" id="amount" name="amount" step="0.01" min="0" placeholder="Ex : 45.90" required>
+                <div class="input-wrapper" id="amount-wrapper">
+                    <input type="text" id="amount" name="amount" placeholder="Ex : 45.90" required
+                           autocomplete="off">
+
+                    <p class="error-message">Veuillez entrer un nombre valide (ex: 45.90)</p>
+                </div>
             </div>
 
             <div class="form-row two-columns">
@@ -102,11 +153,11 @@
 
             <div class="form-actions">
                 <a href="{{ url_for('home') }}" class="btn-secondary">Annuler</a>
-                <button type="submit" class="btn-primary">Enregistrer</button>
+                <button type="submit" class="btn-primary" id="submit-btn">Enregistrer</button>
             </div>
 
             <p id="form-message" class="form-message" hidden>
-                Transaction enregistrée
+                ✅ Transaction enregistrée
             </p>
         </form>
     </section>
@@ -117,9 +168,82 @@
 <script>
     const form = document.getElementById('expense-form');
     const message = document.getElementById('form-message');
+    const amountInput = document.getElementById('amount');
+    const amountWrapper = document.getElementById('amount-wrapper');
+    const submitBtn = document.getElementById('submit-btn');
 
-    form.addEventListener('submit', function (event) {
+    // Fonction de validation du montant
+    function validateAmount(value) {
+        // Remplacer la virgule par un point
+        value = value.replace(',', '.');
+
+        // Vérifier si c'est un nombre valide (positif)
+        const regex = /^\d+(\.\d{0,2})?$/;
+        const isValid = regex.test(value) && parseFloat(value) > 0;
+
+        return isValid;
+    }
+
+    // Validation en temps réel
+    amountInput.addEventListener('input', function() {
+        let value = this.value.trim();
+
+        // Remplacer automatiquement la virgule par un point
+        this.value = value.replace(',', '.');
+
+        if (value === '') {
+            amountWrapper.classList.remove('error', 'valid');
+            return;
+        }
+
+        if (validateAmount(value)) {
+            amountWrapper.classList.remove('error');
+            amountWrapper.classList.add('valid');
+        } else {
+            amountWrapper.classList.remove('valid');
+            amountWrapper.classList.add('error');
+        }
+    });
+
+    // Validation à la soumission
+    form.addEventListener('submit', function(event) {
+        const value = amountInput.value.trim();
+
+        if (!validateAmount(value)) {
+            event.preventDefault();
+            amountWrapper.classList.add('error');
+            amountInput.focus();
+            return false;
+        }
+
         message.hidden = false;
+    });
+
+    // Empêcher les caractères non valides
+    amountInput.addEventListener('keypress', function(event) {
+        const char = String.fromCharCode(event.which);
+        const currentValue = this.value;
+
+        // Autoriser uniquement : chiffres, point, virgule
+        if (!/[\d.,]/.test(char)) {
+            event.preventDefault();
+            return;
+        }
+
+        // Empêcher plusieurs points/virgules
+        if ((char === '.' || char === ',') && (currentValue.includes('.') || currentValue.includes(','))) {
+            event.preventDefault();
+            return;
+        }
+
+        // Empêcher plus de 2 décimales
+        if (currentValue.includes('.')) {
+            const decimals = currentValue.split('.')[1];
+            if (decimals && decimals.length >= 2 && char !== '.' && char !== ',') {
+                event.preventDefault();
+                return;
+            }
+        }
     });
 </script>
 {% endblock %}

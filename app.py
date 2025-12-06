@@ -250,81 +250,126 @@ def mes_depenses():
         categories=categories
     )'''
 
+
 @app.route("/dashboard")
 def budget_dashboard():
+    from datetime import timedelta
+    from collections import defaultdict
+
     now = datetime.utcnow()
-    start_of_month = datetime(now.year, now.month, 1)
 
-    # Total dépenses (montants négatifs) du mois
-    total_depenses_raw = db.session.query(
-        func.coalesce(func.sum(Transaction.montant), 0)
-    ).filter(
-        Transaction.montant < 0,
-        Transaction.dateTransaction >= start_of_month
-    ).scalar()
-
-    # Total revenus (montants positifs) du mois
-    total_revenus_raw = db.session.query(
-        func.coalesce(func.sum(Transaction.montant), 0)
-    ).filter(
-        Transaction.montant > 0,
-        Transaction.dateTransaction >= start_of_month
-    ).scalar()
-
-    total_depenses = float(-total_depenses_raw)
-    total_revenus = float(total_revenus_raw)
-    solde = total_revenus - total_depenses
-
-    # Dépenses par catégorie
-    depenses_par_categorie = (
-        db.session.query(
-            Categorie.nom,
-            func.coalesce(func.sum(Transaction.montant), 0)
-        )
-        .join(Transaction)
-        .filter(
+    # Fonction helper pour calculer les stats d'une période
+    def get_stats(start_date, end_date=None):
+        query_dep = db.session.query(func.coalesce(func.sum(Transaction.montant), 0)).filter(
             Transaction.montant < 0,
-            Transaction.dateTransaction >= start_of_month
+            Transaction.dateTransaction >= start_date
         )
-        .group_by(Categorie.idCategorie)
-        .all()
-    )
+        query_rev = db.session.query(func.coalesce(func.sum(Transaction.montant), 0)).filter(
+            Transaction.montant > 0,
+            Transaction.dateTransaction >= start_date
+        )
+        if end_date:
+            query_dep = query_dep.filter(Transaction.dateTransaction < end_date)
+            query_rev = query_rev.filter(Transaction.dateTransaction < end_date)
 
-    depenses_par_categorie_dict = {
-        nom: float(-montant) for nom, montant in depenses_par_categorie
-    }
+        return float(-query_dep.scalar()), float(query_rev.scalar())
 
-    # Objectifs
+    # Stats par mois
+    start_month = datetime(now.year, now.month, 1)
+    dep_mois, rev_mois = get_stats(start_month)
+
+    # Stats par trimestre
+    trimestre = (now.month - 1) // 3
+    start_quarter = datetime(now.year, trimestre * 3 + 1, 1)
+    dep_trim, rev_trim = get_stats(start_quarter)
+
+    # Stats par année
+    start_year = datetime(now.year, 1, 1)
+    dep_annee, rev_annee = get_stats(start_year)
+
+    # Dépenses par catégorie (pour chaque période)
+    def get_depenses_par_cat(start_date):
+        result = (
+            db.session.query(Categorie.nom, func.coalesce(func.sum(Transaction.montant), 0))
+            .join(Transaction)
+            .filter(Transaction.montant < 0, Transaction.dateTransaction >= start_date)
+            .group_by(Categorie.idCategorie)
+            .all()
+        )
+        return {nom: float(-montant) for nom, montant in result}
+
+    cat_mois = get_depenses_par_cat(start_month)
+    cat_trim = get_depenses_par_cat(start_quarter)
+    cat_annee = get_depenses_par_cat(start_year)
+
+    # Mapping nom -> id
+    categories_ids = {cat.nom: cat.idCategorie for cat in Categorie.query.all()}
+
+    # Objectifs (basé sur le mois)
     objectifs = Objectif.query.all()
     nb_objectifs = len(objectifs)
     objectifs_respectes = 0
-
     for obj in objectifs:
-        depense_cat_raw = db.session.query(
-            func.coalesce(func.sum(Transaction.montant), 0)
-        ).filter(
+        dep_cat = db.session.query(func.coalesce(func.sum(Transaction.montant), 0)).filter(
             Transaction.idCategorie == obj.idCategorie,
             Transaction.montant < 0,
-            Transaction.dateTransaction >= start_of_month
+            Transaction.dateTransaction >= start_month
         ).scalar()
-
-        depense_cat = float(-depense_cat_raw)
-        if depense_cat <= float(obj.montant):
+        if float(-dep_cat) <= float(obj.montant):
             objectifs_respectes += 1
+    ratio_objectifs = int(round(100 * objectifs_respectes / nb_objectifs)) if nb_objectifs > 0 else 0
 
-    ratio_objectifs = int(
-        round(100 * objectifs_respectes / nb_objectifs)
-    ) if nb_objectifs > 0 else 0
+    # Évolution 6 mois
+    evol_mois_labels, evol_mois_dep, evol_mois_rev = [], [], []
+    for i in range(5, -1, -1):
+        d = now - timedelta(days=i * 30)
+        m_start = datetime(d.year, d.month, 1)
+        m_end = datetime(d.year + (1 if d.month == 12 else 0), (d.month % 12) + 1, 1)
+        dep, rev = get_stats(m_start, m_end)
+        evol_mois_labels.append(d.strftime('%b'))
+        evol_mois_dep.append(dep)
+        evol_mois_rev.append(rev)
+
+    # Évolution 4 trimestres
+    evol_trim_labels, evol_trim_dep, evol_trim_rev = [], [], []
+    for i in range(3, -1, -1):
+        t = (now.month - 1) // 3 + 1 - i
+        a = now.year
+        while t <= 0:
+            t += 4
+            a -= 1
+        t_start = datetime(a, (t - 1) * 3 + 1, 1)
+        t_end = datetime(a + (1 if t == 4 else 0), (t * 3 % 12) + 1, 1)
+        dep, rev = get_stats(t_start, t_end)
+        evol_trim_labels.append(f"T{t} {a}")
+        evol_trim_dep.append(dep)
+        evol_trim_rev.append(rev)
+
+    # Évolution 3 années
+    evol_annee_labels, evol_annee_dep, evol_annee_rev = [], [], []
+    for i in range(2, -1, -1):
+        a = now.year - i
+        dep, rev = get_stats(datetime(a, 1, 1), datetime(a + 1, 1, 1))
+        evol_annee_labels.append(str(a))
+        evol_annee_dep.append(dep)
+        evol_annee_rev.append(rev)
 
     return render_template(
         "budget-dashboard.html",
-        total_depenses=total_depenses,
-        total_revenus=total_revenus,
-        solde=solde,
-        objectifs_respectes=objectifs_respectes,
-        nb_objectifs=nb_objectifs,
-        ratio_objectifs=ratio_objectifs,
-        depenses_par_categorie_dict=depenses_par_categorie_dict,
+        # Stats mois
+        dep_mois=dep_mois, rev_mois=rev_mois, solde_mois=rev_mois - dep_mois, cat_mois=cat_mois,
+        # Stats trimestre
+        dep_trim=dep_trim, rev_trim=rev_trim, solde_trim=rev_trim - dep_trim, cat_trim=cat_trim,
+        # Stats année
+        dep_annee=dep_annee, rev_annee=rev_annee, solde_annee=rev_annee - dep_annee, cat_annee=cat_annee,
+        # Objectifs
+        objectifs_respectes=objectifs_respectes, nb_objectifs=nb_objectifs, ratio_objectifs=ratio_objectifs,
+        # Évolution
+        evol_mois_labels=evol_mois_labels, evol_mois_dep=evol_mois_dep, evol_mois_rev=evol_mois_rev,
+        evol_trim_labels=evol_trim_labels, evol_trim_dep=evol_trim_dep, evol_trim_rev=evol_trim_rev,
+        evol_annee_labels=evol_annee_labels, evol_annee_dep=evol_annee_dep, evol_annee_rev=evol_annee_rev,
+        # Catégories IDs
+        categories_ids=categories_ids,
     )
 
 
@@ -361,6 +406,91 @@ def delete_category(id):
     db.session.delete(categorie)
     db.session.commit()
     return redirect(url_for("categories"))
+
+
+@app.route("/depenses-categorie/<int:id>")
+def depenses_categorie(id):
+    from datetime import timedelta
+    from collections import defaultdict
+
+    categorie = Categorie.query.get_or_404(id)
+
+    # Récupérer toutes les transactions de cette catégorie (dépenses uniquement)
+    transactions = Transaction.query.filter(
+        Transaction.idCategorie == id,
+        Transaction.montant < 0
+    ).order_by(Transaction.dateTransaction.desc()).all()
+
+    now = datetime.utcnow()
+
+    # Calculer les dépenses par mois
+    depenses_par_mois = defaultdict(float)
+    for t in transactions:
+        mois_key = t.dateTransaction.strftime('%Y-%m')
+        depenses_par_mois[mois_key] += float(-t.montant)
+
+    # Générer les 12 derniers mois
+    mois_labels = []
+    mois_data = []
+    for i in range(11, -1, -1):
+        date = now - timedelta(days=i * 30)
+        mois_key = date.strftime('%Y-%m')
+        mois_label = date.strftime('%b %Y')
+        mois_labels.append(mois_label)
+        mois_data.append(depenses_par_mois.get(mois_key, 0))
+
+    # Calculer les dépenses par trimestre
+    depenses_par_trimestre = defaultdict(float)
+    for t in transactions:
+        annee = t.dateTransaction.year
+        trimestre = (t.dateTransaction.month - 1) // 3 + 1
+        trim_key = f"{annee}-T{trimestre}"
+        depenses_par_trimestre[trim_key] += float(-t.montant)
+
+    # Générer les 4 derniers trimestres
+    trimestre_labels = []
+    trimestre_data = []
+    trimestre_actuel = (now.month - 1) // 3 + 1
+    annee_actuelle = now.year
+
+    for i in range(3, -1, -1):
+        t = trimestre_actuel - i
+        a = annee_actuelle
+        while t <= 0:
+            t += 4
+            a -= 1
+        trim_key = f"{a}-T{t}"
+        trimestre_labels.append(f"T{t} {a}")
+        trimestre_data.append(depenses_par_trimestre.get(trim_key, 0))
+
+    # Calculer les dépenses par année
+    depenses_par_annee = defaultdict(float)
+    for t in transactions:
+        annee_key = str(t.dateTransaction.year)
+        depenses_par_annee[annee_key] += float(-t.montant)
+
+    annee_labels = []
+    annee_data = []
+    for i in range(2, -1, -1):
+        a = now.year - i
+        annee_labels.append(str(a))
+        annee_data.append(depenses_par_annee.get(str(a), 0))
+
+    # Total dépenses
+    total_depenses = sum(float(-t.montant) for t in transactions)
+
+    return render_template(
+        "detail-depense.html",
+        categorie=categorie,
+        transactions=transactions[:10],
+        total_depenses=total_depenses,
+        mois_labels=mois_labels,
+        mois_data=mois_data,
+        trimestre_labels=trimestre_labels,
+        trimestre_data=trimestre_data,
+        annee_labels=annee_labels,
+        annee_data=annee_data,
+    )
 
 
 if __name__ == "__main__":
