@@ -66,7 +66,7 @@ class Objectif(db.Model):
 
 @app.route("/")
 def home():
-    argentInitial = 2000
+    argentInitial = 0
     transactions = (
         Transaction.query.order_by(Transaction.dateTransaction.desc()).limit(10).all()
     )
@@ -103,10 +103,16 @@ def add_expense():
     # POST : créer une transaction depuis le formulaire
     titre = request.form.get("label") or "Dépense"
     montant_raw = request.form.get("amount") or "0"
+    type_transaction = request.form.get("type", "depense")
+
     try:
         montant = float(montant_raw)
     except ValueError:
         montant = 0.0
+    if type_transaction == "depense":
+        montant = -abs(montant)
+    else:
+        montant = abs(montant)
 
     commentaire = request.form.get("comment")
     date_str = request.form.get("date")
@@ -145,11 +151,6 @@ def add_expense():
     db.session.commit()
 
     return redirect(url_for("home"))
-
-
-@app.route("/dashboard")
-def budget_dashboard():
-    return render_template("budget-dashboard.html")
 
 
 @app.route("/init-test")
@@ -249,8 +250,8 @@ def mes_depenses():
         categories=categories
     )'''
 
-@app.route("/mes-depenses")
-def mes_depenses():
+@app.route("/dashboard")
+def budget_dashboard():
     now = datetime.utcnow()
     start_of_month = datetime(now.year, now.month, 1)
 
@@ -270,11 +271,11 @@ def mes_depenses():
         Transaction.dateTransaction >= start_of_month
     ).scalar()
 
-    total_depenses = float(-total_depenses_raw)  # on affiche un nombre positif
+    total_depenses = float(-total_depenses_raw)
     total_revenus = float(total_revenus_raw)
     solde = total_revenus - total_depenses
 
-    # Dépenses par catégorie pour le mois courant
+    # Dépenses par catégorie
     depenses_par_categorie = (
         db.session.query(
             Categorie.nom,
@@ -289,12 +290,11 @@ def mes_depenses():
         .all()
     )
 
-    # On transforme en dict { "Logement": 1045.0, ... } avec valeurs positives
     depenses_par_categorie_dict = {
         nom: float(-montant) for nom, montant in depenses_par_categorie
     }
 
-    # Objectifs (très simple : on regarde si les dépenses de la catégorie dépassent l'objectif mensuel)
+    # Objectifs
     objectifs = Objectif.query.all()
     nb_objectifs = len(objectifs)
     objectifs_respectes = 0
@@ -328,6 +328,39 @@ def mes_depenses():
     )
 
 
+@app.route("/categories", methods=["GET", "POST"])
+def categories():
+    if request.method == "POST":
+        nom = request.form.get("nom")
+        description = request.form.get("description", "")
+
+        if nom:
+            # Vérifier si la catégorie existe déjà
+            existante = Categorie.query.filter_by(nom=nom).first()
+            if not existante:
+                nouvelle_cat = Categorie(nom=nom, description=description)
+                db.session.add(nouvelle_cat)
+                db.session.commit()
+
+        return redirect(url_for("categories"))
+
+    # GET : afficher toutes les catégories
+    toutes_categories = Categorie.query.order_by(Categorie.nom).all()
+    return render_template("categories.html", categories=toutes_categories)
+
+
+@app.route("/categories/delete/<int:id>", methods=["POST"])
+def delete_category(id):
+    categorie = Categorie.query.get_or_404(id)
+
+    # Vérifier si des transactions utilisent cette catégorie
+    if categorie.transactions:
+        # Option : ne pas supprimer si utilisée
+        return redirect(url_for("categories"))
+
+    db.session.delete(categorie)
+    db.session.commit()
+    return redirect(url_for("categories"))
 
 
 if __name__ == "__main__":

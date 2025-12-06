@@ -1,27 +1,80 @@
 {% extends "base.html" %}
 
-{% block title %}Ajouter une dépense - Budgéomètre{% endblock %}
+{% block title %}Ajouter une transaction - Budgeomètre{% endblock %}
 
 {% block head_extra %}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/add-expense.css') }}">
+    <style>.toggle-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 8px;
+        }
+
+        .toggle-group input[type="radio"] {
+            display: none;
+        }
+
+        /* État inactif : grisé avec bordure */
+        .toggle-btn {
+            padding: 12px 24px;
+            border: 2px solid #6b7280;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: transparent;
+            color: #9ca3af;
+            font-weight: 600;
+        }
+
+        .toggle-btn:hover {
+            border-color: #9ca3af;
+            color: #d1d5db;
+        }
+
+        /* État actif : coloré */
+        #type-depense:checked + .toggle-btn {
+            background: linear-gradient(135deg, #ef4444, #f87171);
+            border: 2px solid #fca5a5;
+            color: white;
+            box-shadow: 0 0 12px rgba(239, 68, 68, 0.5);
+        }
+
+        #type-revenu:checked + .toggle-btn {
+            background: linear-gradient(135deg, #10b981, #34d399);
+            border: 2px solid #6ee7b7;
+            color: white;
+            box-shadow: 0 0 12px rgba(16, 185, 129, 0.5);
+        }
+    </style>
 {% endblock %}
 
 {% block content %}
 <main class="add-expense-page">
 
     <section class="form-card">
-        <h2>Nouvelle dépense</h2>
+        <h2>Nouvelle transaction</h2>
 
         <form id="expense-form" method="post" action="{{ url_for('add_expense') }}">
+
+            <div class="form-row">
+                <label>Type de transaction</label>
+                <div class="toggle-group">
+                    <input type="radio" id="type-depense" name="type" value="depense" checked>
+                    <label for="type-depense" class="toggle-btn">Dépense</label>
+
+                    <input type="radio" id="type-revenu" name="type" value="revenu">
+                    <label for="type-revenu" class="toggle-btn">Revenu</label>
+                </div>
+            </div>
+
             <div class="form-row">
                 <label for="label">Libellé</label>
-                <input type="text" id="label" name="label" placeholder="Ex : Courses, Loyer..." required>
+                <input type="text" id="label" name="label" placeholder="Ex : Courses, Salaire..." required>
             </div>
 
             <div class="form-row">
                 <label for="amount">Montant (€)</label>
-                <input type="number" id="amount" name="amount" step="0.01" placeholder="Ex : 45.90" required>
-                <p class="hint">Utilise un montant positif pour une entrée (salaire) et négatif pour une dépense.</p>
+                <input type="number" id="amount" name="amount" step="0.01" min="0" placeholder="Ex : 45.90" required>
             </div>
 
             <div class="form-row two-columns">
@@ -44,16 +97,16 @@
             <div class="form-row">
                 <label for="comment">Commentaire</label>
                 <textarea id="comment" name="comment" rows="3"
-                          placeholder="Optionnel : détails de la dépense..."></textarea>
+                          placeholder="Optionnel : détails de la transaction..."></textarea>
             </div>
 
             <div class="form-actions">
                 <a href="{{ url_for('home') }}" class="btn-secondary">Annuler</a>
-                <button type="submit" class="btn-primary">Enregistrer la dépense</button>
+                <button type="submit" class="btn-primary">Enregistrer</button>
             </div>
 
             <p id="form-message" class="form-message" hidden>
-                ✅ Dépense enregistrée
+                Transaction enregistrée
             </p>
         </form>
     </section>
@@ -62,13 +115,10 @@
 
 {% block scripts %}
 <script>
-    // Affichage local de confirmation (le POST redirige vers la page d'accueil)
     const form = document.getElementById('expense-form');
     const message = document.getElementById('form-message');
 
     form.addEventListener('submit', function (event) {
-        // L'envoi se fait normalement vers le serveur ; on garde le message de confirmation
-        // utile si on veut empêcher la navigation automatique (non nécessaire ici)
         message.hidden = false;
     });
 </script>
