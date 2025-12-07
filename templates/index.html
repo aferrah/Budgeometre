@@ -117,6 +117,38 @@
     .montant-cell.negatif {
         color: #ef4444;
     }
+
+    .sortable:hover {
+        background: rgba(255, 255, 255, 0.05);
+    }
+
+    .sortable.active-sort {
+        background: rgba(255, 255, 255, 0.08);
+    }
+
+    .sort-icon {
+        font-size: 0.8rem;
+        opacity: 0.5;
+        margin-left: 5px;
+    }
+
+    .sortable.active-sort .sort-icon {
+        opacity: 1;
+    }
+
+    input[type="text"]::placeholder,
+    select option {
+        color: rgba(255, 255, 255, 0.5);
+    }
+
+    select option {
+        background: #1f2937;
+        color: white;
+    }
+
+    #resetBtn:hover {
+        background: rgba(255, 255, 255, 0.25);
+    }
 </style>
 {% endblock %}
 
@@ -147,21 +179,79 @@
 
     <!-- Dernières transactions -->
     <section class="recent-expenses glass-card" style="margin-bottom: 20px;">
-        <h2>Dernières transactions</h2>
+        <h2>Transactions</h2>
+        
         {% if transactions %}
-            <table>
+            <!-- Filtres -->
+            <div class="filters-container" style="margin-bottom: 20px; display: flex; gap: 15px; flex-wrap: wrap; align-items: flex-end;">
+                <div class="filter-group" style="flex: 1; min-width: 200px;">
+                    <label style="display: block; margin-bottom: 5px; color: rgba(255,255,255,0.7); font-size: 0.85rem;"> Recherche</label>
+                    <input type="text" id="searchInput" placeholder="Rechercher..." 
+                           style="width: 100%; padding: 8px 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.1); color: white;">
+                </div>
+                
+                <div class="filter-group" style="flex: 0 0 auto; min-width: 150px;">
+                    <label style="display: block; margin-bottom: 5px; color: rgba(255,255,255,0.7); font-size: 0.85rem;">Catégorie</label>
+                    <select id="categoryFilter" 
+                            style="width: 100%; padding: 8px 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.1); color: white;">
+                        <option value="all">Toutes</option>
+                        {% set categories_set = [] %}
+                        {% for t in transactions %}
+                            {% if t.categorie.nom not in categories_set %}
+                                {% set _ = categories_set.append(t.categorie.nom) %}
+                                <option value="{{ t.idCategorie }}">{{ t.categorie.nom }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="filter-group" style="flex: 0 0 auto; min-width: 130px;">
+                    <label style="display: block; margin-bottom: 5px; color: rgba(255,255,255,0.7); font-size: 0.85rem;">Type</label>
+                    <select id="typeFilter" 
+                            style="width: 100%; padding: 8px 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.1); color: white;">
+                        <option value="all">Tout</option>
+                        <option value="revenus">Revenus</option>
+                        <option value="depenses">Dépenses</option>
+                    </select>
+                </div>
+                
+                <button id="resetBtn" 
+                        style="padding: 8px 16px; border-radius: 6px; border: none; background: rgba(255,255,255,0.15); color: white; cursor: pointer; font-size: 0.9rem;">
+                    Réinitialiser
+                </button>
+            </div>
+
+            <table id="transactionsTable">
                 <thead>
                     <tr>
-                        <th>Libellé</th>
-                        <th>Catégorie</th>
-                        <th>Montant</th>
+                        <th class="sortable" data-column="date" style="cursor: pointer; user-select: none;">
+                            Date <span class="sort-icon">⇅</span>
+                        </th>
+                        <th class="sortable" data-column="titre" style="cursor: pointer; user-select: none;">
+                            Libellé <span class="sort-icon">⇅</span>
+                        </th>
+                        <th class="sortable" data-column="categorie" style="cursor: pointer; user-select: none;">
+                            Catégorie <span class="sort-icon">⇅</span>
+                        </th>
+                        <th class="sortable" data-column="montant" style="cursor: pointer; user-select: none;">
+                            Montant <span class="sort-icon">⇅</span>
+                        </th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="transactionsBody">
                     {% for t in transactions %}
-                        <tr>
+                        <tr class="transaction-row"
+                            data-date="{{ t.dateTransaction.timestamp() }}"
+                            data-titre="{{ t.titre|lower }}"
+                            data-categorie="{{ t.idCategorie }}"
+                            data-montant="{{ t.montant }}">
+                            <td style="color: rgba(255,255,255,0.8);">{{ t.dateTransaction.strftime('%d/%m/%Y') }}</td>
                             <td>{{ t.titre }}</td>
-                            <td>{{ t.categorie.nom }}</td>
+                            <td>
+                                <span style="display: inline-block; padding: 3px 10px; border-radius: 12px; background: rgba(255,255,255,0.15); font-size: 0.85rem;">
+                                    {{ t.categorie.nom }}
+                                </span>
+                            </td>
                             <td class="montant-cell {{ 'positif' if t.montant >= 0 else 'negatif' }}">
                                 {{ '+' if t.montant >= 0 else '' }}{{ '%.2f'|format(t.montant) }} €
                             </td>
@@ -169,6 +259,11 @@
                     {% endfor %}
                 </tbody>
             </table>
+            
+            <div id="noResults" style="display: none; text-align: center; padding: 30px; color: rgba(255,255,255,0.6);">
+                Aucune transaction trouvée avec ces critères.
+            </div>
+
         {% else %}
             <p style="color: rgba(255, 255, 255, 0.7); text-align: center; padding: 20px;">
                 Aucune transaction enregistrée pour l'instant.
@@ -180,4 +275,159 @@
     <div class="add-expense-container">
         <a href="{{ url_for('budget_dashboard') }}" style="opacity: 0.8;">Accéder au dashboard</a>
     </div>
+
+    <script>
+        // Variables globales
+        let currentSort = { column: 'date', direction: 'desc' };
+        let allRows = [];
+
+        // Initialisation au chargement
+        document.addEventListener('DOMContentLoaded', function() {
+            const tbody = document.getElementById('transactionsBody');
+            if (tbody) {
+                allRows = Array.from(tbody.querySelectorAll('.transaction-row'));
+                attachEventListeners();
+                
+                // Tri initial par date décroissante
+                sortTable('date');
+            }
+        });
+
+        // Attacher les écouteurs
+        function attachEventListeners() {
+            document.querySelectorAll('.sortable').forEach(header => {
+                header.addEventListener('click', function() {
+                    sortTable(this.dataset.column);
+                });
+            });
+
+            document.getElementById('searchInput').addEventListener('input', applyFilters);
+            document.getElementById('categoryFilter').addEventListener('change', applyFilters);
+            document.getElementById('typeFilter').addEventListener('change', applyFilters);
+            document.getElementById('resetBtn').addEventListener('click', resetFilters);
+        }
+
+        // Fonction de tri
+        function sortTable(column) {
+            if (currentSort.column === column) {
+                currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+            } else {
+                currentSort.column = column;
+                currentSort.direction = 'asc';
+            }
+
+            const visibleRows = allRows.filter(row => row.style.display !== 'none');
+            
+            visibleRows.sort((a, b) => {
+                let aValue, bValue;
+
+                switch(column) {
+                    case 'date':
+                        aValue = parseFloat(a.dataset.date);
+                        bValue = parseFloat(b.dataset.date);
+                        break;
+                    case 'titre':
+                        aValue = a.dataset.titre;
+                        bValue = b.dataset.titre;
+                        break;
+                    case 'categorie':
+                        aValue = a.cells[2].textContent.trim();
+                        bValue = b.cells[2].textContent.trim();
+                        break;
+                    case 'montant':
+                        aValue = parseFloat(a.dataset.montant);
+                        bValue = parseFloat(b.dataset.montant);
+                        break;
+                    default:
+                        return 0;
+                }
+
+                let result = 0;
+                if (typeof aValue === 'string') {
+                    result = aValue.localeCompare(bValue, 'fr');
+                } else {
+                    result = aValue - bValue;
+                }
+
+                return currentSort.direction === 'asc' ? result : -result;
+            });
+
+            const tbody = document.getElementById('transactionsBody');
+            visibleRows.forEach(row => tbody.appendChild(row));
+
+            updateSortIcons();
+        }
+
+        // Mettre à jour les icônes
+        function updateSortIcons() {
+            document.querySelectorAll('.sortable').forEach(header => {
+                const icon = header.querySelector('.sort-icon');
+                const column = header.dataset.column;
+                
+                if (column === currentSort.column) {
+                    icon.textContent = currentSort.direction === 'asc' ? '↑' : '↓';
+                    header.classList.add('active-sort');
+                } else {
+                    icon.textContent = '⇅';
+                    header.classList.remove('active-sort');
+                }
+            });
+        }
+
+        // Appliquer les filtres
+        function applyFilters() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const categoryFilter = document.getElementById('categoryFilter').value;
+            const typeFilter = document.getElementById('typeFilter').value;
+
+            let visibleCount = 0;
+
+            allRows.forEach(row => {
+                const titre = row.dataset.titre;
+                const categorie = row.dataset.categorie;
+                const montant = parseFloat(row.dataset.montant);
+
+                let show = true;
+
+                if (searchTerm && !titre.includes(searchTerm)) {
+                    show = false;
+                }
+
+                if (categoryFilter !== 'all' && categorie !== categoryFilter) {
+                    show = false;
+                }
+
+                if (typeFilter === 'revenus' && montant <= 0) {
+                    show = false;
+                } else if (typeFilter === 'depenses' && montant >= 0) {
+                    show = false;
+                }
+
+                row.style.display = show ? '' : 'none';
+                if (show) visibleCount++;
+            });
+
+            const noResults = document.getElementById('noResults');
+            const table = document.getElementById('transactionsTable');
+            if (visibleCount === 0) {
+                noResults.style.display = 'block';
+                table.style.display = 'none';
+            } else {
+                noResults.style.display = 'none';
+                table.style.display = 'table';
+            }
+        }
+
+        // Réinitialiser
+        function resetFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('categoryFilter').value = 'all';
+            document.getElementById('typeFilter').value = 'all';
+            
+            allRows.forEach(row => row.style.display = '');
+            
+            currentSort = { column: 'date', direction: 'desc' };
+            sortTable('date');
+        }
+    </script>
 {% endblock %}
