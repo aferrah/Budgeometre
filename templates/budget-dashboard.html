@@ -5,7 +5,13 @@
   rel="stylesheet"
   href="{{ url_for('static', filename='css/budget-dashboard.css') }}"
 />
-{% endblock %} {% block content %}
+{% endblock %}
+
+{% block header_content %}
+    <h1>Budget dashboard</h1>
+{% endblock %}
+
+{% block content %}
 <div class="dashboard-container">
   <div class="dashboard-header">
     <h2>Tableau de bord</h2>
