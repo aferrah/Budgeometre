@@ -9,24 +9,62 @@
         padding: 30px;
     }
 
-    .solde-circle {
-        width: 180px;
-        height: 180px;
-        border-radius: 50%;
+    .solde-circle-container {
+        position: relative;
+        width: 200px;
+        height: 200px;
         margin: 0 auto 20px;
+    }
+
+    .solde-circle {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 160px;
+        height: 160px;
+        border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
         flex-direction: column;
-        border: 8px solid;
+        z-index: 2;
     }
 
-    .solde-circle.positif {
+    .progress-ring {
+        transform: rotate(-90deg);
+        position: absolute;
+        top: 0;
+        left: 0;
+    }
+
+    .progress-ring-circle {
+        transition: stroke-dashoffset 0.8s ease;
+        transform-origin: 50% 50%;
+    }
+
+    /* Couleurs basées sur le niveau du solde */
+    .solde-circle.excellent {
         border-color: #10b981;
         background: rgba(16, 185, 129, 0.1);
     }
 
-    .solde-circle.negatif {
+    .solde-circle.bon {
+        border-color: #22c55e;
+        background: rgba(34, 197, 94, 0.1);
+    }
+
+    .solde-circle.moyen {
+        border-color: #eab308;
+        background: rgba(234, 179, 8, 0.1);
+    }
+
+    .solde-circle.faible {
+        border-color: #f97316;
+        background: rgba(249, 115, 22, 0.1);
+    }
+
+    .solde-circle.critique {
         border-color: #ef4444;
         background: rgba(239, 68, 68, 0.1);
     }
@@ -36,11 +74,23 @@
         font-weight: 700;
     }
 
-    .solde-circle.positif .montant {
+    .solde-circle.excellent .montant {
         color: #10b981;
     }
 
-    .solde-circle.negatif .montant {
+    .solde-circle.bon .montant {
+        color: #22c55e;
+    }
+
+    .solde-circle.moyen .montant {
+        color: #eab308;
+    }
+
+    .solde-circle.faible .montant {
+        color: #f97316;
+    }
+
+    .solde-circle.critique .montant {
         color: #ef4444;
     }
 
@@ -122,10 +172,6 @@
         background: rgba(255, 255, 255, 0.05);
     }
 
-    .sortable.active-sort {
-        background: rgba(255, 255, 255, 0.08);
-    }
-
     .sort-icon {
         font-size: 0.8rem;
         opacity: 0.5;
@@ -155,9 +201,53 @@
 {% block content %}
     <!-- Carte solde principal -->
     <div class="solde-card glass-card" style="margin-bottom: 20px;">
-        <div class="solde-circle {{ 'positif' if argentActuel >= 0 else 'negatif' }}">
-            <span class="montant">{{ '%.2f'|format(argentActuel) }} €</span>
-            <span class="label">Solde actuel</span>
+        {% set ratio = (argentActuel / total_revenus * 100) if total_revenus > 0 else 0 %}
+        {% set ratio_capped = [ratio, 100]|min if ratio >= 0 else 0 %}
+        {% if ratio >= 75 %}
+            {% set niveau = 'excellent' %}
+            {% set color = '#10b981' %}
+        {% elif ratio >= 50 %}
+            {% set niveau = 'bon' %}
+            {% set color = '#22c55e' %}
+        {% elif ratio >= 25 %}
+            {% set niveau = 'moyen' %}
+            {% set color = '#eab308' %}
+        {% elif ratio >= 0 %}
+            {% set niveau = 'faible' %}
+            {% set color = '#f97316' %}
+        {% else %}
+            {% set niveau = 'critique' %}
+            {% set color = '#ef4444' %}
+        {% endif %}
+        <div class="solde-circle-container">
+            <svg class="progress-ring" width="200" height="200">
+                <!-- Cercle de fond -->
+                <circle
+                    cx="100"
+                    cy="100"
+                    r="90"
+                    stroke="rgba(255, 255, 255, 0.1)"
+                    stroke-width="12"
+                    fill="none"
+                />
+                <!-- Cercle de progression -->
+                <circle
+                    class="progress-ring-circle"
+                    cx="100"
+                    cy="100"
+                    r="90"
+                    stroke="{{ color }}"
+                    stroke-width="12"
+                    fill="none"
+                    stroke-dasharray="565.48"
+                    stroke-dashoffset="{{ 565.48 - (565.48 * ratio_capped / 100) }}"
+                    stroke-linecap="round"
+                />
+            </svg>
+            <div class="solde-circle {{ niveau }}">
+                <span class="montant">{{ '%.2f'|format(argentActuel) }} €</span>
+                <span class="label">{{ '%.0f'|format(ratio_capped) }}% des revenus restants</span>
+            </div>
         </div>
 
         <div class="stats-row">
@@ -245,7 +335,7 @@
                             data-titre="{{ t.titre|lower }}"
                             data-categorie="{{ t.idCategorie }}"
                             data-montant="{{ t.montant }}">
-                            <td style="color: rgba(255,255,255,0.8);">{{ t.dateTransaction.strftime('%d/%m/%Y') }}</td>
+                            <td>{{ t.dateTransaction.strftime('%d/%m/%Y') }}</td>
                             <td>{{ t.titre }}</td>
                             <td>
                                 <span style="display: inline-block; padding: 3px 10px; border-radius: 12px; background: rgba(255,255,255,0.15); font-size: 0.85rem;">
