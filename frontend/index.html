@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Budgeometre - Accueil</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/index.css">
+</head>
+<body>
+    <details>
+        <summary></summary>
+        <nav class="menu">
+            <a href="index.html">Accueil</a>
+            <a href="budget-dashboard.html">Dashboard</a>
+            <a href="#">Objectifs</a>
+            <a href="categories.html">Categories</a>
+            <a href="#">Transactions</a>
+        </nav>
+    </details>
+
+    <div class="container">
+        <header>
+            <h1>Budgeometre</h1>
+        </header>
+
+        <main>
+            <div class="solde-card glass-card" style="margin-bottom: 20px;">
+                <div id="solde-circle" class="solde-circle positif">
+                    <span id="montant" class="montant">-- &#8364;</span>
+                    <span class="label">Solde actuel</span>
+                </div>
+
+                <div class="stats-row">
+                    <div class="stat-item">
+                        <div id="revenus" class="value revenus">+-- &#8364;</div>
+                        <div class="label">Revenus</div>
+                    </div>
+                    <div class="stat-item">
+                        <div id="depenses" class="value depenses">--- &#8364;</div>
+                        <div class="label">Depenses</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="add-expense-container" style="margin-bottom: 30px;">
+                <a class="add-expense-btn" href="add-expense.html">Ajouter une transaction</a>
+            </div>
+
+            <section class="recent-expenses glass-card" style="margin-bottom: 20px;">
+                <h2>Dernieres transactions</h2>
+                <div id="transactions-container">
+                    <p style="color: rgba(255, 255, 255, 0.7); text-align: center; padding: 20px;">
+                        Chargement...
+                    </p>
+                </div>
+            </section>
+
+            <div class="add-expense-container">
+                <a href="budget-dashboard.html" style="opacity: 0.8;">Acceder au dashboard</a>
+            </div>
+        </main>
+
+        <footer></footer>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/index.js"></script>
+</body>
+</html>

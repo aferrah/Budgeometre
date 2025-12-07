@@ -1,0 +1,117 @@
+/* =============================================================================
+   Budgeometre - Index / Accueil CSS
+   ============================================================================= */
+
+.solde-card {
+    text-align: center;
+    padding: 30px;
+}
+
+.solde-circle {
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    margin: 0 auto 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    border: 8px solid;
+}
+
+.solde-circle.positif {
+    border-color: #10b981;
+    background: rgba(16, 185, 129, 0.1);
+}
+
+.solde-circle.negatif {
+    border-color: #ef4444;
+    background: rgba(239, 68, 68, 0.1);
+}
+
+.solde-circle .montant {
+    font-size: 1.8rem;
+    font-weight: 700;
+}
+
+.solde-circle.positif .montant {
+    color: #10b981;
+}
+
+.solde-circle.negatif .montant {
+    color: #ef4444;
+}
+
+.solde-circle .label {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.stats-row {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+}
+
+.stat-item {
+    text-align: center;
+}
+
+.stat-item .value {
+    font-size: 1.3rem;
+    font-weight: 700;
+}
+
+.stat-item .value.revenus {
+    color: #10b981;
+}
+
+.stat-item .value.depenses {
+    color: #ef4444;
+}
+
+.stat-item .label {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.recent-expenses h2 {
+    margin-bottom: 15px;
+    color: white;
+}
+
+.recent-expenses table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.recent-expenses th,
+.recent-expenses td {
+    padding: 12px 15px;
+    text-align: left;
+}
+
+.recent-expenses th {
+    color: rgba(255, 255, 255, 0.7);
+    font-weight: 600;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.recent-expenses td {
+    color: white;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.recent-expenses tr:last-child td {
+    border-bottom: none;
+}
+
+.montant-cell.positif {
+    color: #10b981;
+}
+
+.montant-cell.negatif {
+    color: #ef4444;
+}

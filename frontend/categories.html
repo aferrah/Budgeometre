@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Categories - Budgeometre</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/categories.css">
+</head>
+<body>
+    <details>
+        <summary></summary>
+        <nav class="menu">
+            <a href="index.html">Accueil</a>
+            <a href="budget-dashboard.html">Dashboard</a>
+            <a href="#">Objectifs</a>
+            <a href="categories.html">Categories</a>
+            <a href="#">Transactions</a>
+        </nav>
+    </details>
+
+    <div class="container">
+        <header>
+            <h1>Budgeometre</h1>
+        </header>
+
+        <main class="categories-page">
+
+            <div class="categories-header">
+                <h2>Categories</h2>
+            </div>
+
+            <div id="message-container"></div>
+
+            <div class="add-category-form glass-card">
+                <h3>Ajouter une categorie</h3>
+                <form id="add-category-form">
+                    <div class="form-row">
+                        <input type="text" id="nom" name="nom" placeholder="Nom de la categorie" required>
+                        <input type="text" id="description" name="description" placeholder="Description (optionnel)">
+                        <button type="submit" class="btn-add" id="btn-add">Ajouter</button>
+                    </div>
+                </form>
+            </div>
+
+            <div id="categories-list" class="categories-list">
+                <div class="empty-state glass-card">
+                    <p>Chargement...</p>
+                </div>
+            </div>
+
+        </main>
+
+        <footer></footer>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/categories.js"></script>
+</body>
+</html>

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Depenses - Budgeometre</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/detail-depense.css">
+</head>
+<body>
+    <details>
+        <summary></summary>
+        <nav class="menu">
+            <a href="index.html">Accueil</a>
+            <a href="budget-dashboard.html">Dashboard</a>
+            <a href="#">Objectifs</a>
+            <a href="categories.html">Categories</a>
+            <a href="#">Transactions</a>
+        </nav>
+    </details>
+
+    <div class="container">
+        <header>
+            <h1>Budgeometre</h1>
+        </header>
+
+        <main class="depenses-cat-page">
+
+            <div class="page-header">
+                <h2 id="page-title">Depenses : --</h2>
+                <a href="budget-dashboard.html" class="btn-back">Retour au dashboard</a>
+            </div>
+
+            <div class="total-card">
+                <div class="label">Total des depenses dans cette categorie</div>
+                <div class="value" id="total-depenses">-- &#8364;</div>
+            </div>
+
+            <div class="period-selector">
+                <button class="period-btn active" onclick="showChart('mois', this)">Par mois</button>
+                <button class="period-btn" onclick="showChart('trimestre', this)">Par trimestre</button>
+                <button class="period-btn" onclick="showChart('annee', this)">Par annee</button>
+            </div>
+
+            <div class="chart-container">
+                <h3 id="chart-title">Evolution mensuelle</h3>
+                <div class="chart-wrapper">
+                    <canvas id="depensesChart"></canvas>
+                </div>
+            </div>
+
+            <div class="transactions-section">
+                <h3>Dernieres transactions</h3>
+                <div id="transactions-container">
+                    <div class="no-data">Chargement...</div>
+                </div>
+            </div>
+
+        </main>
+
+        <footer></footer>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/detail-depense.js"></script>
+</body>
+</html>

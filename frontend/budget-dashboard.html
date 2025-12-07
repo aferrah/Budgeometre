@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Budgeometre - Dashboard</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/budget-dashboard.css">
+</head>
+<body>
+    <details>
+        <summary></summary>
+        <nav class="menu">
+            <a href="index.html">Accueil</a>
+            <a href="budget-dashboard.html">Dashboard</a>
+            <a href="#">Objectifs</a>
+            <a href="categories.html">Categories</a>
+            <a href="#">Transactions</a>
+        </nav>
+    </details>
+
+    <div class="container">
+        <header>
+            <h1>Budgeometre</h1>
+        </header>
+
+        <main>
+            <div class="dashboard-container">
+
+                <div class="dashboard-header">
+                    <h2>Tableau de bord</h2>
+                    <p class="subtitle">Votre situation financiere</p>
+                </div>
+
+                <div class="period-selector">
+                    <button class="period-btn active" onclick="changePeriod('month', this)">Mois</button>
+                    <button class="period-btn" onclick="changePeriod('quarter', this)">Trimestre</button>
+                    <button class="period-btn" onclick="changePeriod('year', this)">Annee</button>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="glass-card stat-card">
+                        <div class="stat-label">Depenses (<span id="periode-label">ce mois</span>)</div>
+                        <div class="stat-value" id="stat-depenses" style="color: #ef4444;">-- &#8364;</div>
+                    </div>
+
+                    <div class="glass-card stat-card">
+                        <div class="stat-label">Revenus (<span id="periode-label-2">ce mois</span>)</div>
+                        <div class="stat-value" id="stat-revenus" style="color: #10b981;">-- &#8364;</div>
+                    </div>
+
+                    <div class="glass-card stat-card">
+                        <div class="stat-label">Solde</div>
+                        <div class="stat-value" id="stat-solde">-- &#8364;</div>
+                        <div class="stat-change" id="stat-solde-label">
+                            <span>--</span>
+                        </div>
+                    </div>
+
+                    <div class="glass-card stat-card">
+                        <div class="stat-label">Objectifs</div>
+                        <div class="stat-value" id="stat-objectifs">-/-</div>
+                        <div class="stat-change" id="stat-objectifs-ratio" style="color: rgba(255,255,255,0.8);">
+                            <span>--% respectes</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="charts-grid">
+                    <div class="glass-card chart-container">
+                        <h3 class="chart-title" id="evolution-title">Evolution (6 derniers mois)</h3>
+                        <canvas id="lineChart"></canvas>
+                    </div>
+
+                    <div class="glass-card chart-container">
+                        <h3 class="chart-title">Depenses par categorie</h3>
+                        <p style="font-size: 0.85rem; color: rgba(255,255,255,0.6); text-align: center; margin-bottom: 10px;">
+                            Cliquez sur une barre pour voir le detail
+                        </p>
+                        <canvas id="barChart"></canvas>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+
+        <footer></footer>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/budget-dashboard.js"></script>
+</body>
+</html>
