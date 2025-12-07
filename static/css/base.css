@@ -100,7 +100,7 @@ header {
 h1 {
     text-align: center;
     font-size: 5rem;
-    font-family: "Gill Sans MT", cursive;
+    font-family: 'DM Serif Text', 'Outfit', 'JetBrains Mono', serif;
     background: linear-gradient(90deg, var(--success), #1D889D);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
