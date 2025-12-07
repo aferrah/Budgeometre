@@ -16,6 +16,7 @@ class Categorie(db.Model):
     idCategorie = db.Column(db.Integer, primary_key=True)
     nom = db.Column(db.String(50), nullable=False)
     description = db.Column(db.String(255))
+    couleur = db.Column(db.String(7), default="#8b5cf6")
     transactions = db.relationship("Transaction", back_populates="categorie")
     objectifs = db.relationship("Objectif", back_populates="categorie")
 
@@ -136,7 +137,7 @@ def add_expense():
     if not categorie:
         categorie = Categorie.query.filter_by(nom="Autre").first()
         if not categorie:
-            categorie = Categorie(nom="Autre", description="Catégorie par défaut")
+            categorie = Categorie(nom="Autre", description="Catégorie par défaut", couleur="#64748b")
             db.session.add(categorie)
             db.session.commit()
 
@@ -302,8 +303,10 @@ def budget_dashboard():
     cat_trim = get_depenses_par_cat(start_quarter)
     cat_annee = get_depenses_par_cat(start_year)
 
-    # Mapping nom -> id
-    categories_ids = {cat.nom: cat.idCategorie for cat in Categorie.query.all()}
+    # Mapping nom -> id et couleur
+    all_categories = Categorie.query.all()
+    categories_ids = {cat.nom: cat.idCategorie for cat in all_categories}
+    categories_colors = {cat.nom: cat.couleur or '#8b5cf6' for cat in all_categories}
 
     # Objectifs (basé sur le mois)
     objectifs = Objectif.query.all()
@@ -368,8 +371,9 @@ def budget_dashboard():
         evol_mois_labels=evol_mois_labels, evol_mois_dep=evol_mois_dep, evol_mois_rev=evol_mois_rev,
         evol_trim_labels=evol_trim_labels, evol_trim_dep=evol_trim_dep, evol_trim_rev=evol_trim_rev,
         evol_annee_labels=evol_annee_labels, evol_annee_dep=evol_annee_dep, evol_annee_rev=evol_annee_rev,
-        # Catégories IDs
+        # Catégories IDs et couleurs
         categories_ids=categories_ids,
+        categories_colors=categories_colors,
     )
 
 
@@ -378,12 +382,13 @@ def categories():
     if request.method == "POST":
         nom = request.form.get("nom")
         description = request.form.get("description", "")
+        couleur = request.form.get("couleur", "#8b5cf6")
 
         if nom:
             # Vérifier si la catégorie existe déjà
             existante = Categorie.query.filter_by(nom=nom).first()
             if not existante:
-                nouvelle_cat = Categorie(nom=nom, description=description)
+                nouvelle_cat = Categorie(nom=nom, description=description, couleur=couleur)
                 db.session.add(nouvelle_cat)
                 db.session.commit()
 

@@ -130,9 +130,9 @@
 
             <div class="form-row two-columns">
                 <div>
-                    <label for="category">Catégorie</label>
-                    <select id="category" name="category" required>
-                        <option value="" disabled selected>Choisir une catégorie</option>
+                    <label for="category">Catégorie <span style="font-weight: normal; font-size: 0.85rem; color: rgba(255,255,255,0.6);">(optionnel)</span></label>
+                    <select id="category" name="category">
+                        <option value="">Aucune catégorie (Autre)</option>
                         {% for cat in categories %}
                             <option value="{{ cat.idCategorie }}">{{ cat.nom }}</option>
                         {% endfor %}

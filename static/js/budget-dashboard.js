@@ -9,20 +9,7 @@ try {
 
 const allData = parsed.allData || {};
 const categoriesIds = parsed.categoriesIds || {};
-
-// Couleurs des catégories
-const categoriesRef = [
-  { nom: "Alimentation", color: "#10b981" },
-  { nom: "Transport", color: "#3b82f6" },
-  { nom: "Loisirs", color: "#f59e0b" },
-  { nom: "Logement", color: "#8b5cf6" },
-  { nom: "Santé", color: "#ec4899" },
-  { nom: "Vêtements", color: "#14b8a6" },
-  { nom: "Éducation", color: "#f97316" },
-  { nom: "Épargne", color: "#06b6d4" },
-  { nom: "Autres", color: "#64748b" },
-  { nom: "Autre", color: "#64748b" },
-];
+const categoriesColors = parsed.categoriesColors || {};
 
 let lineChart = null;
 let barChart = null;
@@ -127,10 +114,7 @@ function updateBarChart(data) {
 
   const labels = Object.keys(data.categories || {});
   const values = Object.values(data.categories || {});
-  const colors = labels.map((label) => {
-    const cat = categoriesRef.find((c) => c.nom === label);
-    return cat ? cat.color : "#64748b";
-  });
+  const colors = labels.map((label) => categoriesColors[label] || "#8b5cf6");
 
   const ctx = document.getElementById("barChart")?.getContext("2d");
   if (!ctx) return;

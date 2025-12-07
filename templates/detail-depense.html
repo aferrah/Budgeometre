@@ -178,9 +178,9 @@
     </div>
 
     <!-- Total des dépenses -->
-    <div class="total-card">
+    <div class="total-card" style="border-left: 4px solid {{ categorie.couleur or '#8b5cf6' }};">
         <div class="label">Total des dépenses dans cette catégorie</div>
-        <div class="value">{{ '%.2f'|format(total_depenses) }} €</div>
+        <div class="value" style="color: {{ categorie.couleur or '#8b5cf6' }};">{{ '%.2f'|format(total_depenses) }} €</div>
     </div>
 
     <!-- Sélecteur de période -->
@@ -228,6 +228,7 @@
     const trimestreData = {{ trimestre_data | tojson }};
     const anneeLabels = {{ annee_labels | tojson }};
     const anneeData = {{ annee_data | tojson }};
+    const categorieCouleur = {{ (categorie.couleur or '#8b5cf6') | tojson }};
 
     let currentChart = null;
 
@@ -245,8 +246,8 @@
                 datasets: [{
                     label: label,
                     data: data,
-                    backgroundColor: 'rgba(239, 68, 68, 0.7)',
-                    borderColor: '#ef4444',
+                    backgroundColor: categorieCouleur + 'B3',
+                    borderColor: categorieCouleur,
                     borderWidth: 2,
                     borderRadius: 8,
                     borderSkipped: false

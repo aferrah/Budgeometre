@@ -72,6 +72,10 @@ body {
     font-family: inherit;
 }
 
+.form-row select option {
+    padding: 10px;
+}
+
 .form-row input:focus,
 .form-row select:focus,
 .form-row textarea:focus {
