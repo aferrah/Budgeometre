@@ -1,292 +1,144 @@
-{% extends "base.html" %}
-
-{% block title %}Budgeomètre - Dashboard{% endblock %}
-
+{% extends "base.html" %} {% block title %}Budgeomètre - Dashboard{% endblock %}
 {% block head_extra %}
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/budget-dashboard.css') }}">
-{% endblock %}
-
-{% block content %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='css/budget-dashboard.css') }}"
+/>
+{% endblock %} {% block content %}
 <div class="dashboard-container">
+  <div class="dashboard-header">
+    <h2>Tableau de bord</h2>
+    <p class="subtitle">Votre situation financière</p>
+  </div>
 
-    <div class="dashboard-header">
-        <h2>Tableau de bord</h2>
-        <p class="subtitle">Votre situation financière</p>
+  <div class="period-selector">
+    <button class="period-btn active" onclick="changePeriod('month', this)">
+      Mois
+    </button>
+    <button class="period-btn" onclick="changePeriod('quarter', this)">
+      Trimestre
+    </button>
+    <button class="period-btn" onclick="changePeriod('year', this)">
+      Année
+    </button>
+  </div>
+
+  <!-- ------------------ CARDS ------------------ -->
+  <div class="stats-grid">
+    <!-- Dépenses -->
+    <div class="glass-card stat-card">
+      <div class="stat-label">
+        Dépenses (<span id="periode-label">ce mois</span>)
+      </div>
+      <div class="stat-value" id="stat-depenses" style="color: #ef4444">
+        {{ '%.2f'|format(dep_mois) }}€
+      </div>
     </div>
 
-    <div class="period-selector">
-        <button class="period-btn active" onclick="changePeriod('month', this)">Mois</button>
-        <button class="period-btn" onclick="changePeriod('quarter', this)">Trimestre</button>
-        <button class="period-btn" onclick="changePeriod('year', this)">Année</button>
+    <!-- Revenus -->
+    <div class="glass-card stat-card">
+      <div class="stat-label">
+        Revenus (<span id="periode-label-2">ce mois</span>)
+      </div>
+      <div class="stat-value" id="stat-revenus" style="color: #10b981">
+        {{ '%.2f'|format(rev_mois) }}€
+      </div>
     </div>
 
-    <!-- ------------------ CARDS ------------------ -->
-    <div class="stats-grid">
-
-        <!-- Dépenses -->
-        <div class="glass-card stat-card">
-            <div class="stat-label">Dépenses (<span id="periode-label">ce mois</span>)</div>
-            <div class="stat-value" id="stat-depenses" style="color: #ef4444;">
-                {{ '%.2f'|format(dep_mois) }}€
-            </div>
-        </div>
-
-        <!-- Revenus -->
-        <div class="glass-card stat-card">
-            <div class="stat-label">Revenus (<span id="periode-label-2">ce mois</span>)</div>
-            <div class="stat-value" id="stat-revenus" style="color: #10b981;">
-                {{ '%.2f'|format(rev_mois) }}€
-            </div>
-        </div>
-
-        <!-- Solde -->
-        <div class="glass-card stat-card">
-            <div class="stat-label">Solde</div>
-            <div class="stat-value" id="stat-solde"
-                 style="color: {{ '#22c55e' if solde_mois >= 0 else '#ef4444' }};">
-                {{ '%.2f'|format(solde_mois) }}€
-            </div>
-            <div class="stat-change" id="stat-solde-label">
-                <span>{{ 'Excédent' if solde_mois >= 0 else 'Déficit' }}</span>
-            </div>
-        </div>
-
-        <!-- Objectifs -->
-        <div class="glass-card stat-card">
-            <div class="stat-label">Objectifs</div>
-            <div class="stat-value">
-                {{ objectifs_respectes }}/{{ nb_objectifs }}
-            </div>
-            <div class="stat-change" style="color: rgba(255,255,255,0.8);">
-                <span>{{ ratio_objectifs }}% respectés</span>
-            </div>
-        </div>
-
+    <!-- Solde -->
+    <div class="glass-card stat-card">
+      <div class="stat-label">Solde</div>
+      <div
+        class="stat-value {{ 'positive' if solde_mois >= 0 else 'negative' }}"
+        id="stat-solde"
+      >
+        {{ '%.2f'|format(solde_mois) }}€
+      </div>
+      <div class="stat-change" id="stat-solde-label">
+        <span>{{ 'Excédent' if solde_mois >= 0 else 'Déficit' }}</span>
+      </div>
     </div>
 
-    <!-- ------------------ GRAPHIQUES ------------------ -->
-    <div class="charts-grid">
-        <div class="glass-card chart-container">
-            <h3 class="chart-title" id="evolution-title">Évolution (6 derniers mois)</h3>
-            <canvas id="lineChart"></canvas>
-        </div>
+    <!-- Objectifs -->
+    <div class="glass-card stat-card">
+      <div class="stat-label">Objectifs</div>
+      <div class="stat-value">{{ objectifs_respectes }}/{{ nb_objectifs }}</div>
+      <div class="stat-change" style="color: rgba(255, 255, 255, 0.8)">
+        <span>{{ ratio_objectifs }}% respectés</span>
+      </div>
+    </div>
+  </div>
 
-        <div class="glass-card chart-container">
-            <h3 class="chart-title">Dépenses par catégorie</h3>
-            <p style="font-size: 0.85rem; color: rgba(255,255,255,0.6); text-align: center; margin-bottom: 10px;">
-                Cliquez sur une barre pour voir le détail
-            </p>
-            <canvas id="barChart"></canvas>
-        </div>
+  <!-- ------------------ GRAPHIQUES ------------------ -->
+  <div class="charts-grid">
+    <div class="glass-card chart-container">
+      <h3 class="chart-title" id="evolution-title">
+        Évolution (6 derniers mois)
+      </h3>
+      <canvas id="lineChart"></canvas>
     </div>
 
+    <div class="glass-card chart-container">
+      <h3 class="chart-title">Dépenses par catégorie</h3>
+      <p
+        style="
+          font-size: 0.85rem;
+          color: rgba(255, 255, 255, 0.6);
+          text-align: center;
+          margin-bottom: 10px;
+        "
+      >
+        Cliquez sur une barre pour voir le détail
+      </p>
+      <canvas id="barChart"></canvas>
+    </div>
+  </div>
 </div>
-{% endblock %}
-
-{% block scripts %}
-<script>
-    // Données depuis Flask
-    const allData = {
-        month: {
-            depenses: {{ dep_mois }},
-            revenus: {{ rev_mois }},
-            solde: {{ solde_mois }},
-            categories: {{ cat_mois | tojson }},
-            evolutionLabels: {{ evol_mois_labels | tojson }},
-            evolutionDep: {{ evol_mois_dep | tojson }},
-            evolutionRev: {{ evol_mois_rev | tojson }},
-            label: "ce mois",
-            evolutionTitle: "Évolution (6 derniers mois)"
-        },
-        quarter: {
-            depenses: {{ dep_trim }},
-            revenus: {{ rev_trim }},
-            solde: {{ solde_trim }},
-            categories: {{ cat_trim | tojson }},
-            evolutionLabels: {{ evol_trim_labels | tojson }},
-            evolutionDep: {{ evol_trim_dep | tojson }},
-            evolutionRev: {{ evol_trim_rev | tojson }},
-            label: "ce trimestre",
-            evolutionTitle: "Évolution (4 derniers trimestres)"
-        },
-        year: {
-            depenses: {{ dep_annee }},
-            revenus: {{ rev_annee }},
-            solde: {{ solde_annee }},
-            categories: {{ cat_annee | tojson }},
-            evolutionLabels: {{ evol_annee_labels | tojson }},
-            evolutionDep: {{ evol_annee_dep | tojson }},
-            evolutionRev: {{ evol_annee_rev | tojson }},
-            label: "cette année",
-            evolutionTitle: "Évolution (3 dernières années)"
-        }
-    };
-
-    const categoriesIds = {{ categories_ids | tojson }};
-
-    // Couleurs des catégories
-    const categoriesRef = [
-        { nom: 'Alimentation', color: '#10b981' },
-        { nom: 'Transport', color: '#3b82f6' },
-        { nom: 'Loisirs', color: '#f59e0b' },
-        { nom: 'Logement', color: '#8b5cf6' },
-        { nom: 'Santé', color: '#ec4899' },
-        { nom: 'Vêtements', color: '#14b8a6' },
-        { nom: 'Éducation', color: '#f97316' },
-        { nom: 'Épargne', color: '#06b6d4' },
-        { nom: 'Autres', color: '#64748b' },
-        { nom: 'Autre', color: '#64748b' }
-    ];
-
-    let lineChart = null;
-    let barChart = null;
-    let currentPeriod = 'month';
-
-    // Changer de période
-    function changePeriod(period, btn) {
-        currentPeriod = period;
-
-        // Mettre à jour les boutons
-        document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-
-        const data = allData[period];
-
-        // Mettre à jour les stats
-        document.getElementById('stat-depenses').textContent = data.depenses.toFixed(2) + '€';
-        document.getElementById('stat-revenus').textContent = data.revenus.toFixed(2) + '€';
-        document.getElementById('stat-solde').textContent = data.solde.toFixed(2) + '€';
-        document.getElementById('stat-solde').style.color = data.solde >= 0 ? '#22c55e' : '#ef4444';
-        document.getElementById('stat-solde-label').innerHTML = '<span>' + (data.solde >= 0 ? 'Excédent' : 'Déficit') + '</span>';
-        document.getElementById('stat-solde-label').className = 'stat-change ' + (data.solde >= 0 ? 'up' : 'down');
-
-        // Mettre à jour les labels de période
-        document.getElementById('periode-label').textContent = data.label;
-        document.getElementById('periode-label-2').textContent = data.label;
-        document.getElementById('evolution-title').textContent = data.evolutionTitle;
-
-        // Mettre à jour les graphiques
-        updateLineChart(data);
-        updateBarChart(data);
-    }
-
-    // Graphique linéaire
-    function updateLineChart(data) {
-        if (lineChart) {
-            lineChart.destroy();
-        }
-
-        const ctx = document.getElementById('lineChart').getContext('2d');
-        lineChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: data.evolutionLabels,
-                datasets: [
-                    {
-                        label: 'Dépenses',
-                        data: data.evolutionDep,
-                        borderColor: '#ef4444',
-                        backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                        borderWidth: 3,
-                        tension: 0.4,
-                        fill: true
-                    },
-                    {
-                        label: 'Revenus',
-                        data: data.evolutionRev,
-                        borderColor: '#10b981',
-                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                        borderWidth: 3,
-                        tension: 0.4,
-                        fill: true
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: { labels: { color: '#fff' } }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: { color: '#fff' },
-                        grid: { color: 'rgba(255,255,255,0.1)' }
-                    },
-                    x: {
-                        ticks: { color: '#fff' },
-                        grid: { display: false }
-                    }
-                }
-            }
-        });
-    }
-
-    // Graphique barres
-    function updateBarChart(data) {
-        if (barChart) {
-            barChart.destroy();
-        }
-
-        const labels = Object.keys(data.categories);
-        const values = Object.values(data.categories);
-        const colors = labels.map(label => {
-            const cat = categoriesRef.find(c => c.nom === label);
-            return cat ? cat.color : '#64748b';
-        });
-
-        const ctx = document.getElementById('barChart').getContext('2d');
-        barChart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'Dépenses',
-                    data: values,
-                    backgroundColor: colors,
-                    borderRadius: 8,
-                    borderSkipped: false
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: { display: false }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: { color: '#fff' },
-                        grid: { color: 'rgba(255,255,255,0.1)' }
-                    },
-                    x: {
-                        ticks: { color: '#fff' },
-                        grid: { display: false }
-                    }
-                },
-                onClick: (event, elements) => {
-                    if (elements.length > 0) {
-                        const index = elements[0].index;
-                        const categorieName = labels[index];
-                        const categorieId = categoriesIds[categorieName];
-                        if (categorieId) {
-                            window.location.href = `/depenses-categorie/${categorieId}`;
-                        }
-                    }
-                },
-                onHover: (event, elements) => {
-                    event.native.target.style.cursor = elements.length > 0 ? 'pointer' : 'default';
-                }
-            }
-        });
-    }
-
-    // Initialisation
-    window.addEventListener('load', () => {
-        const data = allData[currentPeriod];
-        updateLineChart(data);
-        updateBarChart(data);
-    });
+{% endblock %} {% block scripts %}
+<script id="dashboard-data" type="application/json">
+  {
+    "allData": {
+      "month": {
+        "depenses": {{ dep_mois | tojson }},
+        "revenus": {{ rev_mois | tojson }},
+        "solde": {{ solde_mois | tojson }},
+        "categories": {{ cat_mois | tojson }},
+        "evolutionLabels": {{ evol_mois_labels | tojson }},
+        "evolutionDep": {{ evol_mois_dep | tojson }},
+        "evolutionRev": {{ evol_mois_rev | tojson }},
+        "label": "ce mois",
+        "evolutionTitle": "Évolution (6 derniers mois)"
+      },
+      "quarter": {
+        "depenses": {{ dep_trim | tojson }},
+        "revenus": {{ rev_trim | tojson }},
+        "solde": {{ solde_trim | tojson }},
+        "categories": {{ cat_trim | tojson }},
+        "evolutionLabels": {{ evol_trim_labels | tojson }},
+        "evolutionDep": {{ evol_trim_dep | tojson }},
+        "evolutionRev": {{ evol_trim_rev | tojson }},
+        "label": "ce trimestre",
+        "evolutionTitle": "Évolution (4 derniers trimestres)"
+      },
+      "year": {
+        "depenses": {{ dep_annee | tojson }},
+        "revenus": {{ rev_annee | tojson }},
+        "solde": {{ solde_annee | tojson }},
+        "categories": {{ cat_annee | tojson }},
+        "evolutionLabels": {{ evol_annee_labels | tojson }},
+        "evolutionDep": {{ evol_annee_dep | tojson }},
+        "evolutionRev": {{ evol_annee_rev | tojson }},
+        "label": "cette année",
+        "evolutionTitle": "Évolution (3 dernières années)"
+      }
+    },
+    "categoriesIds": {{ categories_ids | tojson }}
+  }
 </script>
+
+<script
+  src="{{ url_for('static', filename='js/budget-dashboard.js') }}"
+  defer
+></script>
 {% endblock %}

@@ -393,3 +393,18 @@ h1 {
         padding: 1.5rem;
     }
 }
+
+/* Dashboard-specific helpers */
+.stat-value.positive {
+    color: #22c55e;
+}
+.stat-value.negative {
+    color: #ef4444;
+}
+
+.stat-change.up {
+    color: rgba(34,197,94,0.85);
+}
+.stat-change.down {
+    color: rgba(239,68,68,0.85);
+}
