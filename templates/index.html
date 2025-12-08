@@ -33,7 +33,6 @@
         {% endif %}
         <div class="solde-circle-container">
             <svg class="progress-ring" width="200" height="200">
-                <!-- Cercle de fond -->
                 <circle
                     cx="100"
                     cy="100"
@@ -42,7 +41,6 @@
                     stroke-width="12"
                     fill="none"
                 />
-                <!-- Cercle de progression -->
                 <circle
                     class="progress-ring-circle"
                     cx="100"
@@ -71,6 +69,10 @@
                 <div class="value depenses">-{{ '%.2f'|format(total_depenses) }} €</div>
                 <div class="label">Dépenses</div>
             </div>
+            <div class="stat-item">
+                <div class="value epargne">{{ '%.2f'|format(total_epargne) }} €</div>
+                <div class="label">Épargne</div>
+            </div>
         </div>
     </div>
 
@@ -82,19 +84,19 @@
     <!-- Dernières transactions -->
     <section class="recent-expenses glass-card" style="margin-bottom: 20px;">
         <h2>Transactions</h2>
-        
+
         {% if transactions %}
             <!-- Filtres -->
             <div class="filters-container" style="margin-bottom: 20px; display: flex; gap: 15px; flex-wrap: wrap; align-items: flex-end;">
                 <div class="filter-group" style="flex: 1; min-width: 200px;">
-                    <label style="display: block; margin-bottom: 5px; color: rgba(255,255,255,0.7); font-size: 0.85rem;"> Recherche</label>
-                    <input type="text" id="searchInput" placeholder="Rechercher..." 
+                    <label style="display: block; margin-bottom: 5px; color: rgba(255,255,255,0.7); font-size: 0.85rem;">Recherche</label>
+                    <input type="text" id="searchInput" placeholder="Rechercher..."
                            style="width: 100%; padding: 8px 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.1); color: white;">
                 </div>
-                
+
                 <div class="filter-group" style="flex: 0 0 auto; min-width: 150px;">
                     <label style="display: block; margin-bottom: 5px; color: rgba(255,255,255,0.7); font-size: 0.85rem;">Catégorie</label>
-                    <select id="categoryFilter" 
+                    <select id="categoryFilter"
                             style="width: 100%; padding: 8px 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.1); color: white;">
                         <option value="all">Toutes</option>
                         {% set categories_set = [] %}
@@ -106,18 +108,19 @@
                         {% endfor %}
                     </select>
                 </div>
-                
+
                 <div class="filter-group" style="flex: 0 0 auto; min-width: 130px;">
                     <label style="display: block; margin-bottom: 5px; color: rgba(255,255,255,0.7); font-size: 0.85rem;">Type</label>
-                    <select id="typeFilter" 
+                    <select id="typeFilter"
                             style="width: 100%; padding: 8px 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.1); color: white;">
                         <option value="all">Tout</option>
                         <option value="revenus">Revenus</option>
                         <option value="depenses">Dépenses</option>
+                        <option value="epargne">Épargne</option>
                     </select>
                 </div>
-                
-                <button id="resetBtn" 
+
+                <button id="resetBtn"
                         style="padding: 8px 16px; border-radius: 6px; border: none; background: rgba(255,255,255,0.15); color: white; cursor: pointer; font-size: 0.9rem;">
                     Réinitialiser
                 </button>
@@ -142,7 +145,8 @@
                 </thead>
                 <tbody id="transactionsBody">
                     {% for t in transactions %}
-                        <tr class="transaction-row"
+                        {% set is_epargne = t.categorie.nom == 'Épargne' %}
+                        <tr class="transaction-row {% if is_epargne %}epargne{% endif %}"
                             data-date="{{ t.dateTransaction.timestamp() }}"
                             data-titre="{{ t.titre|lower }}"
                             data-categorie="{{ t.idCategorie }}"
@@ -150,18 +154,18 @@
                             <td>{{ t.dateTransaction.strftime('%d/%m/%Y') }}</td>
                             <td>{{ t.titre }}</td>
                             <td>
-                                <span style="display: inline-block; padding: 3px 10px; border-radius: 12px; background: rgba(255,255,255,0.15); font-size: 0.85rem;">
+                                <span class="categorie-badge {% if is_epargne %}epargne{% endif %}">
                                     {{ t.categorie.nom }}
                                 </span>
                             </td>
-                            <td class="montant-cell {{ 'positif' if t.montant >= 0 else 'negatif' }}">
+                            <td class="montant-cell {% if is_epargne %}epargne{% elif t.montant >= 0 %}positif{% else %}negatif{% endif %}">
                                 {{ '+' if t.montant >= 0 else '' }}{{ '%.2f'|format(t.montant) }} €
                             </td>
                         </tr>
                     {% endfor %}
                 </tbody>
             </table>
-            
+
             <div id="noResults" style="display: none; text-align: center; padding: 30px; color: rgba(255,255,255,0.6);">
                 Aucune transaction trouvée avec ces critères.
             </div>
@@ -179,23 +183,18 @@
     </div>
 
     <script>
-        // Variables globales
         let currentSort = { column: 'date', direction: 'desc' };
         let allRows = [];
 
-        // Initialisation au chargement
         document.addEventListener('DOMContentLoaded', function() {
             const tbody = document.getElementById('transactionsBody');
             if (tbody) {
                 allRows = Array.from(tbody.querySelectorAll('.transaction-row'));
                 attachEventListeners();
-                
-                // Tri initial par date décroissante
                 sortTable('date');
             }
         });
 
-        // Attacher les écouteurs
         function attachEventListeners() {
             document.querySelectorAll('.sortable').forEach(header => {
                 header.addEventListener('click', function() {
@@ -209,7 +208,6 @@
             document.getElementById('resetBtn').addEventListener('click', resetFilters);
         }
 
-        // Fonction de tri
         function sortTable(column) {
             if (currentSort.column === column) {
                 currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
@@ -219,7 +217,7 @@
             }
 
             const visibleRows = allRows.filter(row => row.style.display !== 'none');
-            
+
             visibleRows.sort((a, b) => {
                 let aValue, bValue;
 
@@ -260,12 +258,11 @@
             updateSortIcons();
         }
 
-        // Mettre à jour les icônes
         function updateSortIcons() {
             document.querySelectorAll('.sortable').forEach(header => {
                 const icon = header.querySelector('.sort-icon');
                 const column = header.dataset.column;
-                
+
                 if (column === currentSort.column) {
                     icon.textContent = currentSort.direction === 'asc' ? '↑' : '↓';
                     header.classList.add('active-sort');
@@ -276,7 +273,6 @@
             });
         }
 
-        // Appliquer les filtres
         function applyFilters() {
             const searchTerm = document.getElementById('searchInput').value.toLowerCase();
             const categoryFilter = document.getElementById('categoryFilter').value;
@@ -288,6 +284,7 @@
                 const titre = row.dataset.titre;
                 const categorie = row.dataset.categorie;
                 const montant = parseFloat(row.dataset.montant);
+                const isEpargne = row.classList.contains('epargne');
 
                 let show = true;
 
@@ -299,9 +296,11 @@
                     show = false;
                 }
 
-                if (typeFilter === 'revenus' && montant <= 0) {
+                if (typeFilter === 'revenus' && (montant <= 0 || isEpargne)) {
                     show = false;
-                } else if (typeFilter === 'depenses' && montant >= 0) {
+                } else if (typeFilter === 'depenses' && (montant >= 0 || isEpargne)) {
+                    show = false;
+                } else if (typeFilter === 'epargne' && !isEpargne) {
                     show = false;
                 }
 
@@ -320,14 +319,13 @@
             }
         }
 
-        // Réinitialiser
         function resetFilters() {
             document.getElementById('searchInput').value = '';
             document.getElementById('categoryFilter').value = 'all';
             document.getElementById('typeFilter').value = 'all';
-            
+
             allRows.forEach(row => row.style.display = '');
-            
+
             currentSort = { column: 'date', direction: 'desc' };
             sortTable('date');
         }

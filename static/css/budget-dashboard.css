@@ -408,3 +408,24 @@ h1 {
 .stat-change.down {
     color: rgba(239,68,68,0.85);
 }
+
+/* === CARTE OBJECTIFS CLIQUABLE === */
+.objectifs-card-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    transition: transform 0.2s ease;
+}
+
+.objectifs-card-link:hover {
+    transform: translateY(-3px);
+}
+
+.objectifs-card-link:hover .stat-card {
+    border-color: rgba(139, 92, 246, 0.5);
+    background: rgba(139, 92, 246, 0.15);
+}
+
+.objectifs-card-link .stat-card {
+    cursor: pointer;
+}

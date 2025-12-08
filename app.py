@@ -78,6 +78,12 @@ def home():
         db.func.coalesce(db.func.sum(Transaction.montant), 0)
     ).filter(Transaction.montant < 0).scalar()
 
+    # Total épargne (somme des épargnes de tous les objectifs)
+    total_epargne = db.session.query(
+        db.func.coalesce(db.func.sum(Objectif.epargne_actuelle), 0)
+    ).scalar()
+    total_epargne = float(total_epargne)
+
     total_revenus = float(total_revenus)
     total_depenses = float(-total_depenses_raw)
     argentActuel = total_revenus - total_depenses
@@ -88,6 +94,7 @@ def home():
         argentActuel=argentActuel,
         total_revenus=total_revenus,
         total_depenses=total_depenses,
+        total_epargne=total_epargne,
     )
 
 

@@ -120,6 +120,10 @@
     color: #ef4444;
 }
 
+.stat-item .value.epargne {
+    color: #f59e0b;
+}
+
 .stat-item .label {
     font-size: 0.85rem;
     color: rgba(255, 255, 255, 0.6);
@@ -157,12 +161,42 @@
     border-bottom: none;
 }
 
+/* === MONTANTS === */
 .montant-cell.positif {
     color: #10b981;
 }
 
 .montant-cell.negatif {
     color: #ef4444;
+}
+
+.montant-cell.epargne {
+    color: #f59e0b !important;
+}
+
+/* === BADGES CATÉGORIES === */
+.categorie-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.15);
+    font-size: 0.85rem;
+}
+
+.categorie-badge.epargne {
+    background: rgba(245, 158, 11, 0.2);
+    color: #f59e0b;
+    border: 1px solid rgba(245, 158, 11, 0.4);
+}
+
+/* === TRANSACTIONS ÉPARGNE === */
+.transaction-row.epargne {
+    background: rgba(245, 158, 11, 0.05);
+    border-left: 3px solid #f59e0b;
+}
+
+.transaction-row.epargne:hover {
+    background: rgba(245, 158, 11, 0.1);
 }
 
 /* === TRI DU TABLEAU === */
