@@ -304,6 +304,38 @@ def budget_dashboard():
         evol_annee_dep.append(dep)
         evol_annee_rev.append(rev)
 
+    # Calculer les alertes budgétaires pour le mois en cours
+    budget_alerts = []
+    for cat in all_categories:
+        if cat.limite_budget and cat.limite_budget > 0:
+            depenses_cat_mois = db.session.query(
+                func.coalesce(func.sum(Transaction.montant), 0)
+            ).filter(
+                Transaction.idCategorie == cat.idCategorie,
+                Transaction.montant < 0,
+                Transaction.dateTransaction >= start_month
+            ).scalar()
+            depenses_cat = float(-depenses_cat_mois)
+            pourcentage = (depenses_cat / float(cat.limite_budget)) * 100
+            
+            if pourcentage >= 100:
+                depassement = depenses_cat - float(cat.limite_budget)
+                if depassement == 0:
+                    message = 'Budget atteint !'
+                else:
+                    message = f'Budget dépassé de {depassement:.2f}€ ! ({pourcentage:.0f}%)'
+                budget_alerts.append({
+                    'type': 'danger',
+                    'category': cat.nom,
+                    'message': message
+                })
+            elif pourcentage >= 80:
+                budget_alerts.append({
+                    'type': 'warning',
+                    'category': cat.nom,
+                    'message': f'Vous avez utilisé {pourcentage:.0f}% de votre budget ({depenses_cat:.2f}€ / {float(cat.limite_budget):.2f}€)'
+                })
+
     return render_template(
         "budget-dashboard.html",
         dep_mois=dep_mois, rev_mois=rev_mois, solde_mois=rev_mois - dep_mois, cat_mois=cat_mois,
@@ -315,6 +347,7 @@ def budget_dashboard():
         evol_annee_labels=evol_annee_labels, evol_annee_dep=evol_annee_dep, evol_annee_rev=evol_annee_rev,
         categories_ids=categories_ids,
         categories_colors=categories_colors,
+        budget_alerts=budget_alerts,
     )
 
 

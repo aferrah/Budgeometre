@@ -216,6 +216,7 @@ h1 {
     gap: 0.5rem;
     font-size: 0.9rem;
     font-weight: 600;
+    color: whitesmoke;
 }
 
 .stat-change.up {

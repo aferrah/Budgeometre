@@ -15,7 +15,7 @@
 <div class="dashboard-container">
   <div class="dashboard-header">
     <h2>Tableau de bord</h2>
-    <p class="subtitle">Votre situation financière</p>
+    <p style="margin-bottom: 20px;"class="subtitle">Votre situation financière</p>
   </div>
 
   <div class="period-selector">
@@ -141,10 +141,44 @@
         "evolutionTitle": "Évolution (3 dernières années)"
       }
     },
-    "categoriesIds": {{ categories_ids | tojson }},
+        "categoriesIds": {{ categories_ids | tojson }},
     "categoriesColors": {{ categories_colors | tojson }}
   }
 </script>
+
+<!-- Section alertes budgétaires -->
+{% if budget_alerts %}
+<div class="budget-alerts-section">
+  <h3>
+    Alertes Budget
+  </h3>
+  <div class="alerts-list">
+    {% for alert in budget_alerts %}
+    <div class="alert-item alert-{{ alert.type }}">
+      <span class="alert-icon">
+        {% if alert.type == 'danger' %}
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="15" y1="9" x2="9" y2="15"></line>
+          <line x1="9" y1="9" x2="15" y2="15"></line>
+        </svg>
+        {% else %}
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+        {% endif %}
+      </span>
+      <div class="alert-content">
+        <strong>{{ alert.category }}</strong>
+        <p>{{ alert.message }}</p>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
 
 <script
   src="{{ url_for('static', filename='js/budget-dashboard.js') }}"
