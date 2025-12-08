@@ -90,3 +90,7 @@
 input, select {
     color: white;
 }
+button:hover {
+    transform: scale(1.03);
+    transition: 0.2s ease-in-out;
+}
