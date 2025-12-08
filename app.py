@@ -3,12 +3,12 @@ from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from sqlalchemy import func
 
-
 app = Flask(__name__)
 
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///budget.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["SECRET_KEY"] = "budgeometre_secret_2025"
+
 db = SQLAlchemy(app)
 
 
@@ -51,15 +51,14 @@ class Objectif(db.Model):
     __tablename__ = "OBJECTIF"
     idObjectif = db.Column(db.Integer, primary_key=True)
     montant = db.Column(db.Numeric(15, 2), nullable=False)
-    epargne_actuelle = db.Column(db.Numeric(15, 2), default=0)  # NOUVEAU
+    epargne_actuelle = db.Column(db.Numeric(15, 2), default=0)
     description = db.Column(db.String(255))
-    frequence = db.Column(db.String(20))  # ex: mensuel, annuel
+    frequence = db.Column(db.String(20))
     dateDebut = db.Column(db.DateTime)
     dateFin = db.Column(db.DateTime)
     idCategorie = db.Column(db.Integer, db.ForeignKey("CATEGORIE.idCategorie"), nullable=False)
 
     categorie = db.relationship("Categorie", back_populates="objectifs")
-
 
     def __repr__(self):
         return f"<Objectif {self.description} {self.montant}>"
@@ -71,18 +70,16 @@ def home():
         Transaction.query.order_by(Transaction.dateTransaction.desc()).limit(10).all()
     )
 
-    # Total des revenus (montants positifs)
     total_revenus = db.session.query(
         db.func.coalesce(db.func.sum(Transaction.montant), 0)
     ).filter(Transaction.montant > 0).scalar()
 
-    # Total des dépenses (montants négatifs, on prend la valeur absolue)
     total_depenses_raw = db.session.query(
         db.func.coalesce(db.func.sum(Transaction.montant), 0)
     ).filter(Transaction.montant < 0).scalar()
 
     total_revenus = float(total_revenus)
-    total_depenses = float(-total_depenses_raw)  # Valeur positive pour l'affichage
+    total_depenses = float(-total_depenses_raw)
     argentActuel = total_revenus - total_depenses
 
     return render_template(
@@ -97,11 +94,9 @@ def home():
 @app.route("/add-expense", methods=["GET", "POST"])
 def add_expense():
     if request.method == "GET":
-        # fournir la liste des catégories pour le select
         categories = Categorie.query.order_by(Categorie.nom).all()
         return render_template("add-expense.html", categories=categories)
 
-    # POST : créer une transaction depuis le formulaire
     titre = request.form.get("label") or "Dépense"
     montant_raw = request.form.get("amount") or "0"
     type_transaction = request.form.get("type", "depense")
@@ -133,7 +128,6 @@ def add_expense():
         except Exception:
             categorie = None
 
-    # Si aucune catégorie sélectionnée ou trouvée, créer/attribuer une catégorie 'Autre'
     if not categorie:
         categorie = Categorie.query.filter_by(nom="Autre").first()
         if not categorie:
@@ -206,51 +200,6 @@ def list_transactions():
         lignes.append(f"{t.dateTransaction} - {t.titre} : {t.montant}€ (cat: {t.categorie.nom})")
     return "<br>".join(lignes) if lignes else "Aucune transaction pour l'instant."
 
-'''@app.route("/mes-depenses", methods=["GET", "POST"])
-def mes_depenses():
-    # --- 1) Traitement du formulaire (POST) ---
-    if request.method == "POST":
-        titre = request.form.get("titre")
-        montant = request.form.get("montant")
-        categorie_id = request.form.get("idCategorie")
-
-        # Vérification basique
-        if not titre or not montant or not categorie_id:
-            return "Erreur : tous les champs sont obligatoires.", 400
-
-        # Validation des types
-        try:
-            montant = float(montant)
-            categorie_id = int(categorie_id)
-        except ValueError:
-            return "Erreur : montant ou catégorie invalide.", 400
-
-        # Création de la transaction
-        nouvelle_transaction = Transaction(
-            titre=titre,
-            montant=montant,
-            idCategorie=categorie_id
-        )
-        db.session.add(nouvelle_transaction)
-        db.session.commit()
-
-        # Redirection après ajout
-        return redirect(url_for("mes_depenses"))
-
-    # --- 2) Affichage (GET) ---
-    transactions = (
-        Transaction.query
-        .order_by(Transaction.dateTransaction.desc())
-        .all()
-    )
-    categories = Categorie.query.order_by(Categorie.nom).all()
-
-    return render_template(
-        "mes_depenses.html",
-        transactions=transactions,
-        categories=categories
-    )'''
-
 
 @app.route("/dashboard")
 def budget_dashboard():
@@ -259,7 +208,6 @@ def budget_dashboard():
 
     now = datetime.utcnow()
 
-    # Fonction helper pour calculer les stats d'une période
     def get_stats(start_date, end_date=None):
         query_dep = db.session.query(func.coalesce(func.sum(Transaction.montant), 0)).filter(
             Transaction.montant < 0,
@@ -275,20 +223,16 @@ def budget_dashboard():
 
         return float(-query_dep.scalar()), float(query_rev.scalar())
 
-    # Stats par mois
     start_month = datetime(now.year, now.month, 1)
     dep_mois, rev_mois = get_stats(start_month)
 
-    # Stats par trimestre
     trimestre = (now.month - 1) // 3
     start_quarter = datetime(now.year, trimestre * 3 + 1, 1)
     dep_trim, rev_trim = get_stats(start_quarter)
 
-    # Stats par année
     start_year = datetime(now.year, 1, 1)
     dep_annee, rev_annee = get_stats(start_year)
 
-    # Dépenses par catégorie (pour chaque période)
     def get_depenses_par_cat(start_date):
         result = (
             db.session.query(Categorie.nom, func.coalesce(func.sum(Transaction.montant), 0))
@@ -303,12 +247,10 @@ def budget_dashboard():
     cat_trim = get_depenses_par_cat(start_quarter)
     cat_annee = get_depenses_par_cat(start_year)
 
-    # Mapping nom -> id et couleur
     all_categories = Categorie.query.all()
     categories_ids = {cat.nom: cat.idCategorie for cat in all_categories}
     categories_colors = {cat.nom: cat.couleur or '#8b5cf6' for cat in all_categories}
 
-    # Objectifs (basé sur le mois)
     objectifs = Objectif.query.all()
     nb_objectifs = len(objectifs)
     objectifs_respectes = 0
@@ -322,7 +264,6 @@ def budget_dashboard():
             objectifs_respectes += 1
     ratio_objectifs = int(round(100 * objectifs_respectes / nb_objectifs)) if nb_objectifs > 0 else 0
 
-    # Évolution 6 mois
     evol_mois_labels, evol_mois_dep, evol_mois_rev = [], [], []
     for i in range(5, -1, -1):
         d = now - timedelta(days=i * 30)
@@ -333,7 +274,6 @@ def budget_dashboard():
         evol_mois_dep.append(dep)
         evol_mois_rev.append(rev)
 
-    # Évolution 4 trimestres
     evol_trim_labels, evol_trim_dep, evol_trim_rev = [], [], []
     for i in range(3, -1, -1):
         t = (now.month - 1) // 3 + 1 - i
@@ -348,7 +288,6 @@ def budget_dashboard():
         evol_trim_dep.append(dep)
         evol_trim_rev.append(rev)
 
-    # Évolution 3 années
     evol_annee_labels, evol_annee_dep, evol_annee_rev = [], [], []
     for i in range(2, -1, -1):
         a = now.year - i
@@ -359,19 +298,13 @@ def budget_dashboard():
 
     return render_template(
         "budget-dashboard.html",
-        # Stats mois
         dep_mois=dep_mois, rev_mois=rev_mois, solde_mois=rev_mois - dep_mois, cat_mois=cat_mois,
-        # Stats trimestre
         dep_trim=dep_trim, rev_trim=rev_trim, solde_trim=rev_trim - dep_trim, cat_trim=cat_trim,
-        # Stats année
         dep_annee=dep_annee, rev_annee=rev_annee, solde_annee=rev_annee - dep_annee, cat_annee=cat_annee,
-        # Objectifs
         objectifs_respectes=objectifs_respectes, nb_objectifs=nb_objectifs, ratio_objectifs=ratio_objectifs,
-        # Évolution
         evol_mois_labels=evol_mois_labels, evol_mois_dep=evol_mois_dep, evol_mois_rev=evol_mois_rev,
         evol_trim_labels=evol_trim_labels, evol_trim_dep=evol_trim_dep, evol_trim_rev=evol_trim_rev,
         evol_annee_labels=evol_annee_labels, evol_annee_dep=evol_annee_dep, evol_annee_rev=evol_annee_rev,
-        # Catégories IDs et couleurs
         categories_ids=categories_ids,
         categories_colors=categories_colors,
     )
@@ -379,7 +312,6 @@ def budget_dashboard():
 
 @app.route("/mes-objectifs", methods=["GET", "POST"])
 def mes_objectifs():
-    # --- POST : ajout d'un objectif ---
     if request.method == "POST":
         montant_str = request.form.get("montant")
         categorie_str = request.form.get("categorie")
@@ -410,7 +342,6 @@ def mes_objectifs():
 
         return redirect(url_for("mes_objectifs"))
 
-    # --- GET : afficher la page ---
     objectifs = Objectif.query.all()
     categories = Categorie.query.all()
 
@@ -459,12 +390,31 @@ def ajouter_epargne(id):
         flash(f"Solde insuffisant ! Vous avez {solde_actuel:.2f}€ disponible.", "error")
         return redirect(url_for("mes_objectifs", _anchor=f"objectif-{id}"))
 
+    # Créer ou récupérer la catégorie "Épargne"
+    cat_epargne = Categorie.query.filter_by(nom="Épargne").first()
+    if not cat_epargne:
+        cat_epargne = Categorie(nom="Épargne", description="Transferts vers épargne", couleur="#f59e0b")
+        db.session.add(cat_epargne)
+        db.session.commit()
+
+    # Créer une transaction négative (retrait du solde)
+    transaction = Transaction(
+        montant=-montant,
+        titre=f"Épargne: {objectif.description or 'Objectif'}",
+        commentaire=f"Transfert vers objectif d'épargne",
+        dateTransaction=datetime.utcnow(),
+        idCategorie=cat_epargne.idCategorie
+    )
+    db.session.add(transaction)
+
+    # Ajouter à l'épargne de l'objectif
     if objectif.epargne_actuelle is None:
         objectif.epargne_actuelle = 0
     objectif.epargne_actuelle = float(objectif.epargne_actuelle) + montant
+
     db.session.commit()
 
-    flash(f"{montant:.2f}€ ajouté à votre objectif !", "success")
+    flash(f"{montant:.2f}€ transféré vers votre épargne !", "success")
     return redirect(url_for("mes_objectifs", _anchor=f"objectif-{id}"))
 
 
@@ -473,25 +423,113 @@ def retirer_epargne(id):
     objectif = Objectif.query.get_or_404(id)
     montant_str = request.form.get("montant")
 
-    if montant_str:
-        try:
-            montant = float(montant_str)
-            if objectif.epargne_actuelle is None:
-                objectif.epargne_actuelle = 0
-            nouvelle_valeur = float(objectif.epargne_actuelle) - montant
-            objectif.epargne_actuelle = max(0, nouvelle_valeur)
-            db.session.commit()
-        except ValueError:
-            pass
+    if not montant_str:
+        return redirect(url_for("mes_objectifs", _anchor=f"objectif-{id}"))
 
+    try:
+        montant = float(montant_str)
+    except ValueError:
+        return redirect(url_for("mes_objectifs", _anchor=f"objectif-{id}"))
+
+    epargne_actuelle = float(objectif.epargne_actuelle) if objectif.epargne_actuelle else 0
+
+    if montant > epargne_actuelle:
+        flash(f"Épargne insuffisante ! Vous avez {epargne_actuelle:.2f}€ dans cet objectif.", "error")
+        return redirect(url_for("mes_objectifs", _anchor=f"objectif-{id}"))
+
+    # Créer ou récupérer la catégorie "Épargne"
+    cat_epargne = Categorie.query.filter_by(nom="Épargne").first()
+    if not cat_epargne:
+        cat_epargne = Categorie(nom="Épargne", description="Transferts vers épargne", couleur="#f59e0b")
+        db.session.add(cat_epargne)
+        db.session.commit()
+
+    # Créer une transaction positive (retour vers solde)
+    transaction = Transaction(
+        montant=montant,
+        titre=f"Retrait épargne: {objectif.description or 'Objectif'}",
+        commentaire=f"Retrait depuis objectif d'épargne",
+        dateTransaction=datetime.utcnow(),
+        idCategorie=cat_epargne.idCategorie
+    )
+    db.session.add(transaction)
+
+    # Retirer de l'épargne
+    objectif.epargne_actuelle = epargne_actuelle - montant
+
+    db.session.commit()
+
+    flash(f"{montant:.2f}€ retransféré vers votre solde !", "success")
     return redirect(url_for("mes_objectifs", _anchor=f"objectif-{id}"))
+
+
+@app.route("/objectif/<int:id>/recuperer", methods=["POST"])
+def recuperer_epargne(id):
+    objectif = Objectif.query.get_or_404(id)
+
+    epargne_actuelle = float(objectif.epargne_actuelle) if objectif.epargne_actuelle else 0
+
+    if epargne_actuelle <= 0:
+        flash("Aucune épargne à récupérer.", "error")
+        return redirect(url_for("mes_objectifs", _anchor=f"objectif-{id}"))
+
+    # Créer ou récupérer la catégorie "Épargne"
+    cat_epargne = Categorie.query.filter_by(nom="Épargne").first()
+    if not cat_epargne:
+        cat_epargne = Categorie(nom="Épargne", description="Transferts vers épargne", couleur="#f59e0b")
+        db.session.add(cat_epargne)
+        db.session.commit()
+
+    # Créer une transaction positive (retour vers solde)
+    transaction = Transaction(
+        montant=epargne_actuelle,
+        titre=f"Récupération épargne: {objectif.description or 'Objectif'}",
+        commentaire=f"Objectif atteint - récupération totale",
+        dateTransaction=datetime.utcnow(),
+        idCategorie=cat_epargne.idCategorie
+    )
+    db.session.add(transaction)
+
+    # Remettre l'épargne à zéro
+    objectif.epargne_actuelle = 0
+
+    db.session.commit()
+
+    flash(f"{epargne_actuelle:.2f}€ récupéré sur votre solde principal !", "success")
+    return redirect(url_for("mes_objectifs"))
+
 
 @app.route("/objectif/<int:id>/supprimer", methods=["POST"])
 def supprimer_objectif(id):
     objectif = Objectif.query.get_or_404(id)
+
+    # Si l'objectif a de l'épargne, la remettre sur le solde
+    epargne_actuelle = float(objectif.epargne_actuelle) if objectif.epargne_actuelle else 0
+
+    if epargne_actuelle > 0:
+        cat_epargne = Categorie.query.filter_by(nom="Épargne").first()
+        if not cat_epargne:
+            cat_epargne = Categorie(nom="Épargne", description="Transferts vers épargne", couleur="#f59e0b")
+            db.session.add(cat_epargne)
+            db.session.commit()
+
+        transaction = Transaction(
+            montant=epargne_actuelle,
+            titre=f"Suppression objectif: {objectif.description or 'Objectif'}",
+            commentaire=f"Récupération épargne suite à suppression",
+            dateTransaction=datetime.utcnow(),
+            idCategorie=cat_epargne.idCategorie
+        )
+        db.session.add(transaction)
+        flash(f"Objectif supprimé. {epargne_actuelle:.2f}€ retransféré vers votre solde.", "success")
+    else:
+        flash("Objectif supprimé.", "success")
+
     db.session.delete(objectif)
     db.session.commit()
     return redirect(url_for("mes_objectifs"))
+
+
 @app.route("/categories", methods=["GET", "POST"])
 def categories():
     if request.method == "POST":
@@ -500,7 +538,6 @@ def categories():
         couleur = request.form.get("couleur", "#8b5cf6")
 
         if nom:
-            # Vérifier si la catégorie existe déjà
             existante = Categorie.query.filter_by(nom=nom).first()
             if not existante:
                 nouvelle_cat = Categorie(nom=nom, description=description, couleur=couleur)
@@ -509,7 +546,6 @@ def categories():
 
         return redirect(url_for("categories"))
 
-    # GET : afficher toutes les catégories
     toutes_categories = Categorie.query.order_by(Categorie.nom).all()
     return render_template("categories.html", categories=toutes_categories)
 
@@ -518,9 +554,7 @@ def categories():
 def delete_category(id):
     categorie = Categorie.query.get_or_404(id)
 
-    # Vérifier si des transactions utilisent cette catégorie
     if categorie.transactions:
-        # Option : ne pas supprimer si utilisée
         return redirect(url_for("categories"))
 
     db.session.delete(categorie)
@@ -535,7 +569,6 @@ def depenses_categorie(id):
 
     categorie = Categorie.query.get_or_404(id)
 
-    # Récupérer toutes les transactions de cette catégorie (dépenses uniquement)
     transactions = Transaction.query.filter(
         Transaction.idCategorie == id,
         Transaction.montant < 0
@@ -543,13 +576,11 @@ def depenses_categorie(id):
 
     now = datetime.utcnow()
 
-    # Calculer les dépenses par mois
     depenses_par_mois = defaultdict(float)
     for t in transactions:
         mois_key = t.dateTransaction.strftime('%Y-%m')
         depenses_par_mois[mois_key] += float(-t.montant)
 
-    # Générer les 12 derniers mois
     mois_labels = []
     mois_data = []
     for i in range(11, -1, -1):
@@ -559,7 +590,6 @@ def depenses_categorie(id):
         mois_labels.append(mois_label)
         mois_data.append(depenses_par_mois.get(mois_key, 0))
 
-    # Calculer les dépenses par trimestre
     depenses_par_trimestre = defaultdict(float)
     for t in transactions:
         annee = t.dateTransaction.year
@@ -567,7 +597,6 @@ def depenses_categorie(id):
         trim_key = f"{annee}-T{trimestre}"
         depenses_par_trimestre[trim_key] += float(-t.montant)
 
-    # Générer les 4 derniers trimestres
     trimestre_labels = []
     trimestre_data = []
     trimestre_actuel = (now.month - 1) // 3 + 1
@@ -583,7 +612,6 @@ def depenses_categorie(id):
         trimestre_labels.append(f"T{t} {a}")
         trimestre_data.append(depenses_par_trimestre.get(trim_key, 0))
 
-    # Calculer les dépenses par année
     depenses_par_annee = defaultdict(float)
     for t in transactions:
         annee_key = str(t.dateTransaction.year)
@@ -596,7 +624,6 @@ def depenses_categorie(id):
         annee_labels.append(str(a))
         annee_data.append(depenses_par_annee.get(str(a), 0))
 
-    # Total dépenses
     total_depenses = sum(float(-t.montant) for t in transactions)
 
     return render_template(

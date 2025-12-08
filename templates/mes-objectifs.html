@@ -73,10 +73,10 @@
                                 </span>
                             </div>
                         </div>
-                        
+
                         <div class="progress-container">
                             <div class="progress-bar">
-                                <div class="progress-fill {% if status == 'Atteint' %}atteint{% else %}encours{% endif %}" 
+                                <div class="progress-fill {% if status == 'Atteint' %}atteint{% else %}encours{% endif %}"
                                      style="width: {{ pourcentage_affiche }}%">
                                 </div>
                             </div>
@@ -86,34 +86,44 @@
                         </div>
 
                         <div class="objectif-actions-bar">
-                            <div class="epargne-controls">
-                                <form action="{{ url_for('retirer_epargne', id=obj.idObjectif) }}" method="POST" class="epargne-form-group">
-                                    <input type="hidden" name="montant" id="montant-retirer-{{ obj.idObjectif }}" value="10">
-                                    <button type="submit" class="btn-epargne btn-moins" title="Retirer">
-                                        <span>−</span>
+                            {% if status == 'Atteint' %}
+                                <!-- Bouton récupérer quand objectif atteint -->
+                                <form action="{{ url_for('recuperer_epargne', id=obj.idObjectif) }}" method="POST" class="recuperer-form">
+                                    <button type="submit" class="btn-recuperer" onclick="return confirm('Récupérer {{ '%.2f'|format(epargne) }}€ sur votre solde principal ?')">
+                                        💰 Récupérer {{ "%.2f"|format(epargne) }}€
                                     </button>
                                 </form>
-                                
-                                <div class="montant-input-group">
-                                    <input type="number" id="montant-input-{{ obj.idObjectif }}" placeholder="Montant" min="0.01" step="0.01" class="input-montant" 
-                                           onchange="document.getElementById('montant-ajouter-{{ obj.idObjectif }}').value = this.value; document.getElementById('montant-retirer-{{ obj.idObjectif }}').value = this.value;">
-                                </div>
+                            {% else %}
+                                <!-- Contrôles d'épargne -->
+                                <div class="epargne-controls">
+                                    <form action="{{ url_for('retirer_epargne', id=obj.idObjectif) }}" method="POST" class="epargne-form-group">
+                                        <input type="hidden" name="montant" id="montant-retirer-{{ obj.idObjectif }}" value="10">
+                                        <button type="submit" class="btn-epargne btn-moins" title="Retirer">
+                                            <span>−</span>
+                                        </button>
+                                    </form>
 
-                                <form action="{{ url_for('ajouter_epargne', id=obj.idObjectif) }}" method="POST" class="epargne-form-group">
-                                    <input type="hidden" name="montant" id="montant-ajouter-{{ obj.idObjectif }}" value="10">
-                                    <button type="submit" class="btn-epargne btn-plus-custom" title="Ajouter">
-                                        <span>+</span>
-                                    </button>
-                                </form>
-                                
-                                <form action="{{ url_for('ajouter_epargne', id=obj.idObjectif) }}" method="POST" class="epargne-form-group">
-                                    <input type="hidden" name="montant" value="10">
-                                    <button type="submit" class="btn-epargne btn-plus-10" title="Ajouter 10€">
-                                        <span>+10€</span>
-                                    </button>
-                                </form>
-                            </div>
-                            
+                                    <div class="montant-input-group">
+                                        <input type="number" id="montant-input-{{ obj.idObjectif }}" placeholder="Montant" min="0.01" step="0.01" class="input-montant"
+                                               onchange="document.getElementById('montant-ajouter-{{ obj.idObjectif }}').value = this.value; document.getElementById('montant-retirer-{{ obj.idObjectif }}').value = this.value;">
+                                    </div>
+
+                                    <form action="{{ url_for('ajouter_epargne', id=obj.idObjectif) }}" method="POST" class="epargne-form-group">
+                                        <input type="hidden" name="montant" id="montant-ajouter-{{ obj.idObjectif }}" value="10">
+                                        <button type="submit" class="btn-epargne btn-plus-custom" title="Ajouter">
+                                            <span>+</span>
+                                        </button>
+                                    </form>
+
+                                    <form action="{{ url_for('ajouter_epargne', id=obj.idObjectif) }}" method="POST" class="epargne-form-group">
+                                        <input type="hidden" name="montant" value="10">
+                                        <button type="submit" class="btn-epargne btn-plus-10" title="Ajouter 10€">
+                                            <span>+10€</span>
+                                        </button>
+                                    </form>
+                                </div>
+                            {% endif %}
+
                             <form action="{{ url_for('supprimer_objectif', id=obj.idObjectif) }}" method="POST" class="delete-form">
                                 <button type="submit" class="btn-delete" title="Supprimer l'objectif" onclick="return confirm('Supprimer cet objectif ?')">
                                     🗑️
