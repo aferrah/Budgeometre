@@ -51,15 +51,13 @@ class Objectif(db.Model):
     idObjectif = db.Column(db.Integer, primary_key=True)
     montant = db.Column(db.Numeric(15, 2), nullable=False)
     description = db.Column(db.String(255))
-    frequence = db.Column(db.String(20))
+    frequence = db.Column(db.String(20))  # ex: mensuel, annuel
     dateDebut = db.Column(db.DateTime)
     dateFin = db.Column(db.DateTime)
-    idCategorie = db.Column(
-        db.Integer,
-        db.ForeignKey("CATEGORIE.idCategorie", ondelete="RESTRICT"),
-        nullable=False,
-    )
+    idCategorie = db.Column(db.Integer, db.ForeignKey("CATEGORIE.idCategorie"), nullable=False)
+
     categorie = db.relationship("Categorie", back_populates="objectifs")
+
 
     def __repr__(self):
         return f"<Objectif {self.description} {self.montant}>"
@@ -374,6 +372,57 @@ def budget_dashboard():
         # Catégories IDs et couleurs
         categories_ids=categories_ids,
         categories_colors=categories_colors,
+    )
+@app.route("/mes-objectifs", methods=["GET", "POST"])
+def mes_objectifs():
+
+    # --- POST : ajout d'un objectif ---
+    if request.method == "POST":
+        montant = float(request.form.get("montant"))
+        description = request.form.get("description")
+        frequence = request.form.get("frequence")
+        categorie_id = int(request.form.get("categorie"))
+
+        new_obj = Objectif(
+            montant=montant,
+            description=description,
+            frequence=frequence,
+            idCategorie=categorie_id,
+            dateDebut=datetime.utcnow(),
+        )
+
+        db.session.add(new_obj)
+        db.session.commit()
+
+        return redirect(url_for("mes_objectifs"))
+
+    # --- GET : afficher la page ---
+    objectifs = Objectif.query.all()
+    categories = Categorie.query.all()
+
+    # Calcul si objectif dépassé pour chaque catégorie
+    now = datetime.utcnow()
+    start_month = datetime(now.year, now.month, 1)
+
+    objectifs_status = []
+    for obj in objectifs:
+        total_depenses = db.session.query(
+            func.coalesce(func.sum(Transaction.montant), 0)
+        ).filter(
+            Transaction.idCategorie == obj.idCategorie,
+            Transaction.montant < 0,
+            Transaction.dateTransaction >= start_month
+        ).scalar()
+
+        total_depenses = abs(float(total_depenses))
+
+        status = "Respecté" if total_depenses <= float(obj.montant) else "Dépassé"
+        objectifs_status.append((obj, total_depenses, status))
+
+    return render_template(
+        "mes-objectifs.html",
+        objectifs_status=objectifs_status,
+        categories=categories
     )
 
 
