@@ -11,20 +11,6 @@
 {% endblock %}
 
 {% block content %}
-<main class="categories-page">
-    <!-- Messages flash inline -->
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            <div class="flash-messages">
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ category }}">
-                        {{ message }}
-                    </div>
-                {% endfor %}
-            </div>
-        {% endif %}
-    {% endwith %}
-
     <div class="categories-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
         <h2>Catégories</h2>
         <a href="{{ url_for('home') }}" class="btn-back">← Retour à l'accueil</a>
@@ -155,7 +141,6 @@
         {% endif %}
     </div>
 
-</main>
 {% endblock %}
 
 {% block scripts %}

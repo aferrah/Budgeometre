@@ -152,6 +152,8 @@ def add_expense():
     )
     db.session.add(tr)
     db.session.commit()
+    
+    flash("Transaction ajoutée avec succès", "success")
 
     return redirect(url_for("home"))
 
@@ -380,6 +382,8 @@ def mes_objectifs():
 
         db.session.add(new_obj)
         db.session.commit()
+        
+        flash("Objectif ajouté avec succès", "success")
 
         return redirect(url_for("mes_objectifs"))
 
@@ -600,6 +604,7 @@ def categories():
                 nouvelle_cat = Categorie(nom=nom, description=description, couleur=couleur, limite_budget=limite_budget)
                 db.session.add(nouvelle_cat)
                 db.session.commit()
+                flash("Catégorie ajoutée avec succès", "success")
 
         return redirect(url_for("categories"))
 
