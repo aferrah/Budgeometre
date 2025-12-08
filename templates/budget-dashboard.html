@@ -13,9 +13,12 @@
 
 {% block content %}
 <div class="dashboard-container">
-  <div class="dashboard-header">
-    <h2>Tableau de bord</h2>
-    <p style="margin-bottom: 20px;"class="subtitle">Votre situation financière</p>
+  <div class="dashboard-header" style="display: flex; justify-content: space-between; align-items: center;">
+    <div>
+      <h2>Tableau de bord</h2>
+      <p style="margin-bottom: 20px;"class="subtitle">Votre situation financière</p>
+    </div>
+    <a href="{{ url_for('home') }}" class="btn-back">← Retour à l'accueil</a>
   </div>
 
   <div class="period-selector">

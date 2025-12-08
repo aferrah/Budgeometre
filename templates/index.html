@@ -76,9 +76,11 @@
         </div>
     </div>
 
-    <!-- Bouton ajouter -->
-    <div class="add-expense-container" style="margin-bottom: 30px;">
+    <!-- Boutons ajouter -->
+    <div class="add-expense-container" style="margin-bottom: 30px; display: flex; gap: 15px; flex-wrap: wrap; justify-content: center;">
         <a class="add-expense-btn" href="{{ url_for('add_expense') }}">Ajouter une transaction</a>
+        <a class="add-expense-btn" href="{{ url_for('mes_objectifs') }}">Ajouter un objectif</a>
+        <a class="add-expense-btn" href="{{ url_for('categories') }}">Ajouter une catégorie</a>
     </div>
 
     <!-- Dernières transactions -->

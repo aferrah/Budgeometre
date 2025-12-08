@@ -12,10 +12,6 @@
 
 {% block content %}
 <main class="categories-page">
-    <div style="margin-bottom: 50px;">
-    <a href="{{ url_for('home') }}" class="btn-back">← Retour à l'accueil</a>
-    </div>
-
     <!-- Messages flash inline -->
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
@@ -29,8 +25,9 @@
         {% endif %}
     {% endwith %}
 
-    <div class="categories-header">
+    <div class="categories-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
         <h2>Catégories</h2>
+        <a href="{{ url_for('home') }}" class="btn-back">← Retour à l'accueil</a>
     </div>
 
     <!-- Formulaire d'ajout -->
