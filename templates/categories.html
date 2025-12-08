@@ -89,14 +89,21 @@
     }
 
     .btn-add {
-        padding: 12px 24px;
+        width: 80px;
+        height: 50px;
+        padding: 0;
         background: linear-gradient(135deg, #8b5cf6, #6366f1);
         border: none;
         border-radius: 8px;
         color: white;
         font-weight: 600;
+        font-size: 1.5rem;
         cursor: pointer;
         transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
     }
 
     .btn-add:hover {
@@ -282,6 +289,138 @@
     .empty-state p {
         font-size: 1.1rem;
     }
+
+    /* Alertes et budget */
+    .flash-messages {
+        margin-bottom: 20px;
+    }
+
+    .alert {
+        padding: 15px 20px;
+        border-radius: 8px;
+        margin-bottom: 10px;
+        backdrop-filter: blur(10px);
+        border: 1px solid;
+    }
+
+    .alert-warning {
+        background: rgba(245, 158, 11, 0.2);
+        border-color: rgba(245, 158, 11, 0.5);
+        color: #fbbf24;
+    }
+
+    .budget-info {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 0;
+        background: transparent;
+        border-radius: 8px;
+    }
+
+    .budget-label {
+        font-size: 0.9rem;
+        color: rgba(255, 255, 255, 0.7);
+        min-width: 120px;
+    }
+
+    .budget-bar-container {
+        flex: 1;
+        height: 20px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .budget-bar {
+        height: 100%;
+        border-radius: 10px;
+        transition: width 0.3s ease;
+        position: relative;
+    }
+
+    .budget-bar.ok {
+        background: linear-gradient(90deg, #10b981, #34d399);
+    }
+
+    .budget-bar.warning {
+        background: linear-gradient(90deg, #f59e0b, #fbbf24);
+    }
+
+    .budget-bar.danger {
+        background: linear-gradient(90deg, #ef4444, #f87171);
+    }
+
+    .budget-amounts {
+        display: flex;
+        gap: 10px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        min-width: 200px;
+        justify-content: flex-end;
+    }
+
+    .budget-spent {
+        color: #ef4444;
+    }
+
+    .budget-limit {
+        color: rgba(255, 255, 255, 0.6);
+    }
+
+    .budget-alert {
+        padding: 8px 12px;
+        border-radius: 6px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        margin-top: 8px;
+        display: inline-block;
+    }
+
+    .budget-alert.warning {
+        background: rgba(245, 158, 11, 0.2);
+        color: #fbbf24;
+        border: 1px solid rgba(245, 158, 11, 0.4);
+    }
+
+    .budget-alert.danger {
+        background: rgba(239, 68, 68, 0.2);
+        color: #f87171;
+        border: 1px solid rgba(239, 68, 68, 0.4);
+    }
+
+    .no-limit {
+        color: rgba(255, 255, 255, 0.5);
+        font-style: italic;
+        font-size: 0.9rem;
+    }
+
+    .category-budget-section {
+        padding: 15px 20px;
+        background: rgba(0, 0, 0, 0.2);
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .form-row input[type="number"] {
+        flex: 1;
+        min-width: 200px;
+        padding: 12px 16px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        font-size: 1rem;
+    }
+
+    .form-row input[type="number"]::placeholder {
+        color: rgba(255, 255, 255, 0.5);
+    }
+
+    .form-row input[type="number"]:focus {
+        outline: none;
+        border-color: #8b5cf6;
+    }
 </style>
 {% endblock %}
 
@@ -292,6 +431,19 @@
 
 {% block content %}
 <main class="categories-page">
+
+    <!-- Messages flash -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-messages">
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
 
     <div class="categories-header">
         <h2>Catégories</h2>
@@ -305,7 +457,14 @@
                 <input type="text" name="nom" placeholder="Nom de la catégorie" required>
                 <input type="text" name="description" placeholder="Description (optionnel)">
                 <input type="color" name="couleur" value="#8b5cf6" title="Couleur de la catégorie">
-                <button type="submit" class="btn-add">Ajouter</button>
+            </div>
+            <div class="form-row" style="margin-top: 10px;">
+                <label style="display: flex; align-items: center; gap: 10px; color: white; cursor: pointer; flex: 0 0 auto; margin-right: 16px;">
+                    <input type="checkbox" id="has_limit" onchange="toggleLimitInput()" style="width: 20px; height: 20px; cursor: pointer;">
+                    <span style="white-space: nowrap;">Définir une limite de budget mensuel</span>
+                </label>
+                <input type="number" id="limite_budget_input" name="limite_budget" placeholder="Limite budget (€)" min="0" step="0.01" style="display: none;">
+                <button type="submit" class="btn-add" title="Ajouter la catégorie">+</button>
             </div>
         </form>
     </div>
@@ -335,6 +494,39 @@
                             </form>
                         </div>
                     </div>
+
+                    <!-- Section Budget (si limite définie) -->
+                    {% if cat.limite_budget and cat.limite_budget > 0 %}
+                    <div class="category-budget-section">
+                        <div class="budget-info">
+                            <span class="budget-label">Budget mensuel:</span>
+                            <div class="budget-bar-container">
+                                {% set pct = cat.pourcentage|default(0) %}
+                                {% if pct < 80 %}
+                                    {% set bar_class = 'ok' %}
+                                {% elif pct < 100 %}
+                                    {% set bar_class = 'warning' %}
+                                {% else %}
+                                    {% set bar_class = 'danger' %}
+                                {% endif %}
+                                <div class="budget-bar {{ bar_class }}" style="width: {{ [pct, 100]|min }}%;"></div>
+                            </div>
+                            <div class="budget-amounts">
+                                <span class="budget-spent">{{ '%.2f'|format(cat.depenses_mois|default(0)) }}€</span>
+                                <span class="budget-limit">/ {{ '%.2f'|format(cat.limite_budget) }}€</span>
+                            </div>
+                        </div>
+                        {% if pct >= 80 and pct < 100 %}
+                            <div class="budget-alert warning">
+                                ⚠️ Attention : vous avez utilisé {{ '%.0f'|format(pct) }}% de votre budget
+                            </div>
+                        {% elif pct >= 100 %}
+                            <div class="budget-alert danger">
+                                ⚠️ Budget dépassé de {{ '%.2f'|format(cat.depenses_mois - cat.limite_budget|float) }}€ !
+                            </div>
+                        {% endif %}
+                    </div>
+                    {% endif %}
 
                     <!-- Déroulant des 3 dernières transactions -->
                     <div class="transactions-dropdown" id="transactions-{{ cat.idCategorie }}">
@@ -378,9 +570,23 @@
         btn.classList.toggle('active');
 
         if (dropdown.classList.contains('open')) {
-            btn.textContent = 'Masquer';
+            btn.textContent = '▲ Masquer';
         } else {
-            btn.textContent = 'Voir';
+            btn.textContent = '▼ Voir';
+        }
+    }
+
+    function toggleLimitInput() {
+        const checkbox = document.getElementById('has_limit');
+        const input = document.getElementById('limite_budget_input');
+        
+        if (checkbox.checked) {
+            input.style.display = 'block';
+            input.required = true;
+        } else {
+            input.style.display = 'none';
+            input.required = false;
+            input.value = '';
         }
     }
 </script>

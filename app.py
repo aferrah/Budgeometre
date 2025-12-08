@@ -18,6 +18,7 @@ class Categorie(db.Model):
     nom = db.Column(db.String(50), nullable=False)
     description = db.Column(db.String(255))
     couleur = db.Column(db.String(7), default="#8b5cf6")
+    limite_budget = db.Column(db.Numeric(15, 2), default=0)
     transactions = db.relationship("Transaction", back_populates="categorie")
     objectifs = db.relationship("Objectif", back_populates="categorie")
 
@@ -543,18 +544,63 @@ def categories():
         nom = request.form.get("nom")
         description = request.form.get("description", "")
         couleur = request.form.get("couleur", "#8b5cf6")
+        limite_budget_raw = request.form.get("limite_budget", "0")
+
+        try:
+            limite_budget = float(limite_budget_raw) if limite_budget_raw else 0
+        except ValueError:
+            limite_budget = 0
+
+        # Calculer le revenu total pour la validation
+        total_revenus = db.session.query(
+            db.func.coalesce(db.func.sum(Transaction.montant), 0)
+        ).filter(Transaction.montant > 0).scalar()
+        total_revenus = float(total_revenus)
+
+        # Vérifier si la limite dépasse le revenu
+        if limite_budget > total_revenus and limite_budget > 0:
+            flash(f"⚠️ Attention : La limite de {limite_budget:.2f}€ dépasse votre revenu total de {total_revenus:.2f}€", "warning")
 
         if nom:
             existante = Categorie.query.filter_by(nom=nom).first()
             if not existante:
-                nouvelle_cat = Categorie(nom=nom, description=description, couleur=couleur)
+                nouvelle_cat = Categorie(nom=nom, description=description, couleur=couleur, limite_budget=limite_budget)
                 db.session.add(nouvelle_cat)
                 db.session.commit()
 
         return redirect(url_for("categories"))
 
+    # Calculer les dépenses par catégorie pour le mois en cours
+    from datetime import datetime
+    now = datetime.utcnow()
+    start_month = datetime(now.year, now.month, 1)
+
     toutes_categories = Categorie.query.order_by(Categorie.nom).all()
-    return render_template("categories.html", categories=toutes_categories)
+    
+    # Calculer les statistiques pour chaque catégorie
+    for cat in toutes_categories:
+        depenses_mois = db.session.query(
+            db.func.coalesce(db.func.sum(Transaction.montant), 0)
+        ).filter(
+            Transaction.idCategorie == cat.idCategorie,
+            Transaction.montant < 0,
+            Transaction.dateTransaction >= start_month
+        ).scalar()
+        
+        cat.depenses_mois = float(-depenses_mois)
+        
+        # Calculer le pourcentage si une limite est définie
+        if cat.limite_budget and cat.limite_budget > 0:
+            cat.pourcentage = (cat.depenses_mois / float(cat.limite_budget)) * 100
+        else:
+            cat.pourcentage = 0
+
+    # Calculer le revenu total pour l'affichage
+    total_revenus = db.session.query(
+        db.func.coalesce(db.func.sum(Transaction.montant), 0)
+    ).filter(Transaction.montant > 0).scalar()
+
+    return render_template("categories.html", categories=toutes_categories, total_revenus=float(total_revenus))
 
 
 @app.route("/categories/delete/<int:id>", methods=["POST"])
