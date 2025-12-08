@@ -1,13 +1,14 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from sqlalchemy import func
+
 
 app = Flask(__name__)
 
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///budget.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-
+app.config["SECRET_KEY"] = "budgeometre_secret_2025"
 db = SQLAlchemy(app)
 
 
@@ -50,6 +51,7 @@ class Objectif(db.Model):
     __tablename__ = "OBJECTIF"
     idObjectif = db.Column(db.Integer, primary_key=True)
     montant = db.Column(db.Numeric(15, 2), nullable=False)
+    epargne_actuelle = db.Column(db.Numeric(15, 2), default=0)  # NOUVEAU
     description = db.Column(db.String(255))
     frequence = db.Column(db.String(20))  # ex: mensuel, annuel
     dateDebut = db.Column(db.DateTime)
@@ -373,18 +375,30 @@ def budget_dashboard():
         categories_ids=categories_ids,
         categories_colors=categories_colors,
     )
+
+
 @app.route("/mes-objectifs", methods=["GET", "POST"])
 def mes_objectifs():
-
     # --- POST : ajout d'un objectif ---
     if request.method == "POST":
-        montant = float(request.form.get("montant"))
+        montant_str = request.form.get("montant")
+        categorie_str = request.form.get("categorie")
+
+        if not montant_str or not categorie_str:
+            return redirect(url_for("mes_objectifs"))
+
+        try:
+            montant = float(montant_str)
+            categorie_id = int(categorie_str)
+        except ValueError:
+            return redirect(url_for("mes_objectifs"))
+
         description = request.form.get("description")
         frequence = request.form.get("frequence")
-        categorie_id = int(request.form.get("categorie"))
 
         new_obj = Objectif(
             montant=montant,
+            epargne_actuelle=0,
             description=description,
             frequence=frequence,
             idCategorie=categorie_id,
@@ -400,24 +414,15 @@ def mes_objectifs():
     objectifs = Objectif.query.all()
     categories = Categorie.query.all()
 
-    # Calcul si objectif dépassé pour chaque catégorie
-    now = datetime.utcnow()
-    start_month = datetime(now.year, now.month, 1)
-
     objectifs_status = []
     for obj in objectifs:
-        total_depenses = db.session.query(
-            func.coalesce(func.sum(Transaction.montant), 0)
-        ).filter(
-            Transaction.idCategorie == obj.idCategorie,
-            Transaction.montant < 0,
-            Transaction.dateTransaction >= start_month
-        ).scalar()
+        epargne = float(obj.epargne_actuelle) if obj.epargne_actuelle else 0
+        montant_cible = float(obj.montant)
 
-        total_depenses = abs(float(total_depenses))
+        status = "Atteint" if epargne >= montant_cible else "En cours"
+        pourcentage = (epargne / montant_cible * 100) if montant_cible > 0 else 0
 
-        status = "Respecté" if total_depenses <= float(obj.montant) else "Dépassé"
-        objectifs_status.append((obj, total_depenses, status))
+        objectifs_status.append((obj, epargne, montant_cible, pourcentage, status))
 
     return render_template(
         "mes-objectifs.html",
@@ -426,6 +431,67 @@ def mes_objectifs():
     )
 
 
+@app.route("/objectif/<int:id>/ajouter", methods=["POST"])
+def ajouter_epargne(id):
+    objectif = Objectif.query.get_or_404(id)
+    montant_str = request.form.get("montant")
+
+    if not montant_str:
+        return redirect(url_for("mes_objectifs", _anchor=f"objectif-{id}"))
+
+    try:
+        montant = float(montant_str)
+    except ValueError:
+        return redirect(url_for("mes_objectifs", _anchor=f"objectif-{id}"))
+
+    # Calculer le solde actuel
+    total_revenus = db.session.query(
+        db.func.coalesce(db.func.sum(Transaction.montant), 0)
+    ).filter(Transaction.montant > 0).scalar()
+
+    total_depenses = db.session.query(
+        db.func.coalesce(db.func.sum(Transaction.montant), 0)
+    ).filter(Transaction.montant < 0).scalar()
+
+    solde_actuel = float(total_revenus) + float(total_depenses)
+
+    if montant > solde_actuel:
+        flash(f"Solde insuffisant ! Vous avez {solde_actuel:.2f}€ disponible.", "error")
+        return redirect(url_for("mes_objectifs", _anchor=f"objectif-{id}"))
+
+    if objectif.epargne_actuelle is None:
+        objectif.epargne_actuelle = 0
+    objectif.epargne_actuelle = float(objectif.epargne_actuelle) + montant
+    db.session.commit()
+
+    flash(f"{montant:.2f}€ ajouté à votre objectif !", "success")
+    return redirect(url_for("mes_objectifs", _anchor=f"objectif-{id}"))
+
+
+@app.route("/objectif/<int:id>/retirer", methods=["POST"])
+def retirer_epargne(id):
+    objectif = Objectif.query.get_or_404(id)
+    montant_str = request.form.get("montant")
+
+    if montant_str:
+        try:
+            montant = float(montant_str)
+            if objectif.epargne_actuelle is None:
+                objectif.epargne_actuelle = 0
+            nouvelle_valeur = float(objectif.epargne_actuelle) - montant
+            objectif.epargne_actuelle = max(0, nouvelle_valeur)
+            db.session.commit()
+        except ValueError:
+            pass
+
+    return redirect(url_for("mes_objectifs", _anchor=f"objectif-{id}"))
+
+@app.route("/objectif/<int:id>/supprimer", methods=["POST"])
+def supprimer_objectif(id):
+    objectif = Objectif.query.get_or_404(id)
+    db.session.delete(objectif)
+    db.session.commit()
+    return redirect(url_for("mes_objectifs"))
 @app.route("/categories", methods=["GET", "POST"])
 def categories():
     if request.method == "POST":

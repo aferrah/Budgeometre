@@ -1,96 +1,391 @@
+/* mes-objectifs.css */
+
+.content-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.page-title {
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: #e2e8f0;
+    margin-bottom: 1.5rem;
+}
+
+/* ===== FORMULAIRE ===== */
 .objectif-form {
-    background: rgba(255,255,255,0.08);
-    padding: 25px;
-    border-radius: 12px;
-    max-width: 600px;
-    margin: auto;
-    margin-bottom: 40px;
+    background: rgba(30, 41, 59, 0.5);
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    border: 1px solid rgba(51, 65, 85, 0.5);
+}
+
+.objectif-form h2 {
+    color: #cbd5e1;
+    font-size: 1.1rem;
+    margin-bottom: 1.5rem;
+    font-weight: 500;
 }
 
 .form-row {
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 15px;
+    margin-bottom: 1.2rem;
 }
 
 .form-row label {
-    font-size: 18px;
-    margin-bottom: 5px;
+    display: block;
+    color: #64748b;
+    font-size: 0.8rem;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .form-row input,
 .form-row select {
-    padding: 10px;
-    border-radius: 8px;
-    border: none;
-    font-size: 16px;
     width: 100%;
-}
-
-.btn-submit {
-    padding: 10px 18px;
-    font-size: 18px;
+    padding: 0.75rem 1rem;
+    border: 1px solid rgba(51, 65, 85, 0.6);
     border-radius: 8px;
-    border: none;
-    background-color: #8be9fd;
-    cursor: pointer;
-    transition: 0.2s;
+    font-size: 0.95rem;
+    background: rgba(15, 23, 42, 0.6);
+    color: #cbd5e1;
+    transition: all 0.3s ease;
 }
 
-.btn-submit:hover {
-    background-color: #50c7e0;
-}
-/* Style général des champs */
-.form-row input,
-.form-row select {
-    background: rgba(255,255,255,0.12);   /* fond translucide */
-    color: #fff;                          /* texte en blanc */
-    border: 1px solid rgba(255,255,255,0.25); /* bordure discrète */
-    border-radius: 10px;
-    padding: 12px 15px;
-    font-size: 18px;
-    width: 100%;
-    outline: none;
-    transition: 0.2s;
-}
-
-/* Placeholder plus doux */
-.form-row input::placeholder {
-    color: rgba(255,255,255,0.6);
-}
-
-/* Au focus (quand tu cliques sur l'input) */
 .form-row input:focus,
 .form-row select:focus {
-    border-color: #8be9fd;
-    box-shadow: 0 0 8px rgba(139,233,253,0.4);
+    outline: none;
+    border-color: rgba(100, 116, 139, 0.8);
 }
 
-/* Style du select */
-.form-row select {
-    appearance: none;
-    background-position: right 10px center;
-    background-repeat: no-repeat;
+.form-row input::placeholder {
+    color: #475569;
 }
 
-/* Bouton Ajouter */
+.form-row select option {
+    background: #1e293b;
+    color: #cbd5e1;
+}
+
 .btn-submit {
-    background-color: #8be9fd;
-    color: #000;
+    width: 100%;
+    padding: 0.85rem;
+    background: rgba(139, 92, 246, 0.8);
+    color: #fff;
     border: none;
-    border-radius: 10px;
-    padding: 12px 20px;
-    font-size: 18px;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
     cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 0.5rem;
 }
 
 .btn-submit:hover {
-    background-color: #78d6ea;
+    background: rgba(139, 92, 246, 1);
 }
-input, select {
-    color: white;
+
+/* ===== LISTE DES OBJECTIFS ===== */
+.content-container > h2 {
+    font-size: 1.1rem;
+    color: #cbd5e1;
+    margin-bottom: 1.2rem;
+    font-weight: 500;
 }
-button:hover {
-    transform: scale(1.03);
-    transition: 0.2s ease-in-out;
+
+.objectifs-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.objectif-card {
+    background: rgba(30, 41, 59, 0.6);
+    border-radius: 12px;
+    padding: 1.2rem 1.5rem;
+    border: 1px solid rgba(51, 65, 85, 0.5);
+    border-left: 4px solid #8b5cf6;
+    transition: all 0.2s ease;
+}
+
+.objectif-card:hover {
+    background: rgba(30, 41, 59, 0.8);
+}
+
+.objectif-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.objectif-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.objectif-left {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.objectif-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #e2e8f0;
+    margin: 0;
+}
+
+.categorie-label {
+    color: #64748b;
+    font-size: 0.85rem;
+}
+
+.objectif-right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.objectif-stats {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.2rem;
+}
+
+.montant-actuel {
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+.montant-actuel.atteint {
+    color: #10b981;
+}
+
+.montant-actuel.encours {
+    color: #f59e0b;
+}
+
+.status-badge {
+    padding: 0.4rem 0.9rem;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.status-badge.atteint {
+    background: rgba(16, 185, 129, 0.15);
+    color: #10b981;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.status-badge.encours {
+    background: rgba(245, 158, 11, 0.15);
+    color: #f59e0b;
+    border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+/* ===== BARRE DE PROGRESSION ===== */
+.progress-container {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.progress-bar {
+    flex: 1;
+    height: 8px;
+    background: rgba(15, 23, 42, 0.8);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    border-radius: 10px;
+    transition: width 0.5s ease;
+}
+
+.progress-fill.atteint {
+    background: linear-gradient(90deg, #10b981, #34d399);
+    box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
+}
+
+.progress-fill.encours {
+    background: linear-gradient(90deg, #f59e0b, #fbbf24);
+    box-shadow: 0 0 8px rgba(245, 158, 11, 0.4);
+}
+
+.progress-percent {
+    font-size: 0.85rem;
+    font-weight: 600;
+    min-width: 45px;
+    text-align: right;
+}
+
+.progress-percent.atteint {
+    color: #10b981;
+}
+
+.progress-percent.encours {
+    color: #f59e0b;
+}
+
+/* ===== BOUTONS EPARGNE ===== */
+.objectif-actions-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 0.75rem;
+    border-top: 1px solid rgba(51, 65, 85, 0.4);
+}
+
+.epargne-controls {
+    display: flex;
+    align-items: center;
+    background: rgba(15, 23, 42, 0.6);
+    border-radius: 8px;
+    padding: 0.3rem;
+    gap: 0.3rem;
+}
+
+.epargne-form-group {
+    display: flex;
+}
+
+.montant-input-group {
+    display: flex;
+    align-items: center;
+}
+
+.input-montant {
+    width: 80px;
+    padding: 0.5rem 0.6rem;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    background: rgba(51, 65, 85, 0.5);
+    color: #cbd5e1;
+    text-align: center;
+}
+
+.input-montant:focus {
+    outline: none;
+    background: rgba(51, 65, 85, 0.8);
+}
+
+.input-montant::placeholder {
+    color: #64748b;
+}
+
+.btn-epargne {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem 0.75rem;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-moins {
+    background: rgba(239, 68, 68, 0.8);
+    color: #fff;
+}
+
+.btn-moins:hover {
+    background: rgba(239, 68, 68, 1);
+}
+
+.btn-plus-custom {
+    background: rgba(139, 92, 246, 0.8);
+    color: #fff;
+}
+
+.btn-plus-custom:hover {
+    background: rgba(139, 92, 246, 1);
+}
+
+.btn-plus-10 {
+    background: rgba(16, 185, 129, 0.2);
+    color: #10b981;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    margin-left: 0.5rem;
+}
+
+.btn-plus-10:hover {
+    background: rgba(16, 185, 129, 0.3);
+}
+
+.btn-delete {
+    background: transparent;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: #ef4444;
+    padding: 0.5rem 0.6rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.9rem;
+}
+
+.btn-delete:hover {
+    background: rgba(239, 68, 68, 0.2);
+}
+/* ===== RESPONSIVE ===== */
+@media (max-width: 640px) {
+    .content-container {
+        padding: 1rem;
+    }
+
+    .objectif-form {
+        padding: 1.5rem;
+    }
+
+    .objectif-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .objectif-right {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .epargne-controls {
+        flex-wrap: wrap;
+    }
+
+    .input-montant {
+        width: 60px;
+    }
+}
+
+/* ===== MESSAGES FLASH ===== */
+.flash-message {
+    padding: 1rem 1.2rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.flash-message.error {
+    background: rgba(239, 68, 68, 0.15);
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.flash-message.success {
+    background: rgba(16, 185, 129, 0.15);
+    color: #10b981;
+    border: 1px solid rgba(16, 185, 129, 0.3);
 }
