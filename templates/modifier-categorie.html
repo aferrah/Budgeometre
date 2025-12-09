@@ -1,0 +1,215 @@
+{% extends "base.html" %}
+
+{% block title %}Modifier une catégorie - Budgeomètre{% endblock %}
+
+{% block head_extra %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/categories.css') }}">
+<style>
+    .form-card {
+        max-width: 600px;
+        margin: 0 auto;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 12px;
+        padding: 30px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .form-card h2 {
+        color: white;
+        margin-bottom: 25px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-group label {
+        display: block;
+        color: rgba(255, 255, 255, 0.8);
+        margin-bottom: 8px;
+        font-weight: 500;
+    }
+
+    .form-group input,
+    .form-group textarea {
+        width: 100%;
+        padding: 12px;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 8px;
+        color: white;
+        font-size: 1rem;
+    }
+
+    .form-group input[type="color"] {
+        width: 80px;
+        height: 50px;
+        cursor: pointer;
+        padding: 4px;
+    }
+
+    .form-group input::placeholder,
+    .form-group textarea::placeholder {
+        color: rgba(255, 255, 255, 0.4);
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+        outline: none;
+        border-color: rgba(139, 92, 246, 0.5);
+        background: rgba(255, 255, 255, 0.15);
+    }
+
+    .color-preview {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .color-preview-box {
+        width: 50px;
+        height: 50px;
+        border-radius: 8px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .checkbox-group {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 15px;
+    }
+
+    .checkbox-group input[type="checkbox"] {
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+    }
+
+    .checkbox-group label {
+        color: white;
+        cursor: pointer;
+        margin: 0;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 15px;
+        margin-top: 30px;
+    }
+
+    .btn {
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: none;
+        font-size: 1rem;
+        text-decoration: none;
+        display: inline-block;
+        text-align: center;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #8b5cf6, #6366f1);
+        color: white;
+        flex: 1;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 16px rgba(139, 92, 246, 0.4);
+    }
+
+    .btn-secondary {
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .btn-secondary:hover {
+        background: rgba(255, 255, 255, 0.2);
+        border-color: rgba(255, 255, 255, 0.5);
+    }
+</style>
+{% endblock %}
+
+{% block header_content %}
+    <h1>Modifier une catégorie</h1>
+{% endblock %}
+
+{% block content %}
+<main style="padding: 20px;">
+    
+    <section class="form-card">
+        <h2>Modifier la catégorie : {{ categorie.nom }}</h2>
+
+        <form method="post" action="{{ url_for('modifier_categorie', id=categorie.idCategorie) }}">
+            
+            <div class="form-group">
+                <label for="nom">Nom de la catégorie *</label>
+                <input type="text" id="nom" name="nom" value="{{ categorie.nom }}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="description">Description</label>
+                <textarea id="description" name="description" rows="3" placeholder="Description de la catégorie (optionnel)">{{ categorie.description or '' }}</textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="couleur">Couleur</label>
+                <div class="color-preview">
+                    <input type="color" id="couleur" name="couleur" value="{{ categorie.couleur or '#8b5cf6' }}" onchange="updateColorPreview()">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="checkbox-group">
+                    <input type="checkbox" id="has_limit" {% if categorie.limite_budget and categorie.limite_budget > 0 %}checked{% endif %} onchange="toggleLimitInput()">
+                    <label for="has_limit">Définir une limite de budget mensuel</label>
+                </div>
+                <input type="number" id="limite_budget" name="limite_budget" 
+                       value="{{ '%.2f'|format(categorie.limite_budget) if categorie.limite_budget else '' }}" 
+                       placeholder="Limite budget (€)" min="0" step="0.01"
+                       style="{% if not categorie.limite_budget or categorie.limite_budget == 0 %}display: none;{% endif %}">
+            </div>
+
+            <div class="form-actions">
+                <a href="{{ url_for('categories') }}" class="btn btn-secondary">Annuler</a>
+                <button type="submit" class="btn btn-primary">Enregistrer les modifications</button>
+            </div>
+
+        </form>
+    </section>
+
+</main>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function updateColorPreview() {
+        const colorInput = document.getElementById('couleur');
+        const colorPreview = document.getElementById('colorPreview');
+        const colorCode = document.getElementById('colorCode');
+        
+        colorPreview.style.backgroundColor = colorInput.value;
+        colorCode.textContent = colorInput.value;
+    }
+
+    function toggleLimitInput() {
+        const checkbox = document.getElementById('has_limit');
+        const input = document.getElementById('limite_budget');
+        
+        if (checkbox.checked) {
+            input.style.display = 'block';
+            input.required = true;
+        } else {
+            input.style.display = 'none';
+            input.required = false;
+            input.value = '0';
+        }
+    }
+</script>
+{% endblock %}

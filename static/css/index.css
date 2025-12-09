@@ -138,11 +138,12 @@
 .recent-expenses table {
     width: 100%;
     border-collapse: collapse;
+    font-size: 0.9rem;
 }
 
 .recent-expenses th,
 .recent-expenses td {
-    padding: 12px 15px;
+    padding: 8px 12px;
     text-align: left;
 }
 
@@ -150,6 +151,7 @@
     color: rgba(255, 255, 255, 0.7);
     font-weight: 600;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 0.85rem;
 }
 
 .recent-expenses td {
@@ -177,10 +179,10 @@
 /* === BADGES CATÉGORIES === */
 .categorie-badge {
     display: inline-block;
-    padding: 3px 10px;
-    border-radius: 12px;
+    padding: 2px 8px;
+    border-radius: 10px;
     background: rgba(255, 255, 255, 0.15);
-    font-size: 0.85rem;
+    font-size: 0.8rem;
 }
 
 .categorie-badge.epargne {
@@ -227,4 +229,81 @@ select option {
 
 #resetBtn:hover {
     background: rgba(255, 255, 255, 0.25);
+}
+
+/* === BOUTONS D'ACTION === */
+.transaction-actions {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+}
+
+.btn-action {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 5px;
+    padding: 4px 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    font-size: 0.85rem;
+    display: inline-block;
+}
+
+.btn-action.btn-edit:hover {
+    background: rgba(139, 92, 246, 0.3);
+    border-color: rgba(139, 92, 246, 0.5);
+    transform: scale(1.1);
+}
+
+.btn-action.btn-delete {
+    color: white;
+}
+
+.btn-action.btn-delete:hover {
+    background: rgba(239, 68, 68, 0.3);
+    border-color: rgba(239, 68, 68, 0.5);
+    transform: scale(1.1);
+}
+
+/* === PAGINATION === */
+.pagination {
+    user-select: none;
+}
+
+.page-btn {
+    display: inline-block;
+    padding: 8px 12px;
+    min-width: 40px;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+    color: white;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.page-btn:hover:not(.disabled):not(.active) {
+    background: rgba(139, 92, 246, 0.3);
+    border-color: rgba(139, 92, 246, 0.5);
+    transform: translateY(-2px);
+}
+
+.page-btn.active {
+    background: linear-gradient(135deg, #8b5cf6, #6366f1);
+    border-color: transparent;
+    font-weight: 700;
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+}
+
+.page-btn.disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+/* Masquer les lignes paginées */
+.pagination-hidden {
+    display: none !important;
 }

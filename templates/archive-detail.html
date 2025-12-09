@@ -1,0 +1,285 @@
+{% extends "base.html" %}
+
+{% block title %}Archive {{ nom_mois }} {{ archive.annee }} - Budgeomètre{% endblock %}
+
+{% block head_extra %}
+<style>
+    .archive-detail-page {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+    }
+
+    .page-header h2 {
+        color: white;
+        margin: 0;
+    }
+
+    .btn-back {
+        padding: 10px 20px;
+        background: rgba(255, 255, 255, 0.1);
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-radius: 8px;
+        color: white;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+
+    .btn-back:hover {
+        background: rgba(255, 255, 255, 0.2);
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+
+    .stat-card {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 12px;
+        padding: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        text-align: center;
+    }
+
+    .stat-label {
+        color: rgba(255, 255, 255, 0.6);
+        font-size: 0.9rem;
+        margin-bottom: 10px;
+    }
+
+    .stat-value {
+        font-size: 1.8rem;
+        font-weight: 700;
+    }
+
+    .stat-value.revenus {
+        color: #10b981;
+    }
+
+    .stat-value.depenses {
+        color: #ef4444;
+    }
+
+    .stat-value.solde {
+        color: #8b5cf6;
+    }
+
+    .stat-value.epargne {
+        color: #f59e0b;
+    }
+
+    .section-card {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 12px;
+        padding: 25px;
+        margin-bottom: 30px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .section-card h3 {
+        color: white;
+        margin-bottom: 20px;
+    }
+
+    .categories-grid {
+        display: grid;
+        gap: 15px;
+    }
+
+    .category-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 8px;
+        border-left: 4px solid;
+    }
+
+    .category-info {
+        flex: 1;
+    }
+
+    .category-name {
+        font-weight: 600;
+        color: white;
+        margin-bottom: 5px;
+    }
+
+    .category-count {
+        font-size: 0.85rem;
+        color: rgba(255, 255, 255, 0.5);
+    }
+
+    .category-amounts {
+        text-align: right;
+    }
+
+    .category-depenses {
+        color: #ef4444;
+        font-weight: 600;
+    }
+
+    .category-revenus {
+        color: #10b981;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    .transactions-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .transactions-table th {
+        color: rgba(255, 255, 255, 0.7);
+        font-weight: 600;
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .transactions-table td {
+        color: white;
+        padding: 12px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .montant-positif {
+        color: #10b981;
+    }
+
+    .montant-negatif {
+        color: #ef4444;
+    }
+
+    .badge-categorie {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.1);
+        font-size: 0.85rem;
+    }
+</style>
+{% endblock %}
+
+{% block header_content %}
+    <h1>Archive {{ nom_mois }} {{ archive.annee }}</h1>
+{% endblock %}
+
+{% block content %}
+<main class="archive-detail-page">
+
+    <div class="page-header">
+        <h2>{{ nom_mois }} {{ archive.annee }}</h2>
+        <a href="{{ url_for('archives') }}" class="btn-back">← Retour aux archives</a>
+    </div>
+
+    <!-- Statistiques principales -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-label">Revenus du mois</div>
+            <div class="stat-value revenus">+{{ '%.2f'|format(archive.total_revenus) }} €</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Dépenses du mois</div>
+            <div class="stat-value depenses">-{{ '%.2f'|format(archive.total_depenses) }} €</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Solde final</div>
+            <div class="stat-value solde">{{ '%.2f'|format(archive.solde_final) }} €</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Épargne totale</div>
+            <div class="stat-value epargne">{{ '%.2f'|format(archive.total_epargne) }} €</div>
+        </div>
+    </div>
+
+    <!-- Statistiques détaillées -->
+    <div class="section-card">
+        <h3>Résumé</h3>
+        <p style="color: rgba(255,255,255,0.7);">
+            Ce mois compte <strong style="color: white;">{{ donnees.stats.nb_transactions }}</strong> transactions
+            ({{ donnees.stats.nb_revenus }} revenus, {{ donnees.stats.nb_depenses }} dépenses).
+        </p>
+    </div>
+
+    <!-- Dépenses par catégorie -->
+    {% if donnees.categories %}
+    <div class="section-card">
+        <h3>Par catégorie</h3>
+        <div class="categories-grid">
+            {% for cat_id, cat_data in donnees.categories.items() %}
+                <div class="category-item" style="border-left-color: {{ cat_data.couleur }};">
+                    <div class="category-info">
+                        <div class="category-name">{{ cat_data.nom }}</div>
+                        <div class="category-count">{{ cat_data.nb_transactions }} transaction(s)</div>
+                    </div>
+                    <div class="category-amounts">
+                        {% if cat_data.depenses > 0 %}
+                            <div class="category-depenses">-{{ '%.2f'|format(cat_data.depenses) }} €</div>
+                        {% endif %}
+                        {% if cat_data.revenus > 0 %}
+                            <div class="category-revenus">+{{ '%.2f'|format(cat_data.revenus) }} €</div>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Toutes les transactions -->
+    <div class="section-card">
+        <h3>Toutes les transactions ({{ donnees.transactions|length }})</h3>
+        {% if donnees.transactions %}
+            <table class="transactions-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Libellé</th>
+                        <th>Catégorie</th>
+                        <th>Montant</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for t in donnees.transactions %}
+                        <tr>
+                            <td>{{ t.date[:10] }}</td>
+                            <td>
+                                {{ t.titre }}
+                                {% if t.commentaire %}
+                                    <div style="font-size: 0.85rem; color: rgba(255,255,255,0.5);">{{ t.commentaire }}</div>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="badge-categorie">{{ t.categorie }}</span>
+                            </td>
+                            <td class="{{ 'montant-positif' if t.montant >= 0 else 'montant-negatif' }}">
+                                {{ '+' if t.montant >= 0 else '' }}{{ '%.2f'|format(t.montant) }} €
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p style="color: rgba(255,255,255,0.5); text-align: center; padding: 20px;">
+                Aucune transaction ce mois-ci
+            </p>
+        {% endif %}
+    </div>
+
+</main>
+{% endblock %}

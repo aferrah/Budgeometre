@@ -56,6 +56,7 @@
                             <button type="button" class="btn-toggle" onclick="toggleTransactions(this, 'transactions-{{ cat.idCategorie }}')">
                                 ▼ Voir
                             </button>
+                            <a href="{{ url_for('modifier_categorie', id=cat.idCategorie) }}" class="btn-edit" title="Modifier">✏️</a>
                             <form method="post" action="{{ url_for('delete_category', id=cat.idCategorie) }}" style="display:inline;">
                                 <button type="submit" class="btn-delete" onclick="return confirm('Supprimer cette catégorie ?')">🗑️</button>
                             </form>

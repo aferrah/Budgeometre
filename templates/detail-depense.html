@@ -166,6 +166,36 @@
         color: rgba(255, 255, 255, 0.5);
         padding: 20px;
     }
+
+    .transaction-actions {
+        display: flex;
+        gap: 8px;
+    }
+
+    .btn-edit, .btn-delete {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 6px;
+        padding: 6px 10px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        font-size: 1rem;
+    }
+
+    .btn-edit:hover {
+        background: rgba(139, 92, 246, 0.3);
+        border-color: rgba(139, 92, 246, 0.5);
+    }
+
+    .btn-delete {
+        color: white;
+    }
+
+    .btn-delete:hover {
+        background: rgba(239, 68, 68, 0.3);
+        border-color: rgba(239, 68, 68, 0.5);
+    }
 </style>
 {% endblock %}
 
@@ -212,7 +242,13 @@
                         <div class="transaction-titre">{{ t.titre }}</div>
                         <div class="transaction-date">{{ t.dateTransaction.strftime('%d/%m/%Y') }}</div>
                     </div>
-                    <div class="transaction-montant">{{ '%.2f'|format(t.montant) }} €</div>
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <div class="transaction-montant">{{ '%.2f'|format(t.montant) }} €</div>
+                        <div class="transaction-actions">
+                            <a href="{{ url_for('modifier_transaction', id=t.idTransaction) }}" class="btn-edit" title="Modifier">✏️</a>
+                            <button class="btn-delete" onclick="confirmDelete({{ t.idTransaction }}, '{{ t.titre }}')" title="Supprimer">🗑️</button>
+                        </div>
+                    </div>
                 </div>
             {% endfor %}
         {% else %}
@@ -308,5 +344,17 @@
     window.addEventListener('load', () => {
         createChart(moisLabels, moisData, 'Dépenses par mois');
     });
+
+    // Fonction de confirmation de suppression
+    function confirmDelete(transactionId, transactionTitre) {
+        if (confirm(`Êtes-vous sûr de vouloir supprimer la transaction "${transactionTitre}" ?\n\nCette action est irréversible.`)) {
+            // Créer un formulaire et le soumettre
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = `/transaction/${transactionId}/supprimer`;
+            document.body.appendChild(form);
+            form.submit();
+        }
+    }
 </script>
 {% endblock %}

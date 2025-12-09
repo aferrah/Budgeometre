@@ -196,6 +196,24 @@
     color: white;
 }
 
+.btn-edit {
+    padding: 8px 12px;
+    background: rgba(139, 92, 246, 0.2);
+    border: 2px solid #8b5cf6;
+    border-radius: 6px;
+    color: #8b5cf6;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-edit:hover {
+    background: #8b5cf6;
+    color: white;
+    transform: scale(1.05);
+}
+
 .btn-delete {
     padding: 8px 12px;
     background: rgba(239, 68, 68, 0.2);
@@ -209,6 +227,7 @@
 .btn-delete:hover {
     background: #ef4444;
     color: white;
+    transform: scale(1.05);
 }
 
 /* Déroulant des transactions */

@@ -65,12 +65,47 @@ class Objectif(db.Model):
         return f"<Objectif {self.description} {self.montant}>"
 
 
-@app.route("/")
-def home():
-    transactions = (
-        Transaction.query.order_by(Transaction.dateTransaction.desc()).limit(10).all()
+class ArchiveMensuelle(db.Model):
+    __tablename__ = "ARCHIVE_MENSUELLE"
+    idArchive = db.Column(db.Integer, primary_key=True)
+    annee = db.Column(db.Integer, nullable=False)
+    mois = db.Column(db.Integer, nullable=False)
+    dateArchivage = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    
+    # Statistiques du mois
+    total_revenus = db.Column(db.Numeric(15, 2), default=0)
+    total_depenses = db.Column(db.Numeric(15, 2), default=0)
+    total_epargne = db.Column(db.Numeric(15, 2), default=0)
+    solde_final = db.Column(db.Numeric(15, 2), default=0)
+    
+    # Données JSON pour les transactions et stats détaillées
+    donnees_json = db.Column(db.Text)
+    
+    __table_args__ = (
+        db.UniqueConstraint('annee', 'mois', name='unique_mois_annee'),
+        db.Index("idx_archive_date", "annee", "mois"),
     )
 
+    def __repr__(self):
+        return f"<ArchiveMensuelle {self.mois}/{self.annee}>"
+
+
+@app.route("/")
+def home():
+    from datetime import timedelta
+    
+    # Limiter aux transactions des 3 derniers mois
+    now = datetime.utcnow()
+    date_limite = now - timedelta(days=90)
+    
+    # Récupérer TOUTES les transactions récentes (pas de pagination serveur)
+    transactions = Transaction.query.filter(
+        Transaction.dateTransaction >= date_limite
+    ).order_by(
+        Transaction.dateTransaction.desc()
+    ).all()
+    
+    # Statistiques sur TOUTES les transactions (pas seulement les récentes)
     total_revenus = db.session.query(
         db.func.coalesce(db.func.sum(Transaction.montant), 0)
     ).filter(Transaction.montant > 0).scalar()
@@ -88,6 +123,11 @@ def home():
     total_revenus = float(total_revenus)
     total_depenses = float(-total_depenses_raw)
     argentActuel = total_revenus - total_depenses
+    
+    # Compter les transactions plus anciennes
+    nb_anciennes = Transaction.query.filter(
+        Transaction.dateTransaction < date_limite
+    ).count()
 
     return render_template(
         "index.html",
@@ -96,6 +136,7 @@ def home():
         total_revenus=total_revenus,
         total_depenses=total_depenses,
         total_epargne=total_epargne,
+        nb_anciennes=nb_anciennes
     )
 
 
@@ -158,6 +199,105 @@ def add_expense():
     return redirect(url_for("home"))
 
 
+@app.route("/transaction/<int:id>/modifier", methods=["GET", "POST"])
+def modifier_transaction(id):
+    transaction = Transaction.query.get_or_404(id)
+    
+    # Bloquer la modification des transactions d'épargne
+    if transaction.categorie and transaction.categorie.nom == "Épargne":
+        flash("Les transactions d'épargne ne peuvent pas être modifiées. Modifiez l'objectif depuis la page Objectifs.", "error")
+        return redirect(url_for("home"))
+    
+    if request.method == "GET":
+        categories = Categorie.query.order_by(Categorie.nom).all()
+        return render_template("modifier-transaction.html", transaction=transaction, categories=categories)
+    
+    # POST - Mettre à jour la transaction
+    titre = request.form.get("label") or "Dépense"
+    montant_raw = request.form.get("amount") or "0"
+    type_transaction = request.form.get("type", "depense")
+    
+    try:
+        montant = float(montant_raw)
+    except ValueError:
+        montant = 0.0
+    
+    if type_transaction == "depense":
+        montant = -abs(montant)
+    else:
+        montant = abs(montant)
+    
+    commentaire = request.form.get("comment")
+    date_str = request.form.get("date")
+    if date_str:
+        try:
+            date_tx = datetime.fromisoformat(date_str)
+        except Exception:
+            date_tx = transaction.dateTransaction
+    else:
+        date_tx = transaction.dateTransaction
+    
+    cat_id = request.form.get("category")
+    if cat_id:
+        try:
+            categorie = Categorie.query.get(int(cat_id))
+            if categorie:
+                transaction.idCategorie = categorie.idCategorie
+        except Exception:
+            pass
+    
+    transaction.titre = titre
+    transaction.montant = montant
+    transaction.commentaire = commentaire
+    transaction.dateTransaction = date_tx
+    
+    db.session.commit()
+    flash("Transaction modifiée avec succès", "success")
+    
+    return redirect(url_for("home"))
+
+
+@app.route("/transaction/<int:id>/supprimer", methods=["POST"])
+def supprimer_transaction(id):
+    transaction = Transaction.query.get_or_404(id)
+    
+    # Bloquer la suppression des transactions d'épargne
+    if transaction.categorie and transaction.categorie.nom == "Épargne":
+        flash("Les transactions d'épargne ne peuvent pas être supprimées. Gérez l'épargne depuis la page Objectifs.", "error")
+        return redirect(url_for("home"))
+    
+    db.session.delete(transaction)
+    db.session.commit()
+    flash("Transaction supprimée avec succès", "success")
+    return redirect(url_for("home"))
+
+
+@app.route("/reinitialiser-bdd")
+def reinitialiser_bdd():
+    """Supprime toutes les données de la base de données"""
+    try:
+        # Supprimer toutes les archives
+        ArchiveMensuelle.query.delete()
+        
+        # Supprimer toutes les transactions
+        Transaction.query.delete()
+        
+        # Supprimer tous les objectifs
+        Objectif.query.delete()
+        
+        # Supprimer toutes les catégories
+        Categorie.query.delete()
+        
+        db.session.commit()
+        
+        flash("✅ Base de données réinitialisée avec succès. Toutes les données ont été supprimées.", "success")
+    except Exception as e:
+        db.session.rollback()
+        flash(f"❌ Erreur lors de la réinitialisation : {str(e)}", "error")
+    
+    return redirect(url_for("home"))
+
+
 @app.route("/init-test")
 def init_test():
     cat_alimentation = Categorie(nom="Alimentation", description="Courses, restos, etc.")
@@ -200,6 +340,93 @@ def init_test():
     db.session.commit()
 
     return "Données de test ajoutées ✅ (3 catégories, 7 transactions, 2 objectifs)"
+
+
+@app.route("/init-test-archives")
+def init_test_archives():
+    """Crée des transactions sur plusieurs mois passés pour tester les archives"""
+    from datetime import timedelta
+    
+    # Créer des catégories si elles n'existent pas
+    cat_alimentation = Categorie.query.filter_by(nom="Alimentation").first()
+    cat_transport = Categorie.query.filter_by(nom="Transport").first()
+    cat_loisirs = Categorie.query.filter_by(nom="Loisirs").first()
+    cat_salaire = Categorie.query.filter_by(nom="Salaire").first()
+    
+    if not cat_alimentation:
+        cat_alimentation = Categorie(nom="Alimentation", description="Courses, restos", couleur="#ef4444")
+        db.session.add(cat_alimentation)
+    if not cat_transport:
+        cat_transport = Categorie(nom="Transport", description="Déplacements", couleur="#3b82f6")
+        db.session.add(cat_transport)
+    if not cat_loisirs:
+        cat_loisirs = Categorie(nom="Loisirs", description="Divertissements", couleur="#a855f7")
+        db.session.add(cat_loisirs)
+    if not cat_salaire:
+        cat_salaire = Categorie(nom="Salaire", description="Revenus", couleur="#10b981")
+        db.session.add(cat_salaire)
+    
+    db.session.commit()
+    
+    now = datetime.utcnow()
+    nb_transactions = 0
+    
+    # Créer des transactions pour les 6 derniers mois
+    for i in range(6):
+        # Calculer le mois (mois actuel - i)
+        mois_date = datetime(now.year, now.month, 1) - timedelta(days=i * 30)
+        annee = mois_date.year
+        mois = mois_date.month
+        
+        # Créer 8-15 transactions par mois
+        import random
+        nb_trans_mois = random.randint(8, 15)
+        
+        for j in range(nb_trans_mois):
+            # Date aléatoire dans le mois
+            jour = random.randint(1, 28)
+            date_trans = datetime(annee, mois, jour, random.randint(8, 20), random.randint(0, 59))
+            
+            # Alterner entre différents types de transactions
+            if j == 0:  # Salaire en début de mois
+                trans = Transaction(
+                    titre="Salaire",
+                    montant=random.uniform(2000, 3000),
+                    dateTransaction=date_trans,
+                    categorie=cat_salaire,
+                    commentaire="Salaire mensuel"
+                )
+            elif j % 4 == 1:  # Alimentation
+                titres = ["Supermarché", "Boulangerie", "Restaurant", "Marché", "Épicerie"]
+                trans = Transaction(
+                    titre=random.choice(titres),
+                    montant=-random.uniform(15, 80),
+                    dateTransaction=date_trans,
+                    categorie=cat_alimentation
+                )
+            elif j % 4 == 2:  # Transport
+                titres = ["Essence", "Parking", "Péage", "Train", "Uber"]
+                trans = Transaction(
+                    titre=random.choice(titres),
+                    montant=-random.uniform(10, 60),
+                    dateTransaction=date_trans,
+                    categorie=cat_transport
+                )
+            else:  # Loisirs
+                titres = ["Cinéma", "Concert", "Livre", "Sortie", "Streaming"]
+                trans = Transaction(
+                    titre=random.choice(titres),
+                    montant=-random.uniform(8, 50),
+                    dateTransaction=date_trans,
+                    categorie=cat_loisirs
+                )
+            
+            db.session.add(trans)
+            nb_transactions += 1
+    
+    db.session.commit()
+    
+    return f"✅ {nb_transactions} transactions créées sur 6 mois passés. Vous pouvez maintenant tester l'archivage !"
 
 
 @app.route("/transactions")
@@ -641,6 +868,41 @@ def categories():
     return render_template("categories.html", categories=toutes_categories, total_revenus=float(total_revenus))
 
 
+@app.route("/categories/<int:id>/modifier", methods=["GET", "POST"])
+def modifier_categorie(id):
+    categorie = Categorie.query.get_or_404(id)
+    
+    if request.method == "GET":
+        return render_template("modifier-categorie.html", categorie=categorie)
+    
+    # POST - Mettre à jour la catégorie
+    nom = request.form.get("nom")
+    description = request.form.get("description", "")
+    couleur = request.form.get("couleur", "#8b5cf6")
+    limite_budget_raw = request.form.get("limite_budget", "0")
+    
+    try:
+        limite_budget = float(limite_budget_raw) if limite_budget_raw else 0
+    except ValueError:
+        limite_budget = 0
+    
+    if nom:
+        # Vérifier si le nom n'existe pas déjà (sauf pour la catégorie actuelle)
+        existante = Categorie.query.filter(Categorie.nom == nom, Categorie.idCategorie != id).first()
+        if not existante:
+            categorie.nom = nom
+            categorie.description = description
+            categorie.couleur = couleur
+            categorie.limite_budget = limite_budget
+            
+            db.session.commit()
+            flash("Catégorie modifiée avec succès", "success")
+        else:
+            flash("Une catégorie avec ce nom existe déjà", "error")
+    
+    return redirect(url_for("categories"))
+
+
 @app.route("/categories/delete/<int:id>", methods=["POST"])
 def delete_category(id):
     categorie = Categorie.query.get_or_404(id)
@@ -729,6 +991,156 @@ def depenses_categorie(id):
         annee_labels=annee_labels,
         annee_data=annee_data,
     )
+
+
+@app.route("/archiver-mois", methods=["POST"])
+def archiver_mois():
+    import json
+    from collections import defaultdict
+    
+    # Récupérer le mois et l'année à archiver (par défaut le mois dernier)
+    mois_str = request.form.get("mois")
+    annee_str = request.form.get("annee")
+    
+    now = datetime.utcnow()
+    if mois_str and annee_str:
+        mois = int(mois_str)
+        annee = int(annee_str)
+    else:
+        # Par défaut, archiver le mois dernier
+        if now.month == 1:
+            mois = 12
+            annee = now.year - 1
+        else:
+            mois = now.month - 1
+            annee = now.year
+    
+    # Vérifier si une archive existe déjà
+    archive_existante = ArchiveMensuelle.query.filter_by(annee=annee, mois=mois).first()
+    if archive_existante:
+        flash(f"Une archive pour {mois}/{annee} existe déjà", "warning")
+        return redirect(url_for("archives"))
+    
+    # Calculer les dates de début et fin du mois
+    debut_mois = datetime(annee, mois, 1)
+    if mois == 12:
+        fin_mois = datetime(annee + 1, 1, 1)
+    else:
+        fin_mois = datetime(annee, mois + 1, 1)
+    
+    # Récupérer les transactions du mois
+    transactions_mois = Transaction.query.filter(
+        Transaction.dateTransaction >= debut_mois,
+        Transaction.dateTransaction < fin_mois
+    ).order_by(Transaction.dateTransaction.desc()).all()
+    
+    # Calculer les statistiques
+    total_revenus = sum(float(t.montant) for t in transactions_mois if t.montant > 0)
+    total_depenses = sum(float(-t.montant) for t in transactions_mois if t.montant < 0)
+    
+    # Statistiques par catégorie
+    stats_categories = defaultdict(lambda: {'nom': '', 'couleur': '#8b5cf6', 'depenses': 0, 'revenus': 0, 'nb_transactions': 0})
+    transactions_data = []
+    
+    for t in transactions_mois:
+        cat_id = t.idCategorie
+        stats_categories[cat_id]['nom'] = t.categorie.nom
+        stats_categories[cat_id]['couleur'] = t.categorie.couleur or '#8b5cf6'
+        stats_categories[cat_id]['nb_transactions'] += 1
+        
+        if t.montant < 0:
+            stats_categories[cat_id]['depenses'] += float(-t.montant)
+        else:
+            stats_categories[cat_id]['revenus'] += float(t.montant)
+        
+        transactions_data.append({
+            'titre': t.titre,
+            'montant': float(t.montant),
+            'date': t.dateTransaction.strftime('%Y-%m-%d %H:%M:%S'),
+            'categorie': t.categorie.nom,
+            'commentaire': t.commentaire or ''
+        })
+    
+    # Récupérer l'épargne totale à ce moment
+    total_epargne = db.session.query(
+        db.func.coalesce(db.func.sum(Objectif.epargne_actuelle), 0)
+    ).scalar()
+    
+    # Calculer le solde
+    solde_final = total_revenus - total_depenses
+    
+    # Préparer les données JSON
+    donnees = {
+        'transactions': transactions_data,
+        'categories': {k: v for k, v in stats_categories.items()},
+        'stats': {
+            'nb_transactions': len(transactions_mois),
+            'nb_depenses': sum(1 for t in transactions_mois if t.montant < 0),
+            'nb_revenus': sum(1 for t in transactions_mois if t.montant > 0)
+        }
+    }
+    
+    # Créer l'archive
+    archive = ArchiveMensuelle(
+        annee=annee,
+        mois=mois,
+        total_revenus=total_revenus,
+        total_depenses=total_depenses,
+        total_epargne=float(total_epargne),
+        solde_final=solde_final,
+        donnees_json=json.dumps(donnees)
+    )
+    
+    db.session.add(archive)
+    db.session.commit()
+    
+    flash(f"Archive créée pour {mois}/{annee} avec {len(transactions_mois)} transactions", "success")
+    return redirect(url_for("archives"))
+
+
+@app.route("/archives")
+def archives():
+    archives = ArchiveMensuelle.query.order_by(
+        ArchiveMensuelle.annee.desc(),
+        ArchiveMensuelle.mois.desc()
+    ).all()
+    
+    # Liste des mois disponibles pour archivage
+    now = datetime.utcnow()
+    mois_disponibles = []
+    
+    # Obtenir tous les mois qui ont des transactions
+    transactions = Transaction.query.all()
+    mois_avec_transactions = set()
+    for t in transactions:
+        mois_avec_transactions.add((t.dateTransaction.year, t.dateTransaction.month))
+    
+    # Filtrer ceux qui ne sont pas déjà archivés
+    archives_existantes = {(a.annee, a.mois) for a in archives}
+    
+    for annee, mois in sorted(mois_avec_transactions, reverse=True):
+        if (annee, mois) not in archives_existantes and (annee < now.year or mois < now.month):
+            mois_disponibles.append({'annee': annee, 'mois': mois})
+    
+    return render_template("archives.html", archives=archives, mois_disponibles=mois_disponibles)
+
+
+@app.route("/archives/<int:id>")
+def voir_archive(id):
+    import json
+    
+    archive = ArchiveMensuelle.query.get_or_404(id)
+    donnees = json.loads(archive.donnees_json) if archive.donnees_json else {}
+    
+    # Nom du mois en français
+    mois_noms = ['', 'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
+                 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
+    nom_mois = mois_noms[archive.mois]
+    
+    return render_template("archive-detail.html", 
+                         archive=archive, 
+                         donnees=donnees,
+                         nom_mois=nom_mois)
 
 
 if __name__ == "__main__":
