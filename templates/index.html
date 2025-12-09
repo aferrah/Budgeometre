@@ -32,25 +32,25 @@
             {% set color = '#ef4444' %}
         {% endif %}
         <div class="solde-circle-container">
-            <svg class="progress-ring" width="200" height="200">
+            <svg class="progress-ring" width="250" height="250">
                 <circle
-                    cx="100"
-                    cy="100"
-                    r="90"
+                    cx="125"
+                    cy="125"
+                    r="110"
                     stroke="rgba(255, 255, 255, 0.1)"
                     stroke-width="12"
                     fill="none"
                 />
                 <circle
                     class="progress-ring-circle"
-                    cx="100"
-                    cy="100"
-                    r="90"
+                    cx="125"
+                    cy="125"
+                    r="110"
                     stroke="{{ color }}"
                     stroke-width="12"
                     fill="none"
-                    stroke-dasharray="565.48"
-                    stroke-dashoffset="{{ 565.48 - (565.48 * ratio_capped / 100) }}"
+                    stroke-dasharray="690.8"
+                    stroke-dashoffset="{{ 690.8 - (690.8 * ratio_capped / 100) }}"
                     stroke-linecap="round"
                 />
             </svg>
