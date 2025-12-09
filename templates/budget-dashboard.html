@@ -1,4 +1,5 @@
-{% extends "base.html" %} {% block title %}Budgeomètre - Dashboard{% endblock %}
+{% extends "base.html" %}
+{% block title %}Budgeomètre - Dashboard{% endblock %}
 {% block head_extra %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <link
@@ -13,10 +14,10 @@
 
 {% block content %}
 <div class="dashboard-container">
-  <div class="dashboard-header" style="display: flex; justify-content: space-between; align-items: center;">
+  <div class="dashboard-header">
     <div>
       <h2>Tableau de bord</h2>
-      <p style="margin-bottom: 20px;"class="subtitle">Votre situation financière</p>
+      <p class="subtitle dashboard-subtitle">Votre situation financière</p>
     </div>
     <a href="{{ url_for('home') }}" class="btn-back">← Retour à l'accueil</a>
   </div>
@@ -33,33 +34,29 @@
     </button>
   </div>
 
-  <!-- ------------------ CARDS ------------------ -->
   <div class="stats-grid">
-    <!-- Dépenses -->
     <div class="glass-card stat-card">
       <div class="stat-label">
         Dépenses (<span id="periode-label">ce mois</span>)
       </div>
-      <div class="stat-value" id="stat-depenses" style="color: #ef4444">
+      <div class="stat-value negative-fixed" id="stat-depenses">
         {{ '%.2f'|format(dep_mois) }}€
       </div>
     </div>
 
-    <!-- Revenus -->
     <div class="glass-card stat-card">
       <div class="stat-label">
         Revenus (<span id="periode-label-2">ce mois</span>)
       </div>
-      <div class="stat-value" id="stat-revenus" style="color: #10b981">
+      <div class="stat-value positive-fixed" id="stat-revenus">
         {{ '%.2f'|format(rev_mois) }}€
       </div>
     </div>
 
-    <!-- Solde -->
     <div class="glass-card stat-card">
       <div class="stat-label">Solde</div>
       <div
-        class="stat-value {{ 'positive' if solde_mois >= 0 else 'negative' }}"
+        class="stat-value {{ 'positive-dynamic' if solde_mois >= 0 else 'negative-dynamic' }}"
         id="stat-solde"
       >
         {{ '%.2f'|format(solde_mois) }}€
@@ -69,19 +66,17 @@
       </div>
     </div>
 
-    <!-- Objectifs (cliquable) -->
     <a href="{{ url_for('mes_objectifs') }}" class="objectifs-card-link">
       <div class="glass-card stat-card">
         <div class="stat-label">Limites budgétaires respectées</div>
         <div class="stat-value">{{ objectifs_respectes }}/{{ nb_objectifs }}</div>
-        <div class="stat-change" style="color: rgba(255, 255, 255, 0.8)">
+        <div class="stat-change objectives-ratio-label">
           <span>{{ ratio_objectifs }}% respectés</span>
         </div>
       </div>
     </a>
   </div>
 
-  <!-- ------------------ GRAPHIQUES ------------------ -->
   <div class="charts-grid">
     <div class="glass-card chart-container">
       <h3 class="chart-title" id="evolution-title">
@@ -92,21 +87,50 @@
 
     <div class="glass-card chart-container">
       <h3 class="chart-title">Dépenses par catégorie</h3>
-      <p
-        style="
-          font-size: 0.85rem;
-          color: rgba(255, 255, 255, 0.6);
-          text-align: center;
-          margin-bottom: 10px;
-        "
-      >
+      <p class="chart-info-text">
         Cliquez sur une barre pour voir le détail
       </p>
       <canvas id="barChart"></canvas>
     </div>
   </div>
 </div>
-{% endblock %} {% block scripts %}
+
+{% if budget_alerts %}
+<div class="budget-alerts-section">
+  <h3>
+    Alertes Budget
+  </h3>
+  <div class="alerts-list">
+    {% for alert in budget_alerts %}
+    <div class="alert-item alert-{{ alert.type }}">
+      <span class="alert-icon">
+        {% if alert.type == 'danger' %}
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="15" y1="9" x2="9" y2="15"></line>
+          <line x1="9" y1="9" x2="15" y2="15"></line>
+        </svg>
+        {% else %}
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+        {% endif %}
+      </span>
+      <div class="alert-content">
+        <strong>{{ alert.category }}</strong>
+        <p>{{ alert.message }}</p>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block scripts %}
 <script id="dashboard-data" type="application/json">
   {
     "allData": {
@@ -148,40 +172,6 @@
     "categoriesColors": {{ categories_colors | tojson }}
   }
 </script>
-
-<!-- Section alertes budgétaires -->
-{% if budget_alerts %}
-<div class="budget-alerts-section">
-  <h3>
-    Alertes Budget
-  </h3>
-  <div class="alerts-list">
-    {% for alert in budget_alerts %}
-    <div class="alert-item alert-{{ alert.type }}">
-      <span class="alert-icon">
-        {% if alert.type == 'danger' %}
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="10"></circle>
-          <line x1="15" y1="9" x2="9" y2="15"></line>
-          <line x1="9" y1="9" x2="15" y2="15"></line>
-        </svg>
-        {% else %}
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="10"></circle>
-          <line x1="12" y1="8" x2="12" y2="12"></line>
-          <line x1="12" y1="16" x2="12.01" y2="16"></line>
-        </svg>
-        {% endif %}
-      </span>
-      <div class="alert-content">
-        <strong>{{ alert.category }}</strong>
-        <p>{{ alert.message }}</p>
-      </div>
-    </div>
-    {% endfor %}
-  </div>
-</div>
-{% endif %}
 
 <script
   src="{{ url_for('static', filename='js/budget-dashboard.js') }}"
