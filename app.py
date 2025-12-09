@@ -488,18 +488,20 @@ def budget_dashboard():
     categories_ids = {cat.nom: cat.idCategorie for cat in all_categories}
     categories_colors = {cat.nom: cat.couleur or '#8b5cf6' for cat in all_categories}
 
-    objectifs = Objectif.query.all()
-    nb_objectifs = len(objectifs)
-    objectifs_respectes = 0
-    for obj in objectifs:
-        dep_cat = db.session.query(func.coalesce(func.sum(Transaction.montant), 0)).filter(
-            Transaction.idCategorie == obj.idCategorie,
-            Transaction.montant < 0,
-            Transaction.dateTransaction >= start_month
-        ).scalar()
-        if float(-dep_cat) <= float(obj.montant):
-            objectifs_respectes += 1
-    ratio_objectifs = int(round(100 * objectifs_respectes / nb_objectifs)) if nb_objectifs > 0 else 0
+    # Calculer le nombre de budgets respectés (catégories avec limite)
+    nb_budgets = 0
+    budgets_respectes = 0
+    for cat in all_categories:
+        if cat.limite_budget and cat.limite_budget > 0:
+            nb_budgets += 1
+            dep_cat = db.session.query(func.coalesce(func.sum(Transaction.montant), 0)).filter(
+                Transaction.idCategorie == cat.idCategorie,
+                Transaction.montant < 0,
+                Transaction.dateTransaction >= start_month
+            ).scalar()
+            if float(-dep_cat) <= float(cat.limite_budget):
+                budgets_respectes += 1
+    ratio_objectifs = int(round(100 * budgets_respectes / nb_budgets)) if nb_budgets > 0 else 0
 
     evol_mois_labels, evol_mois_dep, evol_mois_rev = [], [], []
     for i in range(5, -1, -1):
@@ -570,7 +572,7 @@ def budget_dashboard():
         dep_mois=dep_mois, rev_mois=rev_mois, solde_mois=rev_mois - dep_mois, cat_mois=cat_mois,
         dep_trim=dep_trim, rev_trim=rev_trim, solde_trim=rev_trim - dep_trim, cat_trim=cat_trim,
         dep_annee=dep_annee, rev_annee=rev_annee, solde_annee=rev_annee - dep_annee, cat_annee=cat_annee,
-        objectifs_respectes=objectifs_respectes, nb_objectifs=nb_objectifs, ratio_objectifs=ratio_objectifs,
+        objectifs_respectes=budgets_respectes, nb_objectifs=nb_budgets, ratio_objectifs=ratio_objectifs,
         evol_mois_labels=evol_mois_labels, evol_mois_dep=evol_mois_dep, evol_mois_rev=evol_mois_rev,
         evol_trim_labels=evol_trim_labels, evol_trim_dep=evol_trim_dep, evol_trim_rev=evol_trim_rev,
         evol_annee_labels=evol_annee_labels, evol_annee_dep=evol_annee_dep, evol_annee_rev=evol_annee_rev,
