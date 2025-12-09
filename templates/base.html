@@ -54,5 +54,21 @@
     </div>
 
     {% block scripts %}{% endblock %}
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const flashMessages = document.querySelectorAll('.flash');
+            flashMessages.forEach(function(flash) {
+                setTimeout(function() {
+                    flash.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                    flash.style.opacity = '0';
+                    flash.style.transform = 'translateY(-10px)';
+                    setTimeout(function() {
+                        flash.remove();
+                    }, 300);
+                }, 2500);
+            });
+        });
+    </script>
 </body>
 </html>
