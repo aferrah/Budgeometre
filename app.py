@@ -298,6 +298,20 @@ def reinitialiser_bdd():
     return redirect(url_for("home"))
 
 
+@app.route("/reset-and-init")
+def reset_and_init():
+    """Réinitialise complètement la DB et génère des données de test"""
+    try:
+        # Supprimer toutes les données
+        db.drop_all()
+        # Recréer les tables
+        db.create_all()
+        # Rediriger vers la génération de données
+        return redirect(url_for('init_test_archives'))
+    except Exception as e:
+        return f"❌ Erreur : {str(e)}"
+
+
 @app.route("/init-test")
 def init_test():
     cat_alimentation = Categorie(nom="Alimentation", description="Courses, restos, etc.")
@@ -347,29 +361,88 @@ def init_test_archives():
     """Crée des transactions sur plusieurs mois passés pour tester les archives"""
     from datetime import timedelta
     
-    # Créer des catégories si elles n'existent pas
-    cat_alimentation = Categorie.query.filter_by(nom="Alimentation").first()
-    cat_transport = Categorie.query.filter_by(nom="Transport").first()
-    cat_loisirs = Categorie.query.filter_by(nom="Loisirs").first()
-    cat_salaire = Categorie.query.filter_by(nom="Salaire").first()
+    # Créer des catégories avec des couleurs variées
+    categories_config = [
+        {"nom": "Alimentation", "description": "Courses, restaurants", "couleur": "#ef4444", "limite": 400},
+        {"nom": "Transport", "description": "Déplacements", "couleur": "#3b82f6", "limite": 150},
+        {"nom": "Loisirs", "description": "Divertissements", "couleur": "#a855f7", "limite": 200},
+        {"nom": "Logement", "description": "Loyer, charges", "couleur": "#f59e0b", "limite": 800},
+        {"nom": "Santé", "description": "Médecin, pharmacie", "couleur": "#14b8a6", "limite": 100},
+        {"nom": "Shopping", "description": "Vêtements, accessoires", "couleur": "#ec4899", "limite": 150},
+        {"nom": "Salaire", "description": "Revenus mensuels", "couleur": "#10b981", "limite": None},
+    ]
     
-    if not cat_alimentation:
-        cat_alimentation = Categorie(nom="Alimentation", description="Courses, restos", couleur="#ef4444")
-        db.session.add(cat_alimentation)
-    if not cat_transport:
-        cat_transport = Categorie(nom="Transport", description="Déplacements", couleur="#3b82f6")
-        db.session.add(cat_transport)
-    if not cat_loisirs:
-        cat_loisirs = Categorie(nom="Loisirs", description="Divertissements", couleur="#a855f7")
-        db.session.add(cat_loisirs)
-    if not cat_salaire:
-        cat_salaire = Categorie(nom="Salaire", description="Revenus", couleur="#10b981")
-        db.session.add(cat_salaire)
+    categories = {}
+    for config in categories_config:
+        cat = Categorie.query.filter_by(nom=config["nom"]).first()
+        if not cat:
+            cat = Categorie(
+                nom=config["nom"],
+                description=config["description"],
+                couleur=config["couleur"],
+                limite_budget=config["limite"]
+            )
+            db.session.add(cat)
+        else:
+            # Mettre à jour la couleur et la limite si elles n'existent pas
+            if not cat.couleur:
+                cat.couleur = config["couleur"]
+            if config["limite"] and not cat.limite_budget:
+                cat.limite_budget = config["limite"]
+        categories[config["nom"]] = cat
     
     db.session.commit()
     
     now = datetime.utcnow()
     nb_transactions = 0
+    import random
+    
+    # Données pour générer des transactions variées
+    transactions_types = {
+        "Alimentation": [
+            ("Supermarché", 35, 80),
+            ("Boulangerie", 3, 10),
+            ("Restaurant", 20, 60),
+            ("Marché", 15, 40),
+            ("Fast-food", 8, 20),
+            ("Épicerie", 10, 30),
+        ],
+        "Transport": [
+            ("Essence", 40, 70),
+            ("Parking", 5, 15),
+            ("Péage", 10, 25),
+            ("Train", 15, 50),
+            ("Taxi/Uber", 10, 35),
+            ("Entretien voiture", 50, 150),
+        ],
+        "Loisirs": [
+            ("Cinéma", 10, 25),
+            ("Concert", 30, 80),
+            ("Livre", 8, 25),
+            ("Sortie bar", 15, 40),
+            ("Netflix/Spotify", 10, 20),
+            ("Sport", 20, 50),
+        ],
+        "Logement": [
+            ("Loyer", 600, 900),
+            ("Électricité", 40, 80),
+            ("Eau", 20, 40),
+            ("Internet", 30, 50),
+            ("Assurance habitation", 15, 30),
+        ],
+        "Santé": [
+            ("Pharmacie", 10, 40),
+            ("Médecin", 25, 60),
+            ("Dentiste", 50, 150),
+            ("Optique", 80, 200),
+        ],
+        "Shopping": [
+            ("Vêtements", 30, 100),
+            ("Chaussures", 40, 120),
+            ("Accessoires", 15, 60),
+            ("Cosmétiques", 20, 50),
+        ],
+    }
     
     # Créer des transactions pour les 6 derniers mois
     for i in range(6):
@@ -378,55 +451,50 @@ def init_test_archives():
         annee = mois_date.year
         mois = mois_date.month
         
-        # Créer 8-15 transactions par mois
-        import random
-        nb_trans_mois = random.randint(8, 15)
+        # Salaire en début de mois
+        jour_salaire = random.randint(1, 5)
+        salaire = Transaction(
+            titre="Salaire mensuel",
+            montant=random.uniform(2200, 2800),
+            dateTransaction=datetime(annee, mois, jour_salaire, 9, 0),
+            categorie=categories["Salaire"],
+            commentaire="Virement employeur"
+        )
+        db.session.add(salaire)
+        nb_transactions += 1
         
-        for j in range(nb_trans_mois):
-            # Date aléatoire dans le mois
+        # Transactions fixes mensuelles (loyer, charges)
+        for titre_fixe, montant_min, montant_max in transactions_types["Logement"]:
+            jour = random.randint(1, 10)
+            trans = Transaction(
+                titre=titre_fixe,
+                montant=-random.uniform(montant_min, montant_max),
+                dateTransaction=datetime(annee, mois, jour, random.randint(8, 20), random.randint(0, 59)),
+                categorie=categories["Logement"]
+            )
+            db.session.add(trans)
+            nb_transactions += 1
+        
+        # Transactions variables (15-25 par mois)
+        nb_trans_variables = random.randint(15, 25)
+        for _ in range(nb_trans_variables):
+            # Choisir une catégorie aléatoire (pas Logement ni Salaire)
+            cat_nom = random.choice(["Alimentation", "Transport", "Loisirs", "Santé", "Shopping"])
+            titre, montant_min, montant_max = random.choice(transactions_types[cat_nom])
+            
             jour = random.randint(1, 28)
-            date_trans = datetime(annee, mois, jour, random.randint(8, 20), random.randint(0, 59))
-            
-            # Alterner entre différents types de transactions
-            if j == 0:  # Salaire en début de mois
-                trans = Transaction(
-                    titre="Salaire",
-                    montant=random.uniform(2000, 3000),
-                    dateTransaction=date_trans,
-                    categorie=cat_salaire,
-                    commentaire="Salaire mensuel"
-                )
-            elif j % 4 == 1:  # Alimentation
-                titres = ["Supermarché", "Boulangerie", "Restaurant", "Marché", "Épicerie"]
-                trans = Transaction(
-                    titre=random.choice(titres),
-                    montant=-random.uniform(15, 80),
-                    dateTransaction=date_trans,
-                    categorie=cat_alimentation
-                )
-            elif j % 4 == 2:  # Transport
-                titres = ["Essence", "Parking", "Péage", "Train", "Uber"]
-                trans = Transaction(
-                    titre=random.choice(titres),
-                    montant=-random.uniform(10, 60),
-                    dateTransaction=date_trans,
-                    categorie=cat_transport
-                )
-            else:  # Loisirs
-                titres = ["Cinéma", "Concert", "Livre", "Sortie", "Streaming"]
-                trans = Transaction(
-                    titre=random.choice(titres),
-                    montant=-random.uniform(8, 50),
-                    dateTransaction=date_trans,
-                    categorie=cat_loisirs
-                )
-            
+            trans = Transaction(
+                titre=titre,
+                montant=-random.uniform(montant_min, montant_max),
+                dateTransaction=datetime(annee, mois, jour, random.randint(8, 20), random.randint(0, 59)),
+                categorie=categories[cat_nom]
+            )
             db.session.add(trans)
             nb_transactions += 1
     
     db.session.commit()
     
-    return f"✅ {nb_transactions} transactions créées sur 6 mois passés. Vous pouvez maintenant tester l'archivage !"
+    return f"✅ {nb_transactions} transactions créées sur 6 mois avec 7 catégories colorées et limites budgétaires !"
 
 
 @app.route("/transactions")
