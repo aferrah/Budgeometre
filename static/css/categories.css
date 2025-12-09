@@ -16,7 +16,6 @@
     color: white;
 }
 
-/* Formulaire d'ajout */
 .add-category-form {
     background: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(10px);
@@ -108,7 +107,6 @@
     box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
 }
 
-/* Liste des catégories */
 .categories-list {
     display: grid;
     gap: 15px;
@@ -230,7 +228,6 @@
     transform: scale(1.05);
 }
 
-/* Déroulant des transactions */
 .transactions-dropdown {
     max-height: 0;
     overflow: hidden;
@@ -306,7 +303,6 @@
     font-size: 1.1rem;
 }
 
-/* Alertes et budget */
 .flash-messages {
     margin-bottom: 20px;
 }

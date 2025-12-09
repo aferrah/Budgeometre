@@ -1,29 +1,4 @@
-/* Page globale */
-body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: #f5f6fb;
-}
 
-/* On réutilise le style du header dégradé */
-.header-gradient {
-    width: 100%;
-    padding: 40px;
-    text-align: center;
-    background: linear-gradient(60deg,#1C6D08, #003483, #830048);
-    color: white;
-    border-bottom-left-radius: 20px;
-    border-bottom-right-radius: 20px;
-    margin-bottom: 40px;
-}
-
-.header-gradient h1 {
-    margin: 0;
-    font-size: 32px;
-    font-weight: 700;
-}
-
-/* Conteneur principal */
 .add-expense-page {
     min-height: calc(100vh - 160px);
     display: flex;
@@ -31,9 +6,8 @@ body {
     align-items: flex-start;
 }
 
-/* Carte formulaire */
 .form-card {
-    background: white;
+    background: #99b7ed;
     border-radius: 16px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.1);
     padding: 30px 40px;
@@ -46,9 +20,9 @@ body {
     margin-top: 0;
     margin-bottom: 20px;
     font-size: 24px;
+    color: #0f1645;
 }
 
-/* Lignes de formulaire */
 .form-row {
     margin-bottom: 18px;
     display: flex;
@@ -149,4 +123,89 @@ body {
     .form-row.two-columns {
         grid-template-columns: 1fr;
     }
+}
+
+
+.toggle-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 8px;
+}
+
+.toggle-group input[type="radio"] {
+    display: none;
+}
+
+.toggle-btn {
+    padding: 12px 24px;
+    border: 2px solid #0f1645;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: transparent;
+    color: #9ca3af;
+    font-weight: 600;
+}
+
+.toggle-btn:hover {
+    border-color: #9ca3af;
+    color: #d1d5db;
+}
+
+#type-depense:checked + .toggle-btn {
+    background: linear-gradient(135deg, #ef4444, #f87171);
+    border: 2px solid #fca5a5;
+    color: white;
+    box-shadow: 0 0 12px rgba(239, 68, 68, 0.5);
+}
+
+#type-revenu:checked + .toggle-btn {
+    background: linear-gradient(135deg, #10b981, #34d399);
+    border: 2px solid #6ee7b7;
+    color: white;
+    box-shadow: 0 0 12px rgba(16, 185, 129, 0.5);
+}
+
+.input-wrapper {
+    position: relative;
+}
+
+.input-wrapper input {
+    width: 100%;
+}
+
+.input-wrapper .error-message {
+    display: none;
+    color: #ef4444;
+    font-size: 0.85rem;
+    margin-top: 6px;
+}
+
+.input-wrapper.error input {
+    border-color: #ef4444 !important;
+    background: rgba(239, 68, 68, 0.1) !important;
+}
+
+.input-wrapper.error .error-message {
+    display: block;
+}
+
+.input-wrapper.valid input {
+    border-color: #10b981 !important;
+}
+
+.input-wrapper .validation-icon {
+    position: absolute;
+    right: 12px;
+    top: 12px;
+    font-size: 1.2rem;
+    display: none;
+}
+
+.input-wrapper.error .validation-icon.icon-error {
+    display: block;
+}
+
+.input-wrapper.valid .validation-icon.icon-valid {
+    display: block;
 }

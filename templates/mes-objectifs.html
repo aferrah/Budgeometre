@@ -79,14 +79,12 @@
 
                         <div class="objectif-actions-bar">
                             {% if status == 'Atteint' %}
-                                <!-- Bouton récupérer quand objectif atteint -->
                                 <form action="{{ url_for('recuperer_epargne', id=obj.idObjectif) }}" method="POST" class="recuperer-form">
                                     <button type="submit" class="btn-recuperer" onclick="return confirm('Récupérer {{ '%.2f'|format(epargne) }}€ sur votre solde principal ?')">
                                         💰 Récupérer {{ "%.2f"|format(epargne) }}€
                                     </button>
                                 </form>
                             {% else %}
-                                <!-- Contrôles d'épargne -->
                                 <div class="epargne-controls">
                                     <form action="{{ url_for('retirer_epargne', id=obj.idObjectif) }}" method="POST" class="epargne-form-group">
                                         <input type="hidden" name="montant" id="montant-retirer-{{ obj.idObjectif }}" value="10">
