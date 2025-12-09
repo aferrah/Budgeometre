@@ -172,6 +172,12 @@
     color: #f59e0b;
 }
 
+.archive-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
 .btn-voir {
     display: inline-block;
     padding: 10px 20px;
@@ -187,6 +193,48 @@
 .btn-voir:hover {
     background: #8b5cf6;
     color: white;
+}
+
+.btn-masquer, .btn-supprimer {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-masquer {
+    background: rgba(99, 102, 241, 0.2);
+    border: 2px solid rgba(99, 102, 241, 0.5);
+}
+
+.btn-masquer:hover {
+    background: #6366f1;
+    transform: translateY(-2px);
+}
+
+.btn-supprimer {
+    background: rgba(239, 68, 68, 0.2);
+    border: 2px solid rgba(239, 68, 68, 0.5);
+}
+
+.btn-supprimer:hover {
+    background: #ef4444;
+    transform: translateY(-2px);
+}
+
+.archive-masquee {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.archive-masquee .archive-title {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.archive-masquee .archive-actions {
+    justify-content: flex-start;
 }
 
 .empty-state {

@@ -455,7 +455,7 @@ footer a:hover {
 
 /* Alertes budget dashboard */
 .budget-alerts-section {
-    margin-top: 40px;
+    margin-top: 15px;
     padding: 25px;
     background: rgba(255, 255, 255, 0.05);
     backdrop-filter: blur(20px);

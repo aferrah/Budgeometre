@@ -71,6 +71,7 @@ class ArchiveMensuelle(db.Model):
     annee = db.Column(db.Integer, nullable=False)
     mois = db.Column(db.Integer, nullable=False)
     dateArchivage = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    masquee = db.Column(db.Boolean, default=False)
     
     # Statistiques du mois
     total_revenus = db.Column(db.Numeric(15, 2), default=0)
@@ -1211,6 +1212,31 @@ def voir_archive(id):
                          archive=archive, 
                          donnees=donnees,
                          nom_mois=nom_mois)
+
+
+@app.route("/archives/<int:id>/toggle-masquer", methods=["POST"])
+def toggle_masquer_archive(id):
+    archive = ArchiveMensuelle.query.get_or_404(id)
+    archive.masquee = not archive.masquee
+    db.session.commit()
+    if archive.masquee:
+        flash("Archive masquée", "success")
+    else:
+        flash("Archive affichée", "success")
+    return redirect(url_for("archives"))
+
+
+@app.route("/archives/<int:id>/supprimer", methods=["POST"])
+def supprimer_archive(id):
+    archive = ArchiveMensuelle.query.get_or_404(id)
+    mois_noms = ['', 'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
+                 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
+    nom_complet = f"{mois_noms[archive.mois]} {archive.annee}"
+    
+    db.session.delete(archive)
+    db.session.commit()
+    flash(f"Archive {nom_complet} supprimée définitivement", "success")
+    return redirect(url_for("archives"))
 
 
 if __name__ == "__main__":

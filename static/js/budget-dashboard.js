@@ -95,7 +95,23 @@ function updateLineChart(data) {
     },
     options: {
       responsive: true,
-      plugins: { legend: { labels: { color: "#fff" } } },
+      plugins: { 
+        legend: { labels: { color: "#fff" } },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              let label = context.dataset.label || '';
+              if (label) {
+                label += ': ';
+              }
+              if (context.parsed.y !== null) {
+                label += context.parsed.y.toFixed(2) + '€';
+              }
+              return label;
+            }
+          }
+        }
+      },
       scales: {
         y: {
           beginAtZero: true,
@@ -135,7 +151,23 @@ function updateBarChart(data) {
     },
     options: {
       responsive: true,
-      plugins: { legend: { display: false } },
+      plugins: { 
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              let label = context.dataset.label || '';
+              if (label) {
+                label += ': ';
+              }
+              if (context.parsed.y !== null) {
+                label += context.parsed.y.toFixed(2) + '€';
+              }
+              return label;
+            }
+          }
+        }
+      },
       scales: {
         y: {
           beginAtZero: true,
