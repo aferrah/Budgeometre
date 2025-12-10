@@ -235,9 +235,8 @@
         }
 
         function applySortToVisibleRows(column, direction) {
-            const visibleRows = allRows.filter(row => row.style.display !== 'none');
-
-            visibleRows.sort((a, b) => {
+            // Trier TOUTES les lignes, pas seulement celles visibles
+            allRows.sort((a, b) => {
                 let aValue, bValue;
 
                 switch(column) {
@@ -272,7 +271,7 @@
             });
 
             const tbody = document.getElementById('transactionsBody');
-            visibleRows.forEach(row => tbody.appendChild(row));
+            allRows.forEach(row => tbody.appendChild(row));
         }
 
         function sortTable(column) {
@@ -283,9 +282,8 @@
                 currentSort.direction = 'asc';
             }
 
-            const visibleRows = allRows.filter(row => row.style.display !== 'none');
-
-            visibleRows.sort((a, b) => {
+            // Trier TOUTES les lignes, pas seulement celles visibles
+            allRows.sort((a, b) => {
                 let aValue, bValue;
 
                 switch(column) {
@@ -320,7 +318,7 @@
             });
 
             const tbody = document.getElementById('transactionsBody');
-            visibleRows.forEach(row => tbody.appendChild(row));
+            allRows.forEach(row => tbody.appendChild(row));
 
             updateSortIcons();
             updatePagination();
