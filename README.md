@@ -285,7 +285,7 @@ Ce projet est sous licence MIT.
 **Télécom SudParis - FISA 2A**
 
 - TRIKI Wassim
-- PRETI-LEVY Ruben
+- PRETI- -LEVY Ruben
 - MARTIN Claire
 - HAMIDI Issam
 - BURET Amélie
