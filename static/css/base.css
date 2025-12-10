@@ -160,10 +160,11 @@ summary {
     writing-mode: vertical-lr;
     text-align: center;
     padding: 12px 10px;
-    width: 40px;
-    height: 40px;
-    display: grid;
-    justify-items: center;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     background-color: var(--sidebar-summary-bg);
     backdrop-filter: blur(10px);
     border: 2px solid var(--sidebar-border-color);
@@ -176,9 +177,8 @@ summary {
 }
 summary::before,
 summary::after {
-    align-content: center;
-    top: 0;
-    left: 0;
+    font-size: 1.5rem;
+    line-height: 1;
 }
 summary::before {
     content: "";

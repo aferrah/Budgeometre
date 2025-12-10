@@ -1,15 +1,21 @@
-
 .content-container {
     max-width: 900px;
     margin: 0 auto;
     padding: 2rem;
 }
 
+.header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
 .page-title {
     font-size: 1.8rem;
     font-weight: 600;
     color: #e2e8f0;
-    margin-bottom: 1.5rem;
+    margin: 0;
 }
 
 .objectif-form {
@@ -403,4 +409,8 @@
 .btn-recuperer:hover {
     transform: translateY(-1px);
     box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+}
+
+.no-objectifs {
+    color: white;
 }
