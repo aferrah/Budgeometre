@@ -230,35 +230,40 @@ L'objectif que vous venez de renseigner doit se retrouver sur la page **Mes Obje
 
 Si vous souhaitez accédez aux statistiques des transactions au-delà de 3mois, cliquez sur le bouton **Archives mensuelles** : 
 
-<img width="600" height="153" alt="image" src="https://github.com/user-attachments/assets/3690e8ad-92b1-470f-8233-02d275627cd2" />
+<img width="600" height="166" alt="image" src="https://github.com/user-attachments/assets/2418a748-c0b2-44e0-aaa3-652108043484" />
+
 
 Choisissez le mois à archiver puis cliquer sur le bouton **Archiver**  :
 
-<img width="1031" height="472" alt="image" src="https://github.com/user-attachments/assets/48d66a3e-982a-4aa9-909c-c0e6b8aa8c02" />
+<img width="600" height="499" alt="image" src="https://github.com/user-attachments/assets/5f773730-7844-4e44-bf4d-7fbb35d6a9b3" />
+
 
 #### 4.1 Voir les détails d'une archive
 
 Pour voir les détails de l’archive, cliquer sur le bouton **Voir les détails**
 
-<img width="712" height="207" alt="image" src="https://github.com/user-attachments/assets/8e609469-b7d2-48a6-980f-ea8e4176bf86" />
+<img width="600" height="306" alt="image" src="https://github.com/user-attachments/assets/c24fde91-f9fa-439c-a28a-7ba9a4f6a0a6" />
+
 
 #### 4.2 Masquer une archive
 
 Pour masquer une archive, cliquer sur le bouton avec l’icône d’oeil barré :
 
-<img width="765" height="218" alt="image" src="https://github.com/user-attachments/assets/1ab18e40-94a1-4070-88c6-300dd85fc1de" />
+<img width="600" height="360" alt="image" src="https://github.com/user-attachments/assets/1689ffcc-e117-4918-90d3-2758ae0b2d27" />
 
 Pour démasquer une archive, cliquer sur le bouton oeil.
 
 Résultat :
 
-<img width="1033" height="181" alt="image" src="https://github.com/user-attachments/assets/54b8d23b-8fec-495d-aba7-95c0c6097c86" />
+<img width="600" height="237" alt="image" src="https://github.com/user-attachments/assets/e5924db5-f385-4203-a092-556c67feec04" />
+
 
 #### 4.3 Suppression d'une archive : suppression des données pour un mois donné
 
 Pour supprimer une archive, cliquer sur le bouton poubelle:
 
-<img width="846" height="231" alt="image" src="https://github.com/user-attachments/assets/07a81a80-e0c1-496c-a561-88b428c5e6bc" />
+<img width="1248" height="360" alt="image" src="https://github.com/user-attachments/assets/63c4e552-0406-44a4-8b24-a107c2b0a290" />
+
 
 > Attention : ce bouton supprime les données de la base de données, en même temps que l’archive, une confirmation vous sera alors demandée pour s’assurer que cela n’est pas une erreur.
 
