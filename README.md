@@ -291,7 +291,7 @@ Ce projet est sous licence MIT.
 - BURET Amélie
 - FERRAH Anas
 
-*Projet réalisé en 2024-2025*
+*Projet réalisé en 2025-2026*
 
 
 
