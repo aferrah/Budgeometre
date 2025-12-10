@@ -744,7 +744,7 @@ footer a:hover {
         width: 45px;
         height: 45px;
     }
-    
+
     .notification-panel {
         top: 75px;
         right: 20px;
@@ -752,3 +752,129 @@ footer a:hover {
         width: auto;
     }
 }
+/* ---------- LIGHT MODE ---------- */
+.light-mode {
+    --primary: #4f6cff;
+    --secondary: #8aa3ff;
+    --success: #0d8f60;
+    --warning: #c97d00;
+    --danger: #d43535;
+
+    --dark: #ffffff;
+    --light: #f0f2ff;
+
+    --text-color: #1c1c1c;
+    --sidebar-bg: #ffffff;
+    --sidebar-fg: #1c1c1c;
+    --sidebar-border-color: rgba(0,0,0,0.1);
+
+    background: #f4f6ff !important;
+}
+.light-mode * {
+    color: #000 !important;
+}
+
+.light-mode body::before,
+.light-mode body::after {
+    opacity: 0.15; /* adoucit les néons */
+}
+
+.theme-toggle {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 2000;
+    padding: 10px 12px;
+    font-size: 1.3rem;
+    border-radius: 50%;
+    cursor: pointer;
+    background: rgba(255,255,255,0.2);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,0.3);
+    color: white;
+    transition: 0.3s;
+}
+
+.light-mode .theme-toggle {
+    background: rgba(0,0,0,0.1);
+    color: black;
+}
+/* =============================
+   🎨 VARIABLES DARK MODE
+============================= */
+:root[data-theme="dark"] {
+    --text-color: #ffffff;
+    --text-color-strong: #e0e0e0;
+    --card-bg: rgba(255,255,255,0.05);
+    --bg-color: radial-gradient(circle at top, #0d1b3d, #00051a);
+    --shadow-color: rgba(0,0,0,0.4);
+}
+
+/* =============================
+   🎨 VARIABLES LIGHT MODE
+============================= */
+:root[data-theme="light"] {
+    --text-color: #111827; /* noir doux */
+    --text-color-strong: #000000;
+    --card-bg: rgba(255,255,255,0.55);
+    --bg-color: radial-gradient(circle at top, #eef2ff, #e5e0f8);
+    --shadow-color: rgba(0,0,0,0.15);
+}
+
+/* Tous les textes utilisent maintenant les variables */
+body,
+h1, h2, h3, h4, h5, h6,
+p, span, label, button {
+    color: var(--text-color);
+}
+
+/* Cartes */
+.card, .dashboard-card, .goal-card, .category-card {
+    background: var(--card-bg) !important;
+    box-shadow: 0 4px 20px var(--shadow-color);
+}
+
+/* Background page */
+body {
+    background: var(--bg-color) !important;
+}
+/* =============================
+   🎨 VARIABLES DARK MODE
+============================= */
+:root[data-theme="dark"] {
+    --text-color: #ffffff;
+    --text-color-strong: #e0e0e0;
+    --card-bg: rgba(255,255,255,0.05);
+    --bg-color: radial-gradient(circle at top, #0d1b3d, #00051a);
+    --shadow-color: rgba(0,0,0,0.4);
+}
+
+/* =============================
+   🎨 VARIABLES LIGHT MODE
+============================= */
+:root[data-theme="light"] {
+    --text-color: #111827; /* noir doux */
+    --text-color-strong: #000000;
+    --card-bg: rgba(255,255,255,0.55);
+    --bg-color: radial-gradient(circle at top, #eef2ff, #e5e0f8);
+    --shadow-color: rgba(0,0,0,0.15);
+}
+
+/* Tous les textes utilisent maintenant les variables */
+body,
+h1, h2, h3, h4, h5, h6,
+p, span, label, button {
+    color: var(--text-color);
+}
+
+/* Cartes */
+.card, .dashboard-card, .goal-card, .category-card {
+    background: var(--card-bg) !important;
+    box-shadow: 0 4px 20px var(--shadow-color);
+}
+
+/* Background page */
+body {
+    background: var(--bg-color) !important;
+}
+

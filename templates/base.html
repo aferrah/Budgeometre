@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,6 +15,7 @@
 
 </head>
 <body>
+<button id="theme-toggle" class="theme-toggle">🌙</button>
     <details>
         <summary></summary>
         <nav class="menu">
@@ -76,5 +77,27 @@
             });
         });
     </script>
+<script>
+    const toggleBtn = document.getElementById('theme-toggle');
+
+    // Charger le thème sauvegardé
+    if (localStorage.getItem("theme") === "light") {
+        document.body.classList.add("light-mode");
+        toggleBtn.textContent = "☀️";
+    }
+
+    toggleBtn.addEventListener("click", () => {
+        document.body.classList.toggle("light-mode");
+
+        if (document.body.classList.contains("light-mode")) {
+            localStorage.setItem("theme", "light");
+            toggleBtn.textContent = "☀️";
+        } else {
+            localStorage.setItem("theme", "dark");
+            toggleBtn.textContent = "🌙";
+        }
+    });
+</script>
+
 </body>
 </html>
