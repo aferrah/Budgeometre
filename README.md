@@ -275,14 +275,23 @@ Pour supprimer de manière permanente une archive et toutes ses données associ�
 > **Attention** : Cette action est irréversible. Elle supprime définitivement toutes les données du mois sélectionné de la base de données. Une confirmation vous sera demandée pour éviter toute suppression accidentelle.
 
 ---
-*
+
 ## Licence
 
 Ce projet est sous licence MIT.
 
-## Auteurs
+## Équipe de développement
 
-TRIKI Wassim, PRETI- -LEVY Ruben, MARTIN Claire, HAMIDI Issam, BURET Amélie, FERRAH Anas
+**Télécom SudParis - FISA 2A**
+
+- TRIKI Wassim
+- PRETI-LEVY Ruben
+- MARTIN Claire
+- HAMIDI Issam
+- BURET Amélie
+- FERRAH Anas
+
+*Projet réalisé en 2024-2025*
 
 
 
