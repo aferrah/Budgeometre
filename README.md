@@ -1,59 +1,67 @@
 # Budgeomètre
 
+Application web de gestion de budget personnel développée avec Flask. Suivez vos dépenses, définissez des objectifs d'épargne et visualisez vos finances en temps réel avec des graphiques interactifs.
 
-
----
-
-
-
-## **Table des Matières**
-
-1. [Développement local](#développement-local)
-2. [Fonctionnalités](#fonctionnalités)
-
-
+![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)
+![Flask](https://img.shields.io/badge/Flask-Latest-green.svg)
+![SQLite](https://img.shields.io/badge/Database-SQLite-lightgrey.svg)
 
 ---
 
+## Table des Matières
 
+- [À propos](#à-propos)
+- [Fonctionnalités principales](#fonctionnalités-principales)
+- [Technologies utilisées](#technologies-utilisées)
+- [Installation](#installation)
+- [Démarrage rapide](#démarrage-rapide)
+- [Guide d'utilisation](#guide-dutilisation)
+  - [Gestion des catégories](#1-gestion-des-catégories)
+  - [Gestion des transactions](#2-gestion-des-transactions)
+  - [Objectifs d'épargne](#3-objectifs-dépargne)
+  - [Archives mensuelles](#4-archives-mensuelles)
 
-## Développement local
+---
 
+## À propos
 
+**Budgeomètre** est une application web de gestion budgétaire qui permet de gérer efficacement vos finances personnelles. L'application stocke vos données dans une base SQLite locale (`budget.db`) incluant les catégories, transactions et objectifs d'épargne.
 
-Ce projet Flask stocke des `Categorie`, `Transaction` et `Objectif` dans une base SQLite locale (`budget.db`).
+## Fonctionnalités principales
 
+- **Gestion des catégories** : Créez et personnalisez vos catégories de dépenses avec des couleurs distinctives et des limites de budget mensuelles
+- **Suivi des transactions** : Enregistrez facilement vos revenus et dépenses avec des descriptions détaillées
+- **Tableaux de bord interactifs** : Visualisez vos statistiques financières avec des graphiques dynamiques
+- **Objectifs d'épargne** : Définissez et suivez vos objectifs financiers avec des indicateurs de progression
+- **Archives mensuelles** : Conservez un historique complet de vos finances et consultez vos données passées
+- **Filtrage et tri avancés** : Recherchez et organisez vos transactions selon différents critères
+- **Interface responsive** : Accédez à vos données depuis n'importe quel appareil
 
+## Technologies utilisées
 
-**But de ce README :** expliquer comment installer les dépendances, démarrer l'application et importer des données de test via la page `/init-test`.
+- **Backend** : Flask (Python)
+- **Base de données** : SQLite
+- **Frontend** : HTML5, CSS3, JavaScript
+- **Visualisation** : Graphiques interactifs (Chart.js ou équivalent)
 
+---
 
+## Installation
 
-**Prerequis :**
+### Prérequis
 
-- Python 3.8+ installé
-
-- `git` (optionnel)
-
-
-
-
+- Python 3.8 ou version supérieure
+- pip (gestionnaire de paquets Python)
+- Git (optionnel)
 
 **1) Installer les dépendances**
-
 
 
 ```bash
 
 pip install -r requirements.txt --break-system-packages
 
-```
-
-
-
 **2) Démarrer l'application (création automatique de la BD)**
-
-
 
 ```bash
 
@@ -61,29 +69,23 @@ python3 app.py
 
 ```
 
-
-
 La commande ci-dessus crée automatiquement les tables SQLite (fichier `budget.db`) et démarre un serveur de développement sur `http://127.0.0.1:5000`.
-
 
 
 **3) Importer des données de test**
 
 
-
 Pour peupler rapidement la base avec des catégories, transactions et objectifs d'exemple, ouvrez dans votre navigateur :
 
+```
 
+http://127.0.0.1:5000/init-test-archives
 
 ```
 
-http://127.0.0.1:5000/init-test
-
-```
 
 
-
-Le point d'entrée `/init-test` ajoute plusieurs catégories, transactions et objectifs et renvoie un message de confirmation.
+Le point d'entrée `/init-test-archives` ajoute plusieurs catégories, transactions et objectifs sur 6 mois.
 
 
 
@@ -92,7 +94,6 @@ Le point d'entrée `/init-test` ajoute plusieurs catégories, transactions et ob
 
 
 Après avoir importé les données, visitez :
-
 
 
 ```
@@ -111,8 +112,7 @@ La page affiche les dernières transactions et un aperçu (pie-chart) calculé �
 
 
 
-Pour repartir de zéro, arrêtez le serveur et supprimez le fichier `budget.db` puis relancez `python3 app.py` et (optionnel) `/init-test`.
-
+Pour repartir de zéro, arrêtez le serveur et supprimez le fichier `budget.db` puis relancez `python3 app.py` et (optionnel) `/init-test-archives`.
 
 
 ```bash
@@ -125,11 +125,11 @@ python3 app.py
 
 ---
 
-## Fonctionnalités
+## Guide d'utilisation
 
-### 1. Catégorie
+### 1. Gestion des Catégories
 
-#### 1.1 Ajout des catégories
+#### 1.1 Créer une catégorie
 
 Renseigner le nom, la description et la couleur puis appuyer sur **+**.
 
@@ -141,7 +141,7 @@ Si la limite dépasse notre revenu, le message suivant apparaît:
 <img width="1340" height="252" alt="image" src="https://github.com/user-attachments/assets/c15f8559-3a4c-444c-be67-192c34b122e6" />
 
 
-#### 1.2 Supprimer / modifier une catégorie
+#### 1.2 Modifier ou supprimer une catégorie
 
 Supprimez la catégorie en sélectionnant sur la corbeille.
 
@@ -152,7 +152,7 @@ Celle-ci doit être absente de la liste des catégories après coup.
 Modifiez la en sélectionnant le crayon.
 
 
-#### 1.3 Statistiques par catégorie
+#### 1.3 Consulter les statistiques par catégorie
 
 Les statistiques des dépenses sont visibles depuis **budget dashboard**.
 
@@ -168,57 +168,59 @@ Vous aurez alors accès aux statistiques pour cette catégories.
 
 ---
 
-### 2. Transactions
+### 2. Gestion des transactions
 Pour ajouter une dépense ou un revenu, se rendre sur la page d'accueil et cliquer sur le bouton **Ajouter une transaction** :
 
 <img width="600" height="215" alt="image" src="https://github.com/user-attachments/assets/43def96e-a3a8-4120-a5fb-f0a024587762" />
 
 
-#### 2.1 Ajout des revenus
+#### 2.1 Enregistrer un revenu
 
-Pour ajouter un revenu, cliquer sur le bouton **Revenu**, remplir les informations puis cliquer sur le bouton **Enregistrer** :
+Pour ajouter un revenu, cliquez sur l'onglet **Revenu**, renseignez les informations requises, puis cliquez sur **Enregistrer** :
 
 <img width="500" height="811" alt="image" src="https://github.com/user-attachments/assets/ed463ce8-62ee-4d9a-85ca-1a1c3104ea21" />
 
-#### 2.2 Ajout des dépenses
+#### 2.2 Enregistrer une dépense
 
-Pour ajouter un revenu, cliquer sur le bouton **Dépense**, remplir les informations puis cliquer sur le bouton **Enregistrer** :
+Pour ajouter une dépense, cliquez sur l'onglet **Dépense**, renseignez les informations requises (montant, catégorie, date, description), puis cliquez sur **Enregistrer** :
 
 <img width="500" height="756" alt="image" src="https://github.com/user-attachments/assets/3a01ce3e-ce3c-4dc3-90d6-6f68307330b1" />
 
-#### 2.3 Affichage des dépenses
+#### 2.3 Consulter l'historique des transactions
 
-Les dépenses sur les 3 derniers mois s'affichent sur la page d'accueil (index.html) dans un tableau :
+La page d'accueil affiche automatiquement toutes les transactions des 3 derniers mois dans un tableau récapitulatif :
 <img width="600" height="827" alt="image" src="https://github.com/user-attachments/assets/1d429150-2fb1-4e2c-b06e-a930c23d7953" />
 
 
-#### 2.4 Filtrage du tableau dew dépenses
+#### 2.4 Filtrer et trier les transactions
 
-Il est possible de trier le tableau et de le filtrer selon différents critères :
+Vous pouvez facilement organiser vos transactions à l'aide des outils de tri et de filtrage :
 <img width="600" height="205" alt="image" src="https://github.com/user-attachments/assets/69777ffb-4a7d-452e-bfa7-aa12999fc882" />
 
-Il suffit de cliquer sur le haut du tableau pour trier et pour filtrer, utiliser la barre de recherche.
+- **Tri** : Cliquez sur l'en-tête d'une colonne pour trier les données
+- **Filtrage** : Utilisez la barre de recherche pour filtrer par mot-clé
 
 ---
 
-### 3. Objectifs d'épargne
+### 3. Objectifs d'Épargne
 
+#### 3.1 Définir un objectif d'épargne
 
-#### 3.1 Ajout d'objectifs d'épargne
+Pour créer un nouvel objectif, renseignez les informations suivantes :
 
-Renseignez:
+- **Montant cible** : Le montant que vous souhaitez atteindre
+- **Description** : L'objectif de cette épargne
+- **Fréquence** : Périodicité de contribution (mensuelle, hebdomadaire, etc.)
+- **Catégorie associée** : La catégorie budgétaire liée à cet objectif
 
-- montant;
-- description;
-- fréquence;
-- catégorie associée;
-
-Puis cliquez sur **ajouter**.
+Cliquez ensuite sur le bouton **Ajouter** pour enregistrer votre objectif.
 
 <img width="600" height="1218" alt="image" src="https://github.com/user-attachments/assets/2131d045-7e76-4164-97c2-5ddf4804cf4e" />
 
 
-#### 3.2 Visualisation des objectifs d'épargne
+#### 3.2 Suivre vos objectifs d'épargne
+
+Tous vos objectifs d'épargne sont regroupés et suivis sur la page **Mes Objectifs d'Épargne**. Vous y trouverez pour chaque objectif :
 
 L'objectif que vous venez de renseigner doit se retrouver sur la page **Mes Objectifs d'épargne**
 
@@ -226,26 +228,28 @@ L'objectif que vous venez de renseigner doit se retrouver sur la page **Mes Obje
 
 ---
 
-### 4. Archives mensuelles
+### 4. Archives Mensuelles
 
-Si vous souhaitez accédez aux statistiques des transactions au-delà de 3mois, cliquez sur le bouton **Archives mensuelles** : 
+#### 4.0 Accéder aux archives
+
+Pour consulter l'historique de vos transactions au-delà des 3 derniers mois, utilisez la fonctionnalité **Archives mensuelles** : 
 
 <img width="600" height="166" alt="image" src="https://github.com/user-attachments/assets/2418a748-c0b2-44e0-aaa3-652108043484" />
 
 
-Choisissez le mois à archiver puis cliquer sur le bouton **Archiver**  :
+Sélectionnez le mois que vous souhaitez archiver, puis cliquez sur le bouton **Archiver** :
 
 <img width="600" height="499" alt="image" src="https://github.com/user-attachments/assets/5f773730-7844-4e44-bf4d-7fbb35d6a9b3" />
 
 
-#### 4.1 Voir les détails d'une archive
+#### 4.1 Consulter les détails d'une archive
 
-Pour voir les détails de l’archive, cliquer sur le bouton **Voir les détails**
+Pour accéder aux informations détaillées d'un mois archivé, cliquez sur le bouton **Voir les détails** :
 
 <img width="600" height="306" alt="image" src="https://github.com/user-attachments/assets/c24fde91-f9fa-439c-a28a-7ba9a4f6a0a6" />
 
 
-#### 4.2 Masquer une archive
+#### 4.2 Masquer ou afficher une archive
 
 Pour masquer une archive, cliquer sur le bouton avec l’icône d’oeil barré :
 
@@ -258,14 +262,24 @@ Résultat :
 <img width="600" height="237" alt="image" src="https://github.com/user-attachments/assets/e5924db5-f385-4203-a092-556c67feec04" />
 
 
-#### 4.3 Suppression d'une archive : suppression des données pour un mois donné
+#### 4.3 Supprimer définitivement une archive
 
-Pour supprimer une archive, cliquer sur le bouton poubelle:
+Pour supprimer de manière permanente une archive et toutes ses données associées, cliquez sur l'icône de corbeille :
 
 <img width="1248" height="360" alt="image" src="https://github.com/user-attachments/assets/63c4e552-0406-44a4-8b24-a107c2b0a290" />
 
 
-> Attention : ce bouton supprime les données de la base de données, en même temps que l’archive, une confirmation vous sera alors demandée pour s’assurer que cela n’est pas une erreur.
+> **Attention** : Cette action est irréversible. Elle supprime définitivement toutes les données du mois sélectionné de la base de données. Une confirmation vous sera demandée pour éviter toute suppression accidentelle.
+
+---
+*
+## Licence
+
+Ce projet est sous licence MIT.
+
+## Auteurs
+
+TRIKI Wassim, PRETI- -LEVY Ruben, MARTIN Claire, HAMIDI Issam, BURET Amélie, FERRAH Anas
 
 
 
