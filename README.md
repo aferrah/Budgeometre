@@ -1,4 +1,4 @@
-# Budgeometre
+# Budgeomètre
 
 Application web de gestion de budget personnel développée avec Flask. Suivez vos dépenses, définissez des objectifs d'épargne et visualisez vos finances en temps réel avec des graphiques interactifs.
 
@@ -24,7 +24,7 @@ Application web de gestion de budget personnel développée avec Flask. Suivez v
 
 ## À propos
 
-**Budgeometre** est une application web de gestion budgétaire qui permet de gérer efficacement vos finances personnelles. L'application stocke vos données dans une base SQLite locale (`budget.db`) incluant les catégories, transactions et objectifs d'épargne.
+**Budgeomètre** est une application web de gestion budgétaire qui permet de gérer efficacement vos finances personnelles. L'application stocke vos données dans une base SQLite locale (`budget.db`) incluant les catégories, transactions et objectifs d'épargne.
 
 ## Fonctionnalités principales
 
