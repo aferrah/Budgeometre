@@ -17,7 +17,7 @@
     <section class="form-card">
         <h2>Modifier la catégorie : {{ categorie.nom }}</h2>
 
-        <form method="post" action="{{ url_for('modifier_categorie', id=categorie.idCategorie) }}">
+        <form method="post" action="{{ url_for('categories.modifier_categorie', id=categorie.idCategorie) }}">
             
             <div class="form-group">
                 <label for="nom">Nom de la catégorie *</label>
@@ -48,7 +48,7 @@
             </div>
 
             <div class="form-actions">
-                <a href="{{ url_for('categories') }}" class="btn btn-secondary">Annuler</a>
+                <a href="{{ url_for('categories.categories') }}" class="btn btn-secondary">Annuler</a>
                 <button type="submit" class="btn btn-primary">Enregistrer les modifications</button>
             </div>
 

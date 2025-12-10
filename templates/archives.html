@@ -15,14 +15,14 @@
 
     <div class="page-header">
         <h2> Historique des mois archivés</h2>
-        <a href="{{ url_for('home') }}" class="btn-back">← Retour</a>
+        <a href="{{ url_for('home.home') }}" class="btn-back">← Retour</a>
     </div>
 
     <!-- Formulaire d'archivage -->
     {% if mois_disponibles %}
     <div class="archiver-section">
         <h3>Archiver un mois</h3>
-        <form method="post" action="{{ url_for('archiver_mois') }}" class="archiver-form">
+        <form method="post" action="{{ url_for('archives.archiver_mois') }}" class="archiver-form">
             <div class="form-group">
                 <label>Sélectionner le mois à archiver</label>
                 <select name="mois_annee" required onchange="updateMoisAnnee(this)">
@@ -84,11 +84,11 @@
 
                     <div class="archive-actions">
                         {% if not archive.masquee %}
-                        <a href="{{ url_for('voir_archive', id=archive.idArchive) }}" class="btn-voir">
+                        <a href="{{ url_for('archives.voir_archive', id=archive.idArchive) }}" class="btn-voir">
                             Voir les détails
                         </a>
                         {% endif %}
-                        <form method="post" action="{{ url_for('toggle_masquer_archive', id=archive.idArchive) }}" style="display:inline;">
+                        <form method="post" action="{{ url_for('archives.toggle_masquer_archive', id=archive.idArchive) }}" style="display:inline;">
                             <button type="submit" class="btn-masquer" title="{% if archive.masquee %}Afficher l'archive{% else %}Masquer l'archive{% endif %}">
                                 {% if archive.masquee %}
                                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -104,7 +104,7 @@
                             </button>
                         </form>
                         {% if not archive.masquee %}
-                        <form method="post" action="{{ url_for('supprimer_archive', id=archive.idArchive) }}" style="display:inline;" onsubmit="return confirm('Supprimer définitivement cette archive ? Cette action est irréversible.');">
+                        <form method="post" action="{{ url_for('archives.supprimer_archive', id=archive.idArchive) }}" style="display:inline;" onsubmit="return confirm('Supprimer définitivement cette archive ? Cette action est irréversible.');">
                             <button type="submit" class="btn-supprimer" title="Supprimer l'archive">
                                 🗑️
                             </button>

@@ -17,7 +17,7 @@
     <section class="form-card">
         <h2>Nouvelle transaction</h2>
 
-        <form id="expense-form" method="post" action="{{ url_for('add_expense') }}">
+        <form id="expense-form" method="post" action="{{ url_for('transactions.add_expense') }}">
 
             <div class="form-row">
                 <label>Type de transaction</label>
@@ -69,7 +69,7 @@
             </div>
 
             <div class="form-actions">
-                <a href="{{ url_for('home') }}" class="btn-secondary">Annuler</a>
+                <a href="{{ url_for('home.home') }}" class="btn-secondary">Annuler</a>
                 <button type="submit" class="btn-primary" id="submit-btn">Enregistrer</button>
             </div>
 

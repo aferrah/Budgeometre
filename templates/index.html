@@ -76,10 +76,10 @@
     </div>
 
     <div class="add-expense-container action-buttons-row">
-        <a class="add-expense-btn" href="{{ url_for('add_expense') }}">Ajouter une transaction</a>
-        <a class="add-expense-btn" href="{{ url_for('mes_objectifs') }}">Ajouter un objectif d'épargne</a>
-        <a class="add-expense-btn" href="{{ url_for('categories') }}">Ajouter une catégorie</a>
-        <a class="add-expense-btn archives-btn" href="{{ url_for('archives') }}">Archives mensuelles</a>
+        <a class="add-expense-btn" href="{{ url_for('transactions.add_expense') }}">Ajouter une transaction</a>
+        <a class="add-expense-btn" href="{{ url_for('objectifs.mes_objectifs') }}">Ajouter un objectif d'épargne</a>
+        <a class="add-expense-btn" href="{{ url_for('categories.categories') }}">Ajouter une catégorie</a>
+        <a class="add-expense-btn archives-btn" href="{{ url_for('archives.archives') }}">Archives mensuelles</a>
     </div>
 
     <section class="recent-expenses glass-card home-card">
@@ -162,7 +162,7 @@
                             <td class="actions-cell">
                                 {% if not is_epargne %}
                                 <div class="transaction-actions">
-                                    <a href="{{ url_for('modifier_transaction', id=t.idTransaction) }}" class="btn-action btn-edit" title="Modifier">✏️</a>
+                                    <a href="{{ url_for('transactions.modifier_transaction', id=t.idTransaction) }}" class="btn-action btn-edit" title="Modifier">✏️</a>
                                     <button class="btn-action btn-delete" onclick="confirmDelete({{ t.idTransaction }}, '{{ t.titre }}')" title="Supprimer">🗑️</button>
                                 </div>
                                 {% endif %}
@@ -186,7 +186,7 @@
             <div class="archive-message-box">
                 <p class="archive-message-text">
                     <span class="archive-icon">i</span>
-                    {{ nb_anciennes }} transaction(s) plus ancienne(s) disponible(s) dans les <a href="{{ url_for('archives') }}" class="archive-link">archives</a>
+                    {{ nb_anciennes }} transaction(s) plus ancienne(s) disponible(s) dans les <a href="{{ url_for('archives.archives') }}" class="archive-link">archives</a>
                 </p>
             </div>
             {% endif %}
@@ -199,7 +199,7 @@
     </section>
 
     <div class="add-expense-container">
-        <a href="{{ url_for('budget_dashboard') }}" class="dashboard-link">Accéder au dashboard</a>
+        <a href="{{ url_for('dashboard.budget_dashboard') }}" class="dashboard-link">Accéder au dashboard</a>
     </div>
 
     <script>

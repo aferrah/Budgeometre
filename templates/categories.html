@@ -13,13 +13,13 @@
 {% block content %}
     <div class="categories-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
         <h2>Catégories</h2>
-        <a href="{{ url_for('home') }}" class="btn-back">← Retour à l'accueil</a>
+        <a href="{{ url_for('home.home') }}" class="btn-back">← Retour à l'accueil</a>
     </div>
 
     <!-- Formulaire d'ajout -->
     <div class="add-category-form glass-card">
         <h3> Ajouter une catégorie</h3>
-        <form method="post" action="{{ url_for('categories') }}">
+        <form method="post" action="{{ url_for('categories.categories') }}">
             <div class="form-row">
                 <input type="text" name="nom" placeholder="Nom de la catégorie" required>
                 <input type="text" name="description" placeholder="Description (optionnel)">
@@ -56,8 +56,8 @@
                             <button type="button" class="btn-toggle" onclick="toggleTransactions(this, 'transactions-{{ cat.idCategorie }}')">
                                 ▼ Voir
                             </button>
-                            <a href="{{ url_for('modifier_categorie', id=cat.idCategorie) }}" class="btn-edit" title="Modifier">✏️</a>
-                            <form method="post" action="{{ url_for('delete_category', id=cat.idCategorie) }}" style="display:inline;">
+                            <a href="{{ url_for('categories.modifier_categorie', id=cat.idCategorie) }}" class="btn-edit" title="Modifier">✏️</a>
+                            <form method="post" action="{{ url_for('categories.delete_category', id=cat.idCategorie) }}" style="display:inline;">
                                 <button type="submit" class="btn-delete" onclick="return confirm('Supprimer cette catégorie ?')">🗑️</button>
                             </form>
                         </div>
