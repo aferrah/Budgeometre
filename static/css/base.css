@@ -100,7 +100,6 @@ header {
 h1 {
     text-align: center;
     font-size: 5rem;
-    /* Police conservée comme demandé */
     font-family: 'DM Serif Text', 'Outfit', 'JetBrains Mono', serif;
     background: linear-gradient(90deg, var(--success), #1D889D);
     -webkit-background-clip: text;
@@ -207,8 +206,8 @@ details[open] summary::after {
     content: "";
 }
 .menu {
-    height: auto; /* Changé pour auto */
-    max-height: 0; /* Ajouté pour l'état fermé */
+    height: auto;
+    max-height: 0;
     width: fit-content;
     border-radius: var(--sidebar-rad);
     background-color: var(--sidebar-bg);
@@ -219,7 +218,6 @@ details[open] summary::after {
     flex-direction: column;
     justify-content: space-between;
     overflow: hidden;
-    /* L'animation de fermeture est maintenant basée sur max-height */
     animation: closeMenu 300ms ease-in-out forwards;
 }
 .menu a {
@@ -241,8 +239,10 @@ details[open] summary::after {
     filter: brightness(150%);
     color: var(--primary);
 }
+.menu .reset-bdd-link {
+    color: var(--danger);
+}
 details::before {
-    /* Texte enlevé, mais la règle CSS conservée sans contenu */
     content: "";
     color: var(--sidebar-fg);
     position: absolute;
@@ -254,13 +254,12 @@ details::before {
 details[open]::before {
     animation: fadeMe 300ms linear forwards;
 }
-/* Mise à jour des animations pour utiliser max-height */
 @keyframes menuAnim {
     0% {
         max-height: 0;
     }
     100% {
-        max-height: 500px; /* Grande valeur pour accommoder tout le contenu */
+        max-height: 500px;
     }
 }
 @keyframes fadeMe {
@@ -273,7 +272,7 @@ details[open]::before {
 }
 @keyframes closeMenu {
     0% {
-        max-height: 500px; /* Doit correspondre à la valeur de 100% de menuAnim */
+        max-height: 500px;
     }
     100% {
         max-height: 0;
