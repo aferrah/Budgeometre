@@ -4,12 +4,12 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/mes-objectifs.css') }}">
 
     <div class="header-container">
-        <h1 class="page-title">Mes Objectifs</h1>
+        <h1 class="page-title">Mes Objectifs d'épargne</h1>
         <a href="{{ url_for('home') }}" class="btn-back">← Retour à l'accueil</a>
     </div>
 
     <form method="POST" class="objectif-form">
-        <h2>Ajouter un objectif</h2>
+        <h2>Ajouter un objectif d'épargne</h2>
 
         <div class="form-row">
             <label>Montant cible (€)</label>
@@ -41,7 +41,7 @@
         <button type="submit" class="btn-submit">Ajouter</button>
     </form>
 
-    <h2>Objectifs actuels</h2>
+    <h2>Objectifs d'épargne actuels</h2>
 
     {% if objectifs_status %}
         <div class="objectifs-list">
@@ -115,7 +115,7 @@
                             {% endif %}
 
                             <form action="{{ url_for('supprimer_objectif', id=obj.idObjectif) }}" method="POST" class="delete-form">
-                                <button type="submit" class="btn-delete" title="Supprimer l'objectif" onclick="return confirm('Supprimer cet objectif ?')">
+                                <button type="submit" class="btn-delete" title="Supprimer l'objectif" onclick="return confirm('Supprimer cet objectif d\'épargne ?')">
                                     🗑️
                                 </button>
                             </form>
@@ -125,7 +125,7 @@
             {% endfor %}
         </div>
     {% else %}
-        <p class="no-objectifs">Aucun objectif défini pour le moment.</p>
+        <p class="no-objectifs">Aucun objectif d'épargne défini pour le moment.</p>
     {% endif %}
 
 {% endblock %}
