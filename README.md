@@ -104,7 +104,7 @@ http://127.0.0.1:5000/
 
 
 
-La page affiche les dernières transactions et un aperçu (pie-chart) calculé à partir des valeurs passées par le backend.
+La page affiche les dernières transactions calculées à partir des valeurs passées par le backend.
 
 
 #### 5) Réinitialiser la base
