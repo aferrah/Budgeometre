@@ -166,16 +166,23 @@ Vous aurez alors accès aux statistiques pour cette catégories.
 
 <img width="1961" height="859" alt="image" src="https://github.com/user-attachments/assets/dd2a19fe-6e87-45e4-ab8e-e6cf3ae77432" />
 
+---
 
 ### 2. Transactions
+Pour ajouter une dépense ou un revenu, se rendre sur la page d'accueil et cliquer sur le bouton **Ajouter une transaction** :
+
+<img width="600" height="215" alt="image" src="https://github.com/user-attachments/assets/43def96e-a3a8-4120-a5fb-f0a024587762" />
+
 
 #### 2.1 Ajout des revenus
 
+Pour ajouter un revenu, cliquer sur le bouton **Revenu**, remplir les informations puis cliquer sur le bouton **Enregistrer** :
+
+<img width="600" height="811" alt="image" src="https://github.com/user-attachments/assets/ed463ce8-62ee-4d9a-85ca-1a1c3104ea21" />
+
 #### 2.2 Ajout des dépenses
 
-Pour ajouter une dépense, se rendre la page d'accueil et cliquer sur le bouton **Ajouter un transaction** :
 
-<img width="1352" height="366" alt="image" src="https://github.com/user-attachments/assets/e05b0fe0-822f-4a96-9e39-2f15f8da0348" />
 
 #### 2.3 Affichage des dépenses
 
