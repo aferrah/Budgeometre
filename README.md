@@ -7,7 +7,7 @@
 
 ---
 
-##Développement local
+## Développement local
 
 Ce projet Flask stocke des `Categorie`, `Transaction` et `Objectif` dans une base SQLite locale (`budget.db`).
 
