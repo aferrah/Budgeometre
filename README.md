@@ -186,6 +186,9 @@ Pour ajouter un revenu, cliquer sur le bouton **Revenu**, remplir les informatio
 
 #### 2.3 Affichage des dépenses
 
+
+#### 2.4 Filtrage par date
+
 ### 3. Objectifs d'épargne
 
 #### 3.1 Ajout d'objectifs d'épargne
