@@ -81,7 +81,7 @@
                             {% if status == 'Atteint' %}
                                 <form action="{{ url_for('recuperer_epargne', id=obj.idObjectif) }}" method="POST" class="recuperer-form">
                                     <button type="submit" class="btn-recuperer" onclick="return confirm('Récupérer {{ '%.2f'|format(epargne) }}€ sur votre solde principal ?')">
-                                        💰 Récupérer {{ "%.2f"|format(epargne) }}€
+                                        Récupérer {{ "%.2f"|format(epargne) }}€
                                     </button>
                                 </form>
                             {% else %}
