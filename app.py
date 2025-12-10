@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
+from datetime import timedelta
 from sqlalchemy import func
 
 app = Flask(__name__)
@@ -93,43 +94,56 @@ class ArchiveMensuelle(db.Model):
 
 @app.route("/")
 def home():
-    from datetime import timedelta
-    
-    # Limiter aux transactions des 3 derniers mois
     now = datetime.utcnow()
+
+    # 1) Périodes temporelles
+    # Transactions affichées : 3 derniers mois
     date_limite = now - timedelta(days=90)
-    
-    # Récupérer TOUTES les transactions récentes (pas de pagination serveur)
+
+    # Statistiques affichées dans la grosse carte : mois en cours
+    start_of_month = datetime(now.year, now.month, 1)
+
+    # 2) Transactions récentes (3 derniers mois)
     transactions = Transaction.query.filter(
         Transaction.dateTransaction >= date_limite
     ).order_by(
         Transaction.dateTransaction.desc()
     ).all()
-    
-    # Statistiques sur TOUTES les transactions (pas seulement les récentes)
+
+    # 3) Statistiques du MOIS COURANT
+
+    # Revenus du mois (montants positifs)
     total_revenus = db.session.query(
         db.func.coalesce(db.func.sum(Transaction.montant), 0)
-    ).filter(Transaction.montant > 0).scalar()
+    ).filter(
+        Transaction.montant > 0,
+        Transaction.dateTransaction >= start_of_month
+    ).scalar()
 
+    # Dépenses du mois (montants négatifs)
     total_depenses_raw = db.session.query(
         db.func.coalesce(db.func.sum(Transaction.montant), 0)
-    ).filter(Transaction.montant < 0).scalar()
+    ).filter(
+        Transaction.montant < 0,
+        Transaction.dateTransaction >= start_of_month
+    ).scalar()
 
-    # Total épargne (somme des épargnes de tous les objectifs)
+    # Total épargne : on garde la logique actuelle (somme de epargne_actuelle)
     total_epargne = db.session.query(
         db.func.coalesce(db.func.sum(Objectif.epargne_actuelle), 0)
     ).scalar()
-    total_epargne = float(total_epargne)
 
+    total_epargne = float(total_epargne)
     total_revenus = float(total_revenus)
-    total_depenses = float(-total_depenses_raw)
+    total_depenses = float(-total_depenses_raw)  # on remet en positif pour l'affichage
     argentActuel = total_revenus - total_depenses
-    
-    # Compter les transactions plus anciennes
+
+    # 4) Nombre de transactions plus anciennes que 3 mois
     nb_anciennes = Transaction.query.filter(
         Transaction.dateTransaction < date_limite
     ).count()
 
+    # 5) Envoi au template
     return render_template(
         "index.html",
         transactions=transactions,
@@ -139,6 +153,7 @@ def home():
         total_epargne=total_epargne,
         nb_anciennes=nb_anciennes
     )
+
 
 
 @app.route("/add-expense", methods=["GET", "POST"])
