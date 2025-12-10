@@ -57,9 +57,11 @@
                                 ▼ Voir
                             </button>
                             <a href="{{ url_for('categories.modifier_categorie', id=cat.idCategorie) }}" class="btn-edit" title="Modifier">✏️</a>
-                            <form method="post" action="{{ url_for('categories.delete_category', id=cat.idCategorie) }}" style="display:inline;">
-                                <button type="submit" class="btn-delete" onclick="return confirm('Supprimer cette catégorie ?')">🗑️</button>
-                            </form>
+                            <button type="button" class="btn-delete" 
+                                    data-category-id="{{ cat.idCategorie }}"
+                                    data-category-name="{{ cat.nom }}"
+                                    onclick="deleteCategory(this)"
+                                    title="Supprimer">🗑️</button>
                         </div>
                     </div>
 
@@ -171,5 +173,61 @@
             input.value = '';
         }
     }
+
+    function deleteCategory(button) {
+        const categoryId = button.dataset.categoryId;
+        const categoryName = button.dataset.categoryName;
+        
+        if (!confirm(`Supprimer la catégorie "${categoryName}" ?`)) {
+            return;
+        }
+
+        const card = button.closest('.category-card');
+
+        fetch(`/categories/delete/${categoryId}`, {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            const message = document.createElement('div');
+            message.className = `flash-message ${data.success ? 'success' : 'error'}`;
+            message.textContent = data.message;
+            message.style.cssText = `position: fixed; top: 20px; right: 20px; background: ${data.success ? '#10b981' : '#ef4444'}; color: white; padding: 12px 20px; border-radius: 8px; z-index: 9999; animation: slideIn 0.3s ease;`;
+            document.body.appendChild(message);
+            
+            if (data.success) {
+                // Supprimer visuellement la carte avec animation
+                card.style.animation = 'fadeOut 0.3s ease';
+                setTimeout(() => card.remove(), 300);
+            }
+            
+            setTimeout(() => {
+                message.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => message.remove(), 300);
+            }, 3000);
+        })
+        .catch(error => {
+            console.error('Erreur:', error);
+            alert('Une erreur est survenue');
+        });
+    }
 </script>
+<style>
+    @keyframes slideIn {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+    @keyframes slideOut {
+        from { transform: translateX(0); opacity: 1; }
+        to { transform: translateX(100%); opacity: 0; }
+    }
+    @keyframes fadeOut {
+        from { opacity: 1; transform: scale(1); }
+        to { opacity: 0; transform: scale(0.95); }
+    }
+</style>
 {% endblock %}

@@ -63,10 +63,29 @@ def modifier_categorie(id):
 
 @categories_bp.route("/categories/delete/<int:id>", methods=["POST"])
 def delete_category(id):
+    from flask import jsonify
     categorie = Categorie.query.get_or_404(id)
+    
     if not categorie.transactions:
+        nom = categorie.nom
         db.session.delete(categorie)
         db.session.commit()
+        message = f"Catégorie '{nom}' supprimée avec succès"
+        success = True
+    else:
+        nb_transactions = len(categorie.transactions)
+        message = f"Impossible de supprimer '{categorie.nom}' : {nb_transactions} transaction(s) liée(s)"
+        success = False
+    
+    # Si c'est une requête AJAX, retourner JSON
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return jsonify({
+            'success': success,
+            'message': message
+        })
+    
+    # Sinon, comportement classique
+    flash(message, "success" if success else "error")
     return redirect(url_for("categories.categories"))
 
 
