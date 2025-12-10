@@ -11,8 +11,7 @@
 {% endblock %}
 
 {% block content %}
-    <!-- Carte solde principal -->
-    <div class="solde-card glass-card" style="margin-bottom: 20px;">
+    <div class="solde-card glass-card home-card">
         {% set ratio = (argentActuel / total_revenus * 100) if total_revenus > 0 else 0 %}
         {% set ratio_capped = [ratio, 100]|min if ratio >= 0 else 0 %}
         {% if ratio >= 75 %}
@@ -76,31 +75,27 @@
         </div>
     </div>
 
-    <!-- Boutons ajouter -->
-    <div class="add-expense-container" style="margin-bottom: 30px; display: flex; gap: 15px; flex-wrap: wrap; justify-content: center;">
+    <div class="add-expense-container action-buttons-row">
         <a class="add-expense-btn" href="{{ url_for('add_expense') }}">Ajouter une transaction</a>
         <a class="add-expense-btn" href="{{ url_for('mes_objectifs') }}">Ajouter un objectif</a>
         <a class="add-expense-btn" href="{{ url_for('categories') }}">Ajouter une catégorie</a>
-        <a class="add-expense-btn" href="{{ url_for('archives') }}" style="opacity: 0.8;">Archives mensuelles</a>
+        <a class="add-expense-btn archives-btn" href="{{ url_for('archives') }}">Archives mensuelles</a>
     </div>
 
-    <!-- Dernières transactions -->
-    <section class="recent-expenses glass-card" style="margin-bottom: 20px;">
+    <section class="recent-expenses glass-card home-card">
         <h2>Transactions récentes</h2>
 
         {% if transactions %}
-            <!-- Filtres -->
-            <div class="filters-container" style="margin-bottom: 20px; display: flex; gap: 15px; flex-wrap: wrap; align-items: flex-end;">
-                <div class="filter-group" style="flex: 1; min-width: 200px;">
-                    <label style="display: block; margin-bottom: 5px; color: rgba(255,255,255,0.7); font-size: 0.85rem;">Recherche</label>
+            <div class="filters-container filters-row">
+                <div class="filter-group filter-search-group">
+                    <label class="filter-label">Recherche</label>
                     <input type="text" id="searchInput" placeholder="Rechercher..."
-                           style="width: 100%; padding: 8px 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.1); color: white;">
+                           class="filter-input">
                 </div>
 
-                <div class="filter-group" style="flex: 0 0 auto; min-width: 150px;">
-                    <label style="display: block; margin-bottom: 5px; color: rgba(255,255,255,0.7); font-size: 0.85rem;">Catégorie</label>
-                    <select id="categoryFilter"
-                            style="width: 100%; padding: 8px 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.1); color: white;">
+                <div class="filter-group filter-category-group">
+                    <label class="filter-label">Catégorie</label>
+                    <select id="categoryFilter" class="filter-input filter-select">
                         <option value="all">Toutes</option>
                         {% set categories_set = [] %}
                         {% for t in transactions %}
@@ -112,10 +107,9 @@
                     </select>
                 </div>
 
-                <div class="filter-group" style="flex: 0 0 auto; min-width: 130px;">
-                    <label style="display: block; margin-bottom: 5px; color: rgba(255,255,255,0.7); font-size: 0.85rem;">Type</label>
-                    <select id="typeFilter"
-                            style="width: 100%; padding: 8px 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.1); color: white;">
+                <div class="filter-group filter-type-group">
+                    <label class="filter-label">Type</label>
+                    <select id="typeFilter" class="filter-input filter-select">
                         <option value="all">Tout</option>
                         <option value="revenus">Revenus</option>
                         <option value="depenses">Dépenses</option>
@@ -123,8 +117,7 @@
                     </select>
                 </div>
 
-                <button id="resetBtn"
-                        style="padding: 8px 16px; border-radius: 6px; border: none; background: rgba(255,255,255,0.15); color: white; cursor: pointer; font-size: 0.9rem;">
+                <button id="resetBtn" class="reset-filters-btn">
                     Réinitialiser
                 </button>
             </div>
@@ -132,19 +125,19 @@
             <table id="transactionsTable">
                 <thead>
                     <tr>
-                        <th class="sortable" data-column="date" style="cursor: pointer; user-select: none;">
+                        <th class="sortable" data-column="date">
                             Date <span class="sort-icon">⇅</span>
                         </th>
-                        <th class="sortable" data-column="titre" style="cursor: pointer; user-select: none;">
+                        <th class="sortable" data-column="titre">
                             Libellé <span class="sort-icon">⇅</span>
                         </th>
-                        <th class="sortable" data-column="categorie" style="cursor: pointer; user-select: none;">
+                        <th class="sortable" data-column="categorie">
                             Catégorie <span class="sort-icon">⇅</span>
                         </th>
-                        <th class="sortable" data-column="montant" style="cursor: pointer; user-select: none;">
+                        <th class="sortable" data-column="montant">
                             Montant <span class="sort-icon">⇅</span>
                         </th>
-                        <th style="width: 90px; text-align: center;">Actions</th>
+                        <th class="actions-column">Actions</th>
                     </tr>
                 </thead>
                 <tbody id="transactionsBody">
@@ -158,7 +151,7 @@
                             <td>{{ t.dateTransaction.strftime('%d/%m/%Y') }}</td>
                             <td>{{ t.titre }}</td>
                             <td>
-                                <span class="categorie-badge {% if is_epargne %}epargne{% endif %}" 
+                                <span class="categorie-badge {% if is_epargne %}epargne{% endif %}"
                                       style="background-color: {{ t.categorie.couleur or '#8b5cf6' }}33; border: 1px solid {{ t.categorie.couleur or '#8b5cf6' }}; color: {{ t.categorie.couleur or '#8b5cf6' }};">
                                     {{ t.categorie.nom }}
                                 </span>
@@ -166,7 +159,7 @@
                             <td class="montant-cell {% if is_epargne %}epargne{% elif t.montant >= 0 %}positif{% else %}negatif{% endif %}">
                                 {{ '+' if t.montant >= 0 else '' }}{{ '%.2f'|format(t.montant) }} €
                             </td>
-                            <td style="text-align: center;">
+                            <td class="actions-cell">
                                 {% if not is_epargne %}
                                 <div class="transaction-actions">
                                     <a href="{{ url_for('modifier_transaction', id=t.idTransaction) }}" class="btn-action btn-edit" title="Modifier">✏️</a>
@@ -179,37 +172,34 @@
                 </tbody>
             </table>
 
-            <div id="noResults" style="display: none; text-align: center; padding: 30px; color: rgba(255,255,255,0.6);">
+            <div id="noResults" class="no-results-message">
                 Aucune transaction trouvée avec ces critères.
             </div>
 
-            <!-- Pagination dynamique -->
-            <div id="paginationContainer" class="pagination" style="margin-top: 30px; display: flex; justify-content: center; align-items: center; gap: 10px;">
+            <div id="paginationContainer" class="pagination pagination-container">
             </div>
 
-            <div id="paginationInfo" style="text-align: center; margin-top: 15px; color: rgba(255,255,255,0.5); font-size: 0.9rem;">
+            <div id="paginationInfo" class="pagination-info">
             </div>
 
-            <!-- Message pour les transactions anciennes -->
             {% if nb_anciennes > 0 %}
-            <div style="text-align: center; margin-top: 20px; padding: 15px; background: rgba(139, 92, 246, 0.1); border: 1px solid rgba(139, 92, 246, 0.3); border-radius: 8px;">
-                <p style="color: #a78bfa; margin: 0;">
-                    <span style="display: inline-block; width: 20px; height: 20px; line-height: 20px; text-align: center; background: rgba(139, 92, 246, 0.3); border-radius: 50%; font-weight: bold; font-size: 0.85rem; margin-right: 8px;">i</span>
-                    {{ nb_anciennes }} transaction(s) plus ancienne(s) disponible(s) dans les <a href="{{ url_for('archives') }}" style="color: #c4b5fd; text-decoration: underline;">archives</a>
+            <div class="archive-message-box">
+                <p class="archive-message-text">
+                    <span class="archive-icon">i</span>
+                    {{ nb_anciennes }} transaction(s) plus ancienne(s) disponible(s) dans les <a href="{{ url_for('archives') }}" class="archive-link">archives</a>
                 </p>
             </div>
             {% endif %}
 
         {% else %}
-            <p style="color: rgba(255, 255, 255, 0.7); text-align: center; padding: 20px;">
+            <p class="no-transactions-message">
                 Aucune transaction enregistrée pour l'instant.
             </p>
         {% endif %}
     </section>
 
-    <!-- Lien vers dashboard -->
     <div class="add-expense-container">
-        <a href="{{ url_for('budget_dashboard') }}" style="opacity: 0.8;">Accéder au dashboard</a>
+        <a href="{{ url_for('budget_dashboard') }}" class="dashboard-link">Accéder au dashboard</a>
     </div>
 
     <script>
@@ -222,7 +212,6 @@
             const tbody = document.getElementById('transactionsBody');
             if (tbody) {
                 allRows = Array.from(tbody.querySelectorAll('.transaction-row'));
-                // Initialiser toutes les lignes comme non filtrées
                 allRows.forEach(row => row.dataset.filteredOut = '');
                 attachEventListeners();
                 sortTable('date');
@@ -387,29 +376,25 @@
                 currentPage = 1;
             }
 
-            // Masquer d'abord toutes les lignes filtrées
             allRows.forEach(row => {
                 if (row.dataset.filteredOut) {
                     row.style.display = 'none';
                 }
             });
 
-            // Mettre à jour les contrôles de pagination
             const paginationContainer = document.getElementById('paginationContainer');
             const paginationInfo = document.getElementById('paginationInfo');
 
             if (totalPages <= 1) {
-                // Pas de pagination nécessaire - afficher toutes les lignes visibles
                 visibleRows.forEach(row => row.style.display = '');
                 paginationContainer.innerHTML = '';
                 paginationInfo.textContent = `${visibleRows.length} transactions récentes (3 derniers mois)`;
                 return;
             }
 
-            // Afficher/masquer les lignes selon la pagination
             const start = (currentPage - 1) * itemsPerPage;
             const end = start + itemsPerPage;
-            
+
             visibleRows.forEach((row, index) => {
                 if (index >= start && index < end) {
                     row.style.display = '';
@@ -420,7 +405,6 @@
 
             let html = '';
 
-            // Bouton première page
             if (currentPage > 1) {
                 html += `<span class="page-btn" onclick="changePage(1)" title="Première page">«</span>`;
                 html += `<span class="page-btn" onclick="changePage(${currentPage - 1})">‹</span>`;
@@ -429,12 +413,11 @@
                 html += `<span class="page-btn disabled">‹</span>`;
             }
 
-            // Numéros de page
             const startPage = Math.max(1, currentPage - 2);
             const endPage = Math.min(totalPages, currentPage + 2);
 
             if (startPage > 1) {
-                html += `<span style="color: rgba(255,255,255,0.3);">...</span>`;
+                html += `<span class="page-ellipsis">...</span>`;
             }
 
             for (let i = startPage; i <= endPage; i++) {
@@ -446,10 +429,9 @@
             }
 
             if (endPage < totalPages) {
-                html += `<span style="color: rgba(255,255,255,0.3);">...</span>`;
+                html += `<span class="page-ellipsis">...</span>`;
             }
 
-            // Bouton dernière page
             if (currentPage < totalPages) {
                 html += `<span class="page-btn" onclick="changePage(${currentPage + 1})">›</span>`;
                 html += `<span class="page-btn" onclick="changePage(${totalPages})" title="Dernière page">»</span>`;
