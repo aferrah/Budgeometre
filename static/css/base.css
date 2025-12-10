@@ -158,7 +158,6 @@ h2 {
     border-color: var(--card-border);
 }
 
-/* Navigation Menu */
 details {
     position: fixed;
     top: 40px;
@@ -410,7 +409,6 @@ footer a:hover {
     color: var(--text-muted);
 }
 
-/* Messages flash */
 .flash-messages {
     margin: 1.5rem 0;
     display: flex;
@@ -491,7 +489,6 @@ footer a:hover {
     border-color: var(--primary);
 }
 
-/* Alertes budget dashboard */
 .budget-alerts-section {
     margin-top: 15px;
     padding: 25px;
@@ -561,7 +558,6 @@ footer a:hover {
     font-size: 0.95rem;
 }
 
-/* Système de notifications */
 .notification-bell {
     position: fixed;
     top: 30px;
@@ -786,7 +782,6 @@ footer a:hover {
     }
 }
 
-/* Theme Toggle Button */
 .theme-toggle {
     position: fixed;
     top: 20px;
@@ -807,9 +802,6 @@ footer a:hover {
     transform: scale(1.1);
 }
 
-/* =============================
-   LIGHT MODE - COMPLETE OVERRIDE
-============================= */
 body.light-mode {
     --primary: #5b6eea;
     --secondary: #8b5cf6;
@@ -847,14 +839,12 @@ body.light-mode::after {
     background: radial-gradient(circle, rgba(102, 126, 234, 0.1) 0%, transparent 70%);
 }
 
-/* Light Mode - Theme Toggle */
 body.light-mode .theme-toggle {
     background: rgba(0, 0, 0, 0.1);
     border-color: rgba(0, 0, 0, 0.2);
     color: #1f2937;
 }
 
-/* Light Mode - Text Colors */
 body.light-mode,
 body.light-mode h2,
 body.light-mode h3,
@@ -883,7 +873,6 @@ body.light-mode .form-card h2 {
     color: var(--text-color);
 }
 
-/* Light Mode - Muted Text */
 body.light-mode .text-muted,
 body.light-mode .category-description,
 body.light-mode .transaction-date,
@@ -897,7 +886,6 @@ body.light-mode .hint {
     color: var(--text-muted);
 }
 
-/* Light Mode - Preserve Semantic Colors */
 body.light-mode .stat-value.positive-fixed,
 body.light-mode .stat-value.revenus,
 body.light-mode .montant-cell.positif,
@@ -938,7 +926,6 @@ body.light-mode .stat-value.solde {
     color: #7c3aed !important;
 }
 
-/* Light Mode - Cards */
 body.light-mode .glass-card,
 body.light-mode .form-card,
 body.light-mode .stat-card,
@@ -966,7 +953,6 @@ body.light-mode .objectif-card:hover {
     border-color: rgba(0, 0, 0, 0.15);
 }
 
-/* Light Mode - Menu */
 body.light-mode .menu {
     background-color: #ffffff;
     border-color: rgba(0, 0, 0, 0.15);
@@ -988,7 +974,6 @@ body.light-mode summary {
     color: #1f2937;
 }
 
-/* Light Mode - Inputs & Forms */
 body.light-mode input[type="text"],
 body.light-mode input[type="number"],
 body.light-mode input[type="date"],
@@ -1029,7 +1014,6 @@ body.light-mode .form-row select option {
     color: #1f2937;
 }
 
-/* Light Mode - Buttons */
 body.light-mode .btn-back {
     background: rgba(0, 0, 0, 0.05);
     border-color: rgba(0, 0, 0, 0.2);
@@ -1128,7 +1112,6 @@ body.light-mode .page-btn.active {
     color: white;
 }
 
-/* Light Mode - Tables */
 body.light-mode .recent-expenses th,
 body.light-mode .recent-expenses td,
 body.light-mode .transactions-table th,
@@ -1152,13 +1135,11 @@ body.light-mode .transactions-dropdown {
     border-top-color: var(--table-border);
 }
 
-/* Light Mode - Dropdowns & Sections */
 body.light-mode .category-budget-section {
     background: rgba(0, 0, 0, 0.03);
     border-top-color: var(--table-border);
 }
 
-/* Light Mode - Flash Messages */
 body.light-mode .flash-success {
     background: rgba(5, 150, 105, 0.15);
     border-color: rgba(5, 150, 105, 0.3);
@@ -1177,7 +1158,6 @@ body.light-mode .flash-error {
     color: #dc2626;
 }
 
-/* Light Mode - Badges */
 body.light-mode .categorie-badge,
 body.light-mode .badge-categorie {
     background: rgba(0, 0, 0, 0.08);
@@ -1201,13 +1181,11 @@ body.light-mode .status-badge.encours {
     border-color: rgba(217, 119, 6, 0.3);
 }
 
-/* Light Mode - Progress Bars */
 body.light-mode .budget-bar-container,
 body.light-mode .progress-bar {
     background: rgba(0, 0, 0, 0.1);
 }
 
-/* Light Mode - Alerts */
 body.light-mode .alert-item,
 body.light-mode .notification-item {
     background: rgba(0, 0, 0, 0.03);
@@ -1230,7 +1208,6 @@ body.light-mode .budget-alert.danger {
     border-color: rgba(220, 38, 38, 0.3);
 }
 
-/* Light Mode - Notification Panel */
 body.light-mode .notification-panel {
     background: rgba(255, 255, 255, 0.98);
     border-color: rgba(0, 0, 0, 0.15);
@@ -1244,12 +1221,10 @@ body.light-mode .notification-badge {
     border-color: #f0f4ff;
 }
 
-/* Light Mode - Solde Circle */
 body.light-mode .solde-circle .label {
     color: var(--text-muted);
 }
 
-/* Light Mode - Archive Masked */
 body.light-mode .archive-masquee {
     background: rgba(0, 0, 0, 0.03);
     border-color: rgba(0, 0, 0, 0.08);
@@ -1259,7 +1234,6 @@ body.light-mode .archive-masquee .archive-title {
     color: var(--text-muted);
 }
 
-/* Light Mode - Empty States */
 body.light-mode .empty-state,
 body.light-mode .no-transactions,
 body.light-mode .no-data,
@@ -1268,7 +1242,6 @@ body.light-mode .no-results-message {
     color: var(--text-muted);
 }
 
-/* Light Mode - Toggle Group (Expense Type) */
 body.light-mode .toggle-btn {
     background: rgba(0, 0, 0, 0.03);
     border-color: rgba(0, 0, 0, 0.2);
@@ -1280,7 +1253,6 @@ body.light-mode .toggle-btn:hover {
     color: #1f2937;
 }
 
-/* Light Mode - Épargne Controls */
 body.light-mode .epargne-controls {
     background: rgba(0, 0, 0, 0.05);
 }
@@ -1294,7 +1266,6 @@ body.light-mode .input-montant::placeholder {
     color: rgba(31, 41, 55, 0.5);
 }
 
-/* Light Mode - Scrollbar */
 body.light-mode ::-webkit-scrollbar-track {
     background: rgba(0, 0, 0, 0.05);
 }
@@ -1307,18 +1278,15 @@ body.light-mode ::-webkit-scrollbar-thumb:hover {
     background: rgba(139, 92, 246, 0.6);
 }
 
-/* Light Mode - Chart Info Text */
 body.light-mode .chart-info-text {
     color: var(--text-muted);
 }
 
-/* Light Mode - Objectives Card Link */
 body.light-mode .objectifs-card-link:hover .stat-card {
     border-color: rgba(139, 92, 246, 0.4);
     background: rgba(139, 92, 246, 0.08);
 }
 
-/* Light Mode - Archive Message Box */
 body.light-mode .archive-message-box {
     background: rgba(139, 92, 246, 0.08);
     border-color: rgba(139, 92, 246, 0.2);
@@ -1331,14 +1299,7 @@ body.light-mode .archive-message-text {
 body.light-mode .archive-link {
     color: #8b5cf6;
 }
-/* =============================
-   LIGHT MODE - PAGES SPECIFIQUES
-   Ce fichier doit être inclus après base.css
-============================= */
 
-/* =============================
-   ADD-EXPENSE PAGE
-============================= */
 body.light-mode .add-expense-page .form-card {
     background: rgba(255, 255, 255, 0.85);
     border-color: rgba(0, 0, 0, 0.1);
@@ -1369,9 +1330,6 @@ body.light-mode .add-expense-page .hint {
     color: rgba(31, 41, 55, 0.6);
 }
 
-/* =============================
-   BUDGET DASHBOARD PAGE
-============================= */
 body.light-mode .dashboard-container .dashboard-subtitle {
     color: rgba(31, 41, 55, 0.7);
 }
@@ -1400,9 +1358,6 @@ body.light-mode .chart-title::before {
     background: linear-gradient(180deg, var(--primary), rgba(91, 110, 234, 0.5));
 }
 
-/* =============================
-   CATEGORIES PAGE
-============================= */
 body.light-mode .categories-header h2 {
     color: #1f2937;
 }
@@ -1457,9 +1412,6 @@ body.light-mode .budget-limit {
     color: rgba(31, 41, 55, 0.6);
 }
 
-/* =============================
-   ARCHIVES PAGE
-============================= */
 body.light-mode .archives-page .page-header h2 {
     color: #1f2937;
 }
@@ -1506,9 +1458,6 @@ body.light-mode .stat-box .stat-label {
     color: rgba(31, 41, 55, 0.6);
 }
 
-/* =============================
-   ARCHIVE DETAIL PAGE
-============================= */
 body.light-mode .archive-detail-page .page-header h2 {
     color: #1f2937;
 }
@@ -1551,9 +1500,6 @@ body.light-mode .transactions-table td {
     border-bottom-color: rgba(0, 0, 0, 0.05);
 }
 
-/* =============================
-   DETAIL DEPENSE PAGE
-============================= */
 body.light-mode .depenses-cat-page .page-header h2 {
     color: #1f2937;
 }
@@ -1598,9 +1544,6 @@ body.light-mode .depenses-cat-page .no-data {
     color: rgba(31, 41, 55, 0.5);
 }
 
-/* =============================
-   MES OBJECTIFS PAGE
-============================= */
 body.light-mode .page-title {
     color: #1f2937;
 }
@@ -1697,9 +1640,6 @@ body.light-mode .flash-message.success {
     border-color: rgba(5, 150, 105, 0.3);
 }
 
-/* =============================
-   MODIFIER CATEGORIE PAGE
-============================= */
 body.light-mode .form-card {
     background: rgba(255, 255, 255, 0.85);
 }
@@ -1728,9 +1668,6 @@ body.light-mode .checkbox-group label {
     color: #1f2937;
 }
 
-/* =============================
-   INDEX PAGE - SOLDE CIRCLE
-============================= */
 body.light-mode .solde-circle {
     background: rgba(255, 255, 255, 0.9) !important;
 }
@@ -1768,9 +1705,6 @@ body.light-mode .transaction-row.epargne:hover {
     background: rgba(217, 119, 6, 0.12);
 }
 
-/* =============================
-   MODIFIER TRANSACTION PAGE
-============================= */
 body.light-mode .toggle-btn {
     background: rgba(0, 0, 0, 0.03);
     border-color: rgba(0, 0, 0, 0.2);
@@ -1783,7 +1717,6 @@ body.light-mode .toggle-btn:hover {
     background: rgba(0, 0, 0, 0.06);
 }
 
-/* Error states remain the same color scheme */
 body.light-mode .input-wrapper.error input {
     border-color: #dc2626 !important;
     background: rgba(220, 38, 38, 0.08) !important;
@@ -1797,16 +1730,11 @@ body.light-mode .error-message {
     color: #dc2626;
 }
 
-/* =============================
-   CHARTS - Chart.js Compatibility
-============================= */
 body.light-mode canvas {
     filter: none;
 }
 
-/* Chart tooltip styling is handled by Chart.js config */
 
-/* Light Mode - Solde Circle Border */
 body.light-mode .solde-circle {
     border: 2px solid rgba(0, 0, 0, 0.12) !important;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08) !important;
