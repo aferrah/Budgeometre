@@ -1,7 +1,9 @@
-/* === CARTE SOLDE === */
 .solde-card {
     text-align: center;
     padding: 30px;
+}
+.home-card {
+    margin-bottom: 20px;
 }
 
 .solde-circle-container {
@@ -38,7 +40,6 @@
     transform-origin: 50% 50%;
 }
 
-/* Couleurs basées sur le niveau du solde */
 .solde-circle.excellent {
     border-color: #10b981;
     background: rgba(16, 185, 129, 0.1);
@@ -94,7 +95,6 @@
     color: rgba(255, 255, 255, 0.7);
 }
 
-/* === STATISTIQUES === */
 .stats-row {
     display: flex;
     justify-content: center;
@@ -129,7 +129,6 @@
     color: rgba(255, 255, 255, 0.6);
 }
 
-/* === TABLEAU DES TRANSACTIONS === */
 .recent-expenses h2 {
     margin-bottom: 15px;
     color: white;
@@ -152,18 +151,32 @@
     font-weight: 600;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     font-size: 0.85rem;
+    cursor: pointer;
+    user-select: none;
+}
+.recent-expenses .actions-column {
+    width: 90px;
+    text-align: center;
+    cursor: default;
+    user-select: none;
+}
+.recent-expenses th:last-child {
+    cursor: default;
+    user-select: none;
 }
 
 .recent-expenses td {
     color: white;
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
+.recent-expenses .actions-cell {
+    text-align: center;
+}
 
 .recent-expenses tr:last-child td {
     border-bottom: none;
 }
 
-/* === MONTANTS === */
 .montant-cell.positif {
     color: #10b981;
 }
@@ -176,7 +189,6 @@
     color: #f59e0b !important;
 }
 
-/* === BADGES CATÉGORIES === */
 .categorie-badge {
     display: inline-block;
     padding: 2px 8px;
@@ -191,7 +203,6 @@
     border: 1px solid rgba(245, 158, 11, 0.4);
 }
 
-/* === TRANSACTIONS ÉPARGNE === */
 .transaction-row.epargne {
     background: rgba(245, 158, 11, 0.05);
     border-left: 3px solid #f59e0b;
@@ -201,7 +212,6 @@
     background: rgba(245, 158, 11, 0.1);
 }
 
-/* === TRI DU TABLEAU === */
 .sortable:hover {
     background: rgba(255, 255, 255, 0.05);
 }
@@ -216,7 +226,56 @@
     opacity: 1;
 }
 
-/* === FILTRES === */
+.action-buttons-row {
+    margin-bottom: 30px;
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.action-buttons-row .archives-btn,
+.dashboard-link {
+    opacity: 0.8;
+}
+
+.filters-container {
+    margin-bottom: 20px;
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    align-items: flex-end;
+}
+
+.filter-group {
+    flex: 1;
+    min-width: 200px;
+}
+.filter-category-group,
+.filter-type-group {
+    flex: 0 0 auto;
+    min-width: 150px;
+}
+.filter-type-group {
+    min-width: 130px;
+}
+
+.filter-label {
+    display: block;
+    margin-bottom: 5px;
+    color: rgba(255,255,255,0.7);
+    font-size: 0.85rem;
+}
+
+.filter-input {
+    width: 100%;
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid rgba(255,255,255,0.2);
+    background: rgba(255,255,255,0.1);
+    color: white;
+}
+
 input[type="text"]::placeholder,
 select option {
     color: rgba(255, 255, 255, 0.5);
@@ -227,11 +286,63 @@ select option {
     color: white;
 }
 
+.reset-filters-btn {
+    padding: 8px 16px;
+    border-radius: 6px;
+    border: none;
+    background: rgba(255,255,255,0.15);
+    color: white;
+    cursor: pointer;
+    font-size: 0.9rem;
+    height: 38px;
+}
+
 #resetBtn:hover {
     background: rgba(255, 255, 255, 0.25);
 }
 
-/* === BOUTONS D'ACTION === */
+.no-results-message {
+    display: none;
+    text-align: center;
+    padding: 30px;
+    color: rgba(255,255,255,0.6);
+}
+
+.no-transactions-message {
+    color: rgba(255, 255, 255, 0.7);
+    text-align: center;
+    padding: 20px;
+}
+
+.archive-message-box {
+    text-align: center;
+    margin-top: 20px;
+    padding: 15px;
+    background: rgba(139, 92, 246, 0.1);
+    border: 1px solid rgba(139, 92, 246, 0.3);
+    border-radius: 8px;
+}
+.archive-message-text {
+    color: #a78bfa;
+    margin: 0;
+}
+.archive-icon {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    line-height: 20px;
+    text-align: center;
+    background: rgba(139, 92, 246, 0.3);
+    border-radius: 50%;
+    font-weight: bold;
+    font-size: 0.85rem;
+    margin-right: 8px;
+}
+.archive-link {
+    color: #c4b5fd;
+    text-decoration: underline;
+}
+
 .transaction-actions {
     display: flex;
     gap: 6px;
@@ -266,9 +377,26 @@ select option {
     transform: scale(1.1);
 }
 
-/* === PAGINATION === */
 .pagination {
     user-select: none;
+}
+.pagination-container {
+    margin-top: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+.pagination-info {
+    text-align: center;
+    margin-top: 15px;
+    color: rgba(255,255,255,0.5);
+    font-size: 0.9rem;
+}
+.page-ellipsis {
+    color: rgba(255,255,255,0.3);
+    padding: 8px 0;
+    line-height: 1.5;
 }
 
 .page-btn {
@@ -303,7 +431,6 @@ select option {
     cursor: not-allowed;
 }
 
-/* Masquer les lignes paginées */
 .pagination-hidden {
     display: none !important;
 }
