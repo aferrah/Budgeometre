@@ -1,7 +1,7 @@
 
 # Budgeomètre — Développement local
 
-Ce petit projet Flask stocke des `Categorie`, `Transaction` et `Objectif` dans une base SQLite locale (`budget.db`).
+Ce projet Flask stocke des `Categorie`, `Transaction` et `Objectif` dans une base SQLite locale (`budget.db`).
 
 **But de ce README :** expliquer comment installer les dépendances, démarrer l'application et importer des données de test via la page `/init-test`.
 
@@ -53,3 +53,4 @@ rm budget.db
 python3 app.py
 ```
 
+# Budgeomètre — Fonctionnalités
