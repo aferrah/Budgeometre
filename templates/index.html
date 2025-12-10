@@ -214,7 +214,9 @@
                 allRows = Array.from(tbody.querySelectorAll('.transaction-row'));
                 allRows.forEach(row => row.dataset.filteredOut = '');
                 attachEventListeners();
-                sortTable('date');
+                // Apply initial sort without changing direction
+                applySortToVisibleRows('date', 'desc');
+                updateSortIcons();
                 updatePagination();
             }
         });
@@ -230,6 +232,47 @@
             document.getElementById('categoryFilter').addEventListener('change', applyFilters);
             document.getElementById('typeFilter').addEventListener('change', applyFilters);
             document.getElementById('resetBtn').addEventListener('click', resetFilters);
+        }
+
+        function applySortToVisibleRows(column, direction) {
+            const visibleRows = allRows.filter(row => row.style.display !== 'none');
+
+            visibleRows.sort((a, b) => {
+                let aValue, bValue;
+
+                switch(column) {
+                    case 'date':
+                        aValue = parseFloat(a.dataset.date);
+                        bValue = parseFloat(b.dataset.date);
+                        break;
+                    case 'titre':
+                        aValue = a.dataset.titre;
+                        bValue = b.dataset.titre;
+                        break;
+                    case 'categorie':
+                        aValue = a.cells[2].textContent.trim();
+                        bValue = b.cells[2].textContent.trim();
+                        break;
+                    case 'montant':
+                        aValue = parseFloat(a.dataset.montant);
+                        bValue = parseFloat(b.dataset.montant);
+                        break;
+                    default:
+                        return 0;
+                }
+
+                let result = 0;
+                if (typeof aValue === 'string') {
+                    result = aValue.localeCompare(bValue, 'fr');
+                } else {
+                    result = aValue - bValue;
+                }
+
+                return direction === 'asc' ? result : -result;
+            });
+
+            const tbody = document.getElementById('transactionsBody');
+            visibleRows.forEach(row => tbody.appendChild(row));
         }
 
         function sortTable(column) {
