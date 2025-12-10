@@ -156,15 +156,15 @@ Modifiez la en sélectionnant le crayon.
 
 Les statistiques des dépenses sont visibles depuis **budget dashboard**.
 
-<img width="1213" height="838" alt="image" src="https://github.com/user-attachments/assets/c6335070-adb0-4193-b20d-60f2a4e1fc97" />
+<img width="600" height="838" alt="image" src="https://github.com/user-attachments/assets/c6335070-adb0-4193-b20d-60f2a4e1fc97" />
 
 Pour accéder aux statistiques individuelles des catégories, survolez la catégorie sur le graphe:
 
-<img width="1168" height="818" alt="image" src="https://github.com/user-attachments/assets/ed90b30a-193b-49fc-aee1-e250561fea06" />
+<img width="600" height="818" alt="image" src="https://github.com/user-attachments/assets/ed90b30a-193b-49fc-aee1-e250561fea06" />
 
 Vous aurez alors accès aux statistiques pour cette catégories.
 
-<img width="1961" height="859" alt="image" src="https://github.com/user-attachments/assets/dd2a19fe-6e87-45e4-ab8e-e6cf3ae77432" />
+<img width="600" height="859" alt="image" src="https://github.com/user-attachments/assets/dd2a19fe-6e87-45e4-ab8e-e6cf3ae77432" />
 
 ---
 
@@ -178,16 +178,27 @@ Pour ajouter une dépense ou un revenu, se rendre sur la page d'accueil et cliqu
 
 Pour ajouter un revenu, cliquer sur le bouton **Revenu**, remplir les informations puis cliquer sur le bouton **Enregistrer** :
 
-<img width="600" height="811" alt="image" src="https://github.com/user-attachments/assets/ed463ce8-62ee-4d9a-85ca-1a1c3104ea21" />
+<img width="500" height="811" alt="image" src="https://github.com/user-attachments/assets/ed463ce8-62ee-4d9a-85ca-1a1c3104ea21" />
 
 #### 2.2 Ajout des dépenses
 
+Pour ajouter un revenu, cliquer sur le bouton **Dépense**, remplir les informations puis cliquer sur le bouton **Enregistrer** :
 
+<img width="500" height="756" alt="image" src="https://github.com/user-attachments/assets/3a01ce3e-ce3c-4dc3-90d6-6f68307330b1" />
 
 #### 2.3 Affichage des dépenses
 
+Les dépenses sur les 3 derniers mois s'affichent sur la page d'accueil (index.html) dans un tableau :
+<img width="600" height="827" alt="image" src="https://github.com/user-attachments/assets/1d429150-2fb1-4e2c-b06e-a930c23d7953" />
 
-#### 2.4 Filtrage par date
+
+#### 2.4 Filtrage du tableau dew dépenses
+
+Il est possible de trier le tableau et de le filtrer selon différents critères :
+<img width="600" height="205" alt="image" src="https://github.com/user-attachments/assets/69777ffb-4a7d-452e-bfa7-aa12999fc882" />
+
+Il suffit de cliquer sur le haut du tableau pour trier et pour filtrer, utiliser la barre de recherche.
+
 
 ### 3. Objectifs d'épargne
 
