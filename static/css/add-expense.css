@@ -17,13 +17,6 @@
     width: 90%;
     margin-bottom: 60px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
-}
-
-.form-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.2);
-    border-color: rgba(255, 255, 255, 0.2);
 }
 
 .form-card h2 {
