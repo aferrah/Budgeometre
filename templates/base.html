@@ -24,8 +24,7 @@
             <a href="{{ url_for('categories') }}">Catégories</a>
             <a href="{{ url_for('archives') }}">Archives</a>
             <a href="{{ url_for('add_expense') }}">Ajouter une transactions</a>
-            <hr style="border: none; border-top: 1px solid rgba(255,255,255,0.2); margin: 10px 0;">
-            <a href="{{ url_for('reinitialiser_bdd') }}" 
+            <a href="{{ url_for('reinitialiser_bdd') }}"
                onclick="return confirm('⚠️ ATTENTION ⚠️\n\nVoulez-vous vraiment SUPPRIMER TOUTES LES DONNÉES ?\n\n• Toutes les transactions\n• Tous les objectifs\n• Toutes les catégories\n• Toutes les archives\n\nCette action est IRRÉVERSIBLE !')"
                style="color: #ef4444;">
                 🗑️ Réinitialiser la BDD
