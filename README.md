@@ -9,7 +9,7 @@
 ## **Table des Matières**
 
 1. [Développement local](#développement-local)
-2[Fonctionnalités](#fonctionnalités)
+2. [Fonctionnalités](#fonctionnalités)
 
 
 
