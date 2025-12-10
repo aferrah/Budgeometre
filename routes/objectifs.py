@@ -104,9 +104,9 @@ def recuperer_epargne(id):
     cat = get_or_create_epargne_cat()
     db.session.add(Transaction(montant=epargne, titre=f"Récupération: {objectif.description or 'Objectif'}",
         commentaire="Récupération totale", dateTransaction=datetime.utcnow(), idCategorie=cat.idCategorie))
-    objectif.epargne_actuelle = 0
+    db.session.delete(objectif)
     db.session.commit()
-    flash(f"{epargne:.2f}€ récupéré !", "success")
+    flash(f"{epargne:.2f}€ récupéré ! Objectif d'épargne supprimé.", "success")
     return redirect(url_for("objectifs.mes_objectifs"))
 
 
