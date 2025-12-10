@@ -127,7 +127,9 @@ python3 app.py
 
 ## Fonctionnalités
 
-**1) Installer les dépendances**
+**1) Ajout des dépenses**
+**2) Affichage des dépenses**
+**3) Ajout des revenus**
+**4) Gestion des catégories**
+**5) Ajout d'objectifs**
 
-```bash
-pip install -r requirements.txt --break-system-packages
