@@ -127,9 +127,27 @@ python3 app.py
 
 ## Fonctionnalités
 
-**1) Ajout des dépenses**
-**2) Affichage des dépenses**
-**3) Ajout des revenus**
-**4) Gestion des catégories**
-**5) Ajout d'objectifs**
+### 1. Catégorie
+
+#### 1.1 Ajout des catégories
+
+#### 1.2 Supprimer / modifier une catégorie
+
+### 2. Transactions
+
+#### 2.1 Ajout des revenus
+
+#### 2.2 Ajout des dépenses
+
+Pour ajouter une dépense, se rendre la page d'accueil et cliquer sur le bouton **Ajouter un transaction** :
+
+<img width="1352" height="366" alt="image" src="https://github.com/user-attachments/assets/e05b0fe0-822f-4a96-9e39-2f15f8da0348" />
+
+#### 2.3 Affichage des dépenses
+
+### 3. Objectifs d'épargne
+
+#### 3.1 Ajout d'objectifs d'épargne
+
+### 4. Archives mensuelles
 
