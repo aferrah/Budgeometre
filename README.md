@@ -154,24 +154,40 @@ Modifiez la en sélectionnant le crayon.
 
 #### 1.3 Statistiques par catégorie
 
+Les statistiques des dépenses sont visibles depuis **budget dashboard**.
 
-<img width="1200" height="837" alt="image" src="https://github.com/user-attachments/assets/3ac3070c-b528-4ee5-9674-0f582c0e68d9" />
+<img width="1213" height="838" alt="image" src="https://github.com/user-attachments/assets/c6335070-adb0-4193-b20d-60f2a4e1fc97" />
 
-<img width="2727" height="1511" alt="image" src="https://github.com/user-attachments/assets/871de627-d17a-4fd9-980c-ef95058c55dc" />
+Pour accéder aux statistiques individuelles des catégories, survolez la catégorie sur le graphe:
 
+<img width="1168" height="818" alt="image" src="https://github.com/user-attachments/assets/ed90b30a-193b-49fc-aee1-e250561fea06" />
 
+Vous aurez alors accès aux statistiques pour cette catégories.
+
+<img width="1961" height="859" alt="image" src="https://github.com/user-attachments/assets/dd2a19fe-6e87-45e4-ab8e-e6cf3ae77432" />
+
+---
 
 ### 2. Transactions
+Pour ajouter une dépense ou un revenu, se rendre sur la page d'accueil et cliquer sur le bouton **Ajouter une transaction** :
+
+<img width="600" height="215" alt="image" src="https://github.com/user-attachments/assets/43def96e-a3a8-4120-a5fb-f0a024587762" />
+
 
 #### 2.1 Ajout des revenus
 
+Pour ajouter un revenu, cliquer sur le bouton **Revenu**, remplir les informations puis cliquer sur le bouton **Enregistrer** :
+
+<img width="600" height="811" alt="image" src="https://github.com/user-attachments/assets/ed463ce8-62ee-4d9a-85ca-1a1c3104ea21" />
+
 #### 2.2 Ajout des dépenses
 
-Pour ajouter une dépense, se rendre la page d'accueil et cliquer sur le bouton **Ajouter un transaction** :
 
-<img width="1352" height="366" alt="image" src="https://github.com/user-attachments/assets/e05b0fe0-822f-4a96-9e39-2f15f8da0348" />
 
 #### 2.3 Affichage des dépenses
+
+
+#### 2.4 Filtrage par date
 
 ### 3. Objectifs d'épargne
 
