@@ -26,7 +26,7 @@
             <a href="{{ url_for('add_expense') }}">Ajouter une transactions</a>
             <a href="{{ url_for('reinitialiser_bdd') }}"
                onclick="return confirm('⚠️ ATTENTION ⚠️\n\nVoulez-vous vraiment SUPPRIMER TOUTES LES DONNÉES ?\n\n• Toutes les transactions\n• Tous les objectifs\n• Toutes les catégories\n• Toutes les archives\n\nCette action est IRRÉVERSIBLE !')"
-               style="color: #ef4444;">
+               class="reset-bdd-link">
                 🗑️ Réinitialiser la BDD
             </a>
         </nav>
