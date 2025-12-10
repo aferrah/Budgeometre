@@ -131,6 +131,14 @@ python3 app.py
 
 #### 1.1 Ajout des catégories
 
+Renseigner le nom, la description et la couleur puis appuyer sur **+**.
+<img width="1340" height="494" alt="image" src="https://github.com/user-attachments/assets/743b6a20-e7db-4480-92d7-f24366e714c8" />
+
+On peut rajouter une limite de budget mensuel en cochant la case **Définir une limite de budget mensuel**.
+Si la limite dépasse notre revenu, le message suivant apparaît:
+<img width="1340" height="252" alt="image" src="https://github.com/user-attachments/assets/c15f8559-3a4c-444c-be67-192c34b122e6" />
+
+
 #### 1.2 Supprimer / modifier une catégorie
 
 ### 2. Transactions
