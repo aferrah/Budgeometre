@@ -151,6 +151,16 @@ Celle-ci doit être absente de la liste des catégories après coup.
 
 Modifiez la en sélectionnant le crayon.
 
+
+#### 1.3 Statistiques par catégorie
+
+
+<img width="1200" height="837" alt="image" src="https://github.com/user-attachments/assets/3ac3070c-b528-4ee5-9674-0f582c0e68d9" />
+
+<img width="2727" height="1511" alt="image" src="https://github.com/user-attachments/assets/871de627-d17a-4fd9-980c-ef95058c55dc" />
+
+
+
 ### 2. Transactions
 
 #### 2.1 Ajout des revenus
