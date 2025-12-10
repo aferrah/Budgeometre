@@ -306,10 +306,10 @@ def reinitialiser_bdd():
         
         db.session.commit()
         
-        flash("✅ Base de données réinitialisée avec succès. Toutes les données ont été supprimées.", "success")
+        flash(" Base de données réinitialisée avec succès. Toutes les données ont été supprimées.", "success")
     except Exception as e:
         db.session.rollback()
-        flash(f"❌ Erreur lors de la réinitialisation : {str(e)}", "error")
+        flash(f" Erreur lors de la réinitialisation : {str(e)}", "error")
     
     return redirect(url_for("home"))
 
@@ -325,7 +325,7 @@ def reset_and_init():
         # Rediriger vers la génération de données
         return redirect(url_for('init_test_archives'))
     except Exception as e:
-        return f"❌ Erreur : {str(e)}"
+        return f" Erreur : {str(e)}"
 
 
 @app.route("/init-test")
@@ -369,7 +369,7 @@ def init_test():
     db.session.add_all([obj_alimentation, obj_transport])
     db.session.commit()
 
-    return "Données de test ajoutées ✅ (3 catégories, 7 transactions, 2 objectifs)"
+    return "Données de test ajoutées (3 catégories, 7 transactions, 2 objectifs)"
 
 
 @app.route("/init-test-archives")
@@ -510,7 +510,7 @@ def init_test_archives():
     
     db.session.commit()
     
-    return f"✅ {nb_transactions} transactions créées sur 6 mois avec 7 catégories colorées et limites budgétaires !"
+    return f" {nb_transactions} transactions créées sur 6 mois avec 7 catégories colorées et limites budgétaires !"
 
 
 @app.route("/transactions")
@@ -909,7 +909,7 @@ def categories():
 
         # Vérifier si la limite dépasse le revenu
         if limite_budget > total_revenus and limite_budget > 0:
-            flash(f"⚠️ Attention : La limite de {limite_budget:.2f}€ dépasse votre revenu total de {total_revenus:.2f}€", "warning")
+            flash(f"Attention : La limite de {limite_budget:.2f}€ dépasse votre revenu total de {total_revenus:.2f}€", "warning")
 
         if nom:
             existante = Categorie.query.filter_by(nom=nom).first()
