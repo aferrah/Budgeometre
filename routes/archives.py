@@ -65,9 +65,20 @@ def voir_archive(id):
 
 @archives_bp.route("/archives/<int:id>/toggle-masquer", methods=["POST"])
 def toggle_masquer_archive(id):
+    from flask import jsonify
     archive = ArchiveMensuelle.query.get_or_404(id)
     archive.masquee = not archive.masquee
     db.session.commit()
+    
+    # Si c'est une requête AJAX, retourner JSON
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return jsonify({
+            'success': True,
+            'masquee': archive.masquee,
+            'message': "Archive masquée" if archive.masquee else "Archive affichée"
+        })
+    
+    # Sinon, comportement classique
     flash("Archive masquée" if archive.masquee else "Archive affichée", "success")
     return redirect(url_for("archives.archives"))
 

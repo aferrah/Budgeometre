@@ -46,23 +46,26 @@
     <div class="archives-list">
         {% if archives %}
             {% for archive in archives %}
-                <div class="archive-card {% if archive.masquee %}archive-masquee{% endif %}">
+                <div class="archive-card {% if archive.masquee %}archive-masquee{% endif %}" 
+                     data-archive-id="{{ archive.idArchive }}"
+                     data-total-revenus="{{ '%.2f'|format(archive.total_revenus) }}"
+                     data-total-depenses="{{ '%.2f'|format(archive.total_depenses) }}"
+                     data-solde-final="{{ '%.2f'|format(archive.solde_final) }}"
+                     data-total-epargne="{{ '%.2f'|format(archive.total_epargne) }}"
+                     data-date-archivage="{{ archive.dateArchivage.strftime('%d/%m/%Y à %H:%M') }}">
                     <div class="archive-header">
                         <div>
                             <div class="archive-title">
                                 {% set mois_noms = ['', 'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'] %}
                                 {{ mois_noms[archive.mois] }} {{ archive.annee }}
                             </div>
-                            {% if not archive.masquee %}
-                            <div class="archive-date">
+                            <div class="archive-date" style="{% if archive.masquee %}display:none;{% endif %}">
                                 Archivé le {{ archive.dateArchivage.strftime('%d/%m/%Y à %H:%M') }}
                             </div>
-                            {% endif %}
                         </div>
                     </div>
 
-                    {% if not archive.masquee %}
-                    <div class="archive-stats">
+                    <div class="archive-stats" style="{% if archive.masquee %}display:none;{% endif %}">
                         <div class="stat-box">
                             <div class="stat-label">Revenus</div>
                             <div class="stat-value revenus">+{{ '%.2f'|format(archive.total_revenus) }} €</div>
@@ -80,36 +83,33 @@
                             <div class="stat-value epargne">{{ '%.2f'|format(archive.total_epargne) }} €</div>
                         </div>
                     </div>
-                    {% endif %}
 
                     <div class="archive-actions">
-                        {% if not archive.masquee %}
-                        <a href="{{ url_for('archives.voir_archive', id=archive.idArchive) }}" class="btn-voir">
+                        <a href="{{ url_for('archives.voir_archive', id=archive.idArchive) }}" class="btn-voir" style="{% if archive.masquee %}display:none;{% endif %}">
                             Voir les détails
                         </a>
-                        {% endif %}
-                        <form method="post" action="{{ url_for('archives.toggle_masquer_archive', id=archive.idArchive) }}" style="display:inline;">
-                            <button type="submit" class="btn-masquer" title="{% if archive.masquee %}Afficher l'archive{% else %}Masquer l'archive{% endif %}">
-                                {% if archive.masquee %}
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                                        <circle cx="12" cy="12" r="3"/>
-                                    </svg>
-                                {% else %}
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
-                                        <line x1="1" y1="1" x2="23" y2="23"/>
-                                    </svg>
-                                {% endif %}
-                            </button>
-                        </form>
-                        {% if not archive.masquee %}
-                        <form method="post" action="{{ url_for('archives.supprimer_archive', id=archive.idArchive) }}" style="display:inline;" onsubmit="return confirm('Supprimer définitivement cette archive ? Cette action est irréversible.');">
+                        <button type="button" class="btn-masquer" 
+                                data-archive-id="{{ archive.idArchive }}"
+                                data-masquee="{{ 'true' if archive.masquee else 'false' }}"
+                                onclick="toggleMasquerArchive(this)"
+                                title="{% if archive.masquee %}Afficher l'archive{% else %}Masquer l'archive{% endif %}">
+                            {% if archive.masquee %}
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon-visible">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                    <circle cx="12" cy="12" r="3"/>
+                                </svg>
+                            {% else %}
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon-hidden">
+                                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                                    <line x1="1" y1="1" x2="23" y2="23"/>
+                                </svg>
+                            {% endif %}
+                        </button>
+                        <form method="post" action="{{ url_for('archives.supprimer_archive', id=archive.idArchive) }}" style="display:{% if archive.masquee %}none{% else %}inline{% endif %};" onsubmit="return confirm('Supprimer définitivement cette archive ? Cette action est irréversible.');" class="form-supprimer">
                             <button type="submit" class="btn-supprimer" title="Supprimer l'archive">
                                 🗑️
                             </button>
                         </form>
-                        {% endif %}
                     </div>
                 </div>
             {% endfor %}
@@ -134,5 +134,89 @@
             document.getElementById('annee_input').value = annee;
         }
     }
+
+    function toggleMasquerArchive(button) {
+        const archiveId = button.dataset.archiveId;
+        const card = button.closest('.archive-card');
+        const isMasquee = button.dataset.masquee === 'true';
+
+        fetch(`/archives/${archiveId}/toggle-masquer`, {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Mettre à jour l'état du bouton
+                button.dataset.masquee = data.masquee ? 'true' : 'false';
+                button.title = data.masquee ? 'Afficher l\'archive' : 'Masquer l\'archive';
+                
+                // Mettre à jour la classe de la carte
+                if (data.masquee) {
+                    card.classList.add('archive-masquee');
+                } else {
+                    card.classList.remove('archive-masquee');
+                }
+                
+                // Afficher/masquer les éléments
+                const archiveDate = card.querySelector('.archive-date');
+                const archiveStats = card.querySelector('.archive-stats');
+                const btnVoir = card.querySelector('.btn-voir');
+                const formSupprimer = card.querySelector('.form-supprimer');
+                
+                if (data.masquee) {
+                    // Masquer
+                    if (archiveDate) archiveDate.style.display = 'none';
+                    if (archiveStats) archiveStats.style.display = 'none';
+                    if (btnVoir) btnVoir.style.display = 'none';
+                    if (formSupprimer) formSupprimer.style.display = 'none';
+                } else {
+                    // Afficher
+                    if (archiveDate) archiveDate.style.display = '';
+                    if (archiveStats) archiveStats.style.display = '';
+                    if (btnVoir) btnVoir.style.display = '';
+                    if (formSupprimer) formSupprimer.style.display = 'inline';
+                }
+                
+                // Mettre à jour l'icône
+                const svg = button.querySelector('svg');
+                if (data.masquee) {
+                    // Icône œil (afficher)
+                    svg.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+                } else {
+                    // Icône œil barré (masquer)
+                    svg.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>';
+                }
+
+                // Afficher un message de succès temporaire
+                const message = document.createElement('div');
+                message.className = 'flash-message success';
+                message.textContent = data.message;
+                message.style.cssText = 'position: fixed; top: 20px; right: 20px; background: #10b981; color: white; padding: 12px 20px; border-radius: 8px; z-index: 9999; animation: slideIn 0.3s ease;';
+                document.body.appendChild(message);
+                setTimeout(() => {
+                    message.style.animation = 'slideOut 0.3s ease';
+                    setTimeout(() => message.remove(), 300);
+                }, 2000);
+            }
+        })
+        .catch(error => {
+            console.error('Erreur:', error);
+            alert('Une erreur est survenue');
+        });
+    }
 </script>
+<style>
+    @keyframes slideIn {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+    @keyframes slideOut {
+        from { transform: translateX(0); opacity: 1; }
+        to { transform: translateX(100%); opacity: 0; }
+    }
+</style>
 {% endblock %}
