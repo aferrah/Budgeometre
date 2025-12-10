@@ -1,4 +1,4 @@
-# Budgeometre
+# Budgeomètre
 
 Application web de gestion de budget personnel développée avec Flask. Suivez vos dépenses, définissez des objectifs d'épargne et visualisez vos finances en temps réel avec des graphiques interactifs.
 
@@ -104,7 +104,7 @@ http://127.0.0.1:5000/
 
 
 
-La page affiche les dernières transactions et un aperçu (pie-chart) calculé à partir des valeurs passées par le backend.
+La page affiche les dernières transactions calculées à partir des valeurs passées par le backend.
 
 
 #### 5) Réinitialiser la base
@@ -285,13 +285,13 @@ Ce projet est sous licence MIT.
 **Télécom SudParis - FISA 2A**
 
 - TRIKI Wassim
-- PRETI-LEVY Ruben
+- PRETI- -LEVY Ruben
 - MARTIN Claire
 - HAMIDI Issam
 - BURET Amélie
 - FERRAH Anas
 
-*Projet réalisé en 2024-2025*
+*Projet réalisé en 2025-2026*
 
 
 
