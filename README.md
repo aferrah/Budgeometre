@@ -123,7 +123,7 @@ python3 app.py
 
 ```
 
-
+---
 
 ## Fonctionnalités
 
@@ -199,10 +199,49 @@ Il est possible de trier le tableau et de le filtrer selon différents critères
 
 Il suffit de cliquer sur le haut du tableau pour trier et pour filtrer, utiliser la barre de recherche.
 
+---
 
 ### 3. Objectifs d'épargne
 
 #### 3.1 Ajout d'objectifs d'épargne
 
+---
+
 ### 4. Archives mensuelles
+
+Si vous souhaitez accédez aux statistiques des transactions au-delà de 3mois, cliquez sur le bouton **Archives mensuelles** : 
+
+<img width="600" height="153" alt="image" src="https://github.com/user-attachments/assets/3690e8ad-92b1-470f-8233-02d275627cd2" />
+
+Choisissez le mois à archiver puis cliquer sur le bouton **Archiver**  :
+
+<img width="1031" height="472" alt="image" src="https://github.com/user-attachments/assets/48d66a3e-982a-4aa9-909c-c0e6b8aa8c02" />
+
+#### 4.1 Voir les détails d'une archive
+
+Pour voir les détails de l’archive, cliquer sur le bouton **Voir les détails**
+
+<img width="712" height="207" alt="image" src="https://github.com/user-attachments/assets/8e609469-b7d2-48a6-980f-ea8e4176bf86" />
+
+#### 4.2 Masquer une archive
+
+Pour masquer une archive, cliquer sur le bouton avec l’icône d’oeil barré :
+
+<img width="765" height="218" alt="image" src="https://github.com/user-attachments/assets/1ab18e40-94a1-4070-88c6-300dd85fc1de" />
+
+Pour démasquer une archive, cliquer sur le bouton oeil.
+
+Résultat :
+
+<img width="1033" height="181" alt="image" src="https://github.com/user-attachments/assets/54b8d23b-8fec-495d-aba7-95c0c6097c86" />
+
+#### 4.3 Suppression d'une archive : suppression des données pour un mois donné
+
+Pour supprimer une archive, cliquer sur le bouton poubelle:
+
+<img width="846" height="231" alt="image" src="https://github.com/user-attachments/assets/07a81a80-e0c1-496c-a561-88b428c5e6bc" />
+
+> Attention : ce bouton supprime les données de la base de données, en même temps que l’archive, une confirmation vous sera alors demandée pour s’assurer que cela n’est pas une erreur.
+
+
 
