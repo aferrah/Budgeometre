@@ -203,7 +203,26 @@ Il suffit de cliquer sur le haut du tableau pour trier et pour filtrer, utiliser
 
 ### 3. Objectifs d'épargne
 
+
 #### 3.1 Ajout d'objectifs d'épargne
+
+Renseignez:
+
+- montant;
+- description;
+- fréquence;
+- catégorie associée;
+
+Puis cliquez sur **ajouter**.
+
+<img width="600" height="1218" alt="image" src="https://github.com/user-attachments/assets/2131d045-7e76-4164-97c2-5ddf4804cf4e" />
+
+
+#### 3.2 Visualisation des objectifs d'épargne
+
+L'objectif que vous venez de renseigner doit se retrouver sur la page **Mes Objectifs d'épargne**
+
+<img width="600" height="590" alt="image" src="https://github.com/user-attachments/assets/18803176-83a5-46ec-848b-da833e2dd6ac" />
 
 ---
 
