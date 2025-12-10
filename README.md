@@ -154,11 +154,17 @@ Modifiez la en sélectionnant le crayon.
 
 #### 1.3 Statistiques par catégorie
 
+Les statistiques des dépenses sont visibles depuis **budget dashboard**.
 
-<img width="1200" height="837" alt="image" src="https://github.com/user-attachments/assets/3ac3070c-b528-4ee5-9674-0f582c0e68d9" />
+<img width="1213" height="838" alt="image" src="https://github.com/user-attachments/assets/c6335070-adb0-4193-b20d-60f2a4e1fc97" />
 
-<img width="2727" height="1511" alt="image" src="https://github.com/user-attachments/assets/871de627-d17a-4fd9-980c-ef95058c55dc" />
+Pour accéder aux statistiques individuelles des catégories, survolez la catégorie sur le graphe:
 
+<img width="1168" height="818" alt="image" src="https://github.com/user-attachments/assets/ed90b30a-193b-49fc-aee1-e250561fea06" />
+
+Vous aurez alors accès aux statistiques pour cette catégories.
+
+<img width="1961" height="859" alt="image" src="https://github.com/user-attachments/assets/dd2a19fe-6e87-45e4-ab8e-e6cf3ae77432" />
 
 
 ### 2. Transactions
