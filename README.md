@@ -1,4 +1,4 @@
-# Budgeomètre
+# Budgeometre
 
 Application web de gestion de budget personnel développée avec Flask. Suivez vos dépenses, définissez des objectifs d'épargne et visualisez vos finances en temps réel avec des graphiques interactifs.
 
@@ -14,7 +14,6 @@ Application web de gestion de budget personnel développée avec Flask. Suivez v
 - [Fonctionnalités principales](#fonctionnalités-principales)
 - [Technologies utilisées](#technologies-utilisées)
 - [Installation](#installation)
-- [Démarrage rapide](#démarrage-rapide)
 - [Guide d'utilisation](#guide-dutilisation)
   - [Gestion des catégories](#1-gestion-des-catégories)
   - [Gestion des transactions](#2-gestion-des-transactions)
@@ -54,14 +53,15 @@ Application web de gestion de budget personnel développée avec Flask. Suivez v
 - pip (gestionnaire de paquets Python)
 - Git (optionnel)
 
-**1) Installer les dépendances**
+#### 1) Installer les dépendances
 
 
 ```bash
 
 pip install -r requirements.txt --break-system-packages
+```
 
-**2) Démarrer l'application (création automatique de la BD)**
+#### 2) Démarrer l'application (création automatique de la BD)
 
 ```bash
 
@@ -72,7 +72,7 @@ python3 app.py
 La commande ci-dessus crée automatiquement les tables SQLite (fichier `budget.db`) et démarre un serveur de développement sur `http://127.0.0.1:5000`.
 
 
-**3) Importer des données de test**
+#### 3) Importer des données de test
 
 
 Pour peupler rapidement la base avec des catégories, transactions et objectifs d'exemple, ouvrez dans votre navigateur :
@@ -89,7 +89,7 @@ Le point d'entrée `/init-test-archives` ajoute plusieurs catégories, transacti
 
 
 
-**4) Voir le site**
+#### 4) Voir le site
 
 
 
@@ -107,9 +107,7 @@ http://127.0.0.1:5000/
 La page affiche les dernières transactions et un aperçu (pie-chart) calculé à partir des valeurs passées par le backend.
 
 
-
-**5) Réinitialiser la base**
-
+#### 5) Réinitialiser la base
 
 
 Pour repartir de zéro, arrêtez le serveur et supprimez le fichier `budget.db` puis relancez `python3 app.py` et (optionnel) `/init-test-archives`.
@@ -122,6 +120,11 @@ rm budget.db
 python3 app.py
 
 ```
+
+Il vous est également possible de réinitialiser la base de donnés en cliquant sur le menu hamburger, puis de cliquer sur l'option **Réinitialiser la BDD** :
+
+<img width="250" height="577" alt="image" src="https://github.com/user-attachments/assets/b3e8e2c5-184f-45f8-a3a0-39a1ba3844da" />
+
 
 ---
 
