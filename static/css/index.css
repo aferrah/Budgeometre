@@ -360,14 +360,12 @@ select option {
     display: inline-block;
 }
 
-/* --- AJUSTEMENTS POUR LE BOUTON CRAYON PNG --- */
 
 .btn-action.btn-edit {
-    /* Forcer le conteneur à une taille fixe et petite */
     width: 30px;
     height: 30px;
-    padding: 0; /* Supprimer le padding pour laisser la place à l'image */
-    display: flex; /* Utiliser flex pour centrer l'image */
+    padding: 0;
+    display: flex;
     align-items: center;
     justify-content: center;
 }
@@ -379,19 +377,17 @@ select option {
 }
 
 .btn-edit-icon {
-    /* Forcer l'image elle-même à la taille maximale autorisée par le conteneur */
-    width: 100%; /* Occupe 100% de la largeur du conteneur parent (30px) */
-    height: 100%; /* Occupe 100% de la hauteur du conteneur parent (30px) */
-    max-width: 16px; /* Limite effective de l'icône, ajustez au besoin */
-    max-height: 16px; /* Limite effective de l'icône, ajustez au besoin */
-    object-fit: contain; /* Assure que l'image est redimensionnée sans être coupée */
+    width: 100%;
+    height: 100%;
+    max-width: 16px;
+    max-height: 16px;
+    object-fit: contain;
 }
 
-/* --- FIN DES AJUSTEMENTS --- */
 
 
 .btn-action.btn-delete {
-    padding: 4px 8px; /* On garde le padding standard pour la corbeille */
+    padding: 4px 8px;
     color: white;
 }
 
