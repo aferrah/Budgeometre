@@ -16,7 +16,6 @@
         <a href="{{ url_for('home.home') }}" class="btn-back">← Retour à l'accueil</a>
     </div>
 
-    <!-- Formulaire d'ajout -->
     <div class="add-category-form glass-card">
         <h3> Ajouter une catégorie</h3>
         <form method="post" action="{{ url_for('categories.categories') }}">
@@ -36,7 +35,6 @@
         </form>
     </div>
 
-    <!-- Liste des catégories -->
     <div class="categories-list">
         {% if categories %}
             {% for cat in categories %}
@@ -56,8 +54,10 @@
                             <button type="button" class="btn-toggle" onclick="toggleTransactions(this, 'transactions-{{ cat.idCategorie }}')">
                                 ▼ Voir
                             </button>
-                            <a href="{{ url_for('categories.modifier_categorie', id=cat.idCategorie) }}" class="btn-edit" title="Modifier">✏️</a>
-                            <button type="button" class="btn-delete" 
+                            <a href="{{ url_for('categories.modifier_categorie', id=cat.idCategorie) }}" class="btn-edit" title="Modifier">
+                                <img src="{{ url_for('static', filename='widget/widget_pencil.png') }}" alt="Modifier" class="btn-edit-icon">
+                            </a>
+                            <button type="button" class="btn-delete"
                                     data-category-id="{{ cat.idCategorie }}"
                                     data-category-name="{{ cat.nom }}"
                                     onclick="deleteCategory(this)"
@@ -65,7 +65,6 @@
                         </div>
                     </div>
 
-                    <!-- Section Budget (si limite définie) -->
                     {% if cat.limite_budget and cat.limite_budget > 0 %}
                     <div class="category-budget-section">
                         <div class="budget-info">
@@ -113,7 +112,6 @@
                     </div>
                     {% endif %}
 
-                    <!-- Déroulant des 3 dernières transactions -->
                     <div class="transactions-dropdown" id="transactions-{{ cat.idCategorie }}">
                         <div class="transactions-list">
                             {% set derniers_transactions = cat.transactions|sort(attribute='dateTransaction', reverse=true)|list %}

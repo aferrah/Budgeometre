@@ -19,20 +19,17 @@
         <a href="{{ url_for('dashboard.budget_dashboard') }}" class="btn-back">← Retour au dashboard</a>
     </div>
 
-    <!-- Total des dépenses -->
     <div class="total-card" style="border-left: 4px solid {{ categorie.couleur or '#8b5cf6' }};">
         <div class="label">Total des dépenses dans cette catégorie</div>
         <div class="value" style="color: {{ categorie.couleur or '#8b5cf6' }};">{{ '%.2f'|format(total_depenses) }} €</div>
     </div>
 
-    <!-- Sélecteur de période -->
     <div class="period-selector">
         <button class="period-btn active" onclick="showChart('mois', this)">Par mois</button>
         <button class="period-btn" onclick="showChart('trimestre', this)">Par trimestre</button>
         <button class="period-btn" onclick="showChart('annee', this)">Par année</button>
     </div>
 
-    <!-- Graphique -->
     <div class="chart-container">
         <h3 id="chart-title">Évolution mensuelle</h3>
         <div class="chart-wrapper">
@@ -40,7 +37,6 @@
         </div>
     </div>
 
-    <!-- Dernières transactions -->
     <div class="transactions-section">
         <h3>Dernières transactions</h3>
         {% if transactions %}
@@ -53,7 +49,9 @@
                     <div style="display: flex; align-items: center; gap: 15px;">
                         <div class="transaction-montant">{{ '%.2f'|format(t.montant) }} €</div>
                         <div class="transaction-actions">
-                            <a href="{{ url_for('transactions.modifier_transaction', id=t.idTransaction) }}" class="btn-edit" title="Modifier">✏️</a>
+                            <a href="{{ url_for('transactions.modifier_transaction', id=t.idTransaction) }}" class="btn-edit" title="Modifier">
+                                <img src="{{ url_for('static', filename='widget/widget_pencil.png') }}" alt="Modifier" class="btn-edit-icon">
+                            </a>
                             <button class="btn-delete" onclick="confirmDelete({{ t.idTransaction }}, '{{ t.titre }}')" title="Supprimer">🗑️</button>
                         </div>
                     </div>

@@ -195,7 +195,9 @@
 }
 
 .btn-edit {
-    padding: 8px 12px;
+    width: 38px;
+    height: 38px;
+    padding: 0;
     background: rgba(139, 92, 246, 0.2);
     border: 2px solid #8b5cf6;
     border-radius: 6px;
@@ -203,13 +205,23 @@
     cursor: pointer;
     transition: all 0.3s ease;
     text-decoration: none;
-    display: inline-block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .btn-edit:hover {
     background: #8b5cf6;
     color: white;
     transform: scale(1.05);
+}
+
+.btn-edit-icon {
+    width: 100%;
+    height: 100%;
+    max-width: 16px;
+    max-height: 16px;
+    object-fit: contain;
 }
 
 .btn-delete {

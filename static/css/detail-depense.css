@@ -165,11 +165,27 @@
     background: rgba(255, 255, 255, 0.1);
     border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 6px;
-    padding: 6px 10px;
     cursor: pointer;
     transition: all 0.3s ease;
     text-decoration: none;
     font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-edit {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+}
+
+.btn-edit-icon {
+    width: 100%;
+    height: 100%;
+    max-width: 16px;
+    max-height: 16px;
+    object-fit: contain;
 }
 
 .btn-edit:hover {
@@ -179,6 +195,9 @@
 
 .btn-delete {
     color: white;
+    width: 32px;
+    height: 32px;
+    padding: 0;
 }
 
 .btn-delete:hover {
