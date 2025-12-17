@@ -52,7 +52,9 @@
                             <a href="{{ url_for('transactions.modifier_transaction', id=t.idTransaction) }}" class="btn-edit" title="Modifier">
                                 <img src="{{ url_for('static', filename='widget/widget_pencil.png') }}" alt="Modifier" class="btn-edit-icon">
                             </a>
-                            <button class="btn-delete" onclick="confirmDelete({{ t.idTransaction }}, '{{ t.titre }}')" title="Supprimer">🗑️</button>
+                            <button class="btn-delete" onclick="confirmDelete({{ t.idTransaction }}, '{{ t.titre }}')" title="Supprimer">
+                                <img src="{{ url_for('static', filename='widget/widget_trash_can.png') }}" alt="Supprimer" class="btn-delete-icon">
+                            </button>
                         </div>
                     </div>
                 </div>

@@ -163,9 +163,11 @@
                                 {% if not is_epargne %}
                                 <div class="transaction-actions">
                                     <a href="{{ url_for('transactions.modifier_transaction', id=t.idTransaction) }}" class="btn-action btn-edit" title="Modifier">
-    <img src="{{ url_for('static', filename='widget/widget_pencil.png') }}" alt="Modifier" class="btn-edit-icon">
-</a>
-<button class="btn-action btn-delete" onclick="confirmDelete({{ t.idTransaction }}, '{{ t.titre }}')" title="Supprimer">🗑️</button>
+                                        <img src="{{ url_for('static', filename='widget/widget_pencil.png') }}" alt="Modifier" class="btn-edit-icon">
+                                    </a>
+                                    <button class="btn-action btn-delete" onclick="confirmDelete({{ t.idTransaction }}, '{{ t.titre }}')" title="Supprimer">
+                                        <img src="{{ url_for('static', filename='widget/widget_trash_can.png') }}" alt="Supprimer" class="btn-delete-icon">
+                                    </button>
                                 </div>
                                 {% endif %}
                             </td>

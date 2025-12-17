@@ -61,7 +61,9 @@
                                     data-category-id="{{ cat.idCategorie }}"
                                     data-category-name="{{ cat.nom }}"
                                     onclick="deleteCategory(this)"
-                                    title="Supprimer">🗑️</button>
+                                    title="Supprimer">
+                                <img src="{{ url_for('static', filename='widget/widget_trash_can.png') }}" alt="Supprimer" class="btn-delete-icon">
+                            </button>
                         </div>
                     </div>
 

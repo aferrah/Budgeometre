@@ -18,7 +18,6 @@
         <a href="{{ url_for('home.home') }}" class="btn-back">← Retour</a>
     </div>
 
-    <!-- Formulaire d'archivage -->
     {% if mois_disponibles %}
     <div class="archiver-section">
         <h3>Archiver un mois</h3>
@@ -42,11 +41,10 @@
     </div>
     {% endif %}
 
-    <!-- Liste des archives -->
     <div class="archives-list">
         {% if archives %}
             {% for archive in archives %}
-                <div class="archive-card {% if archive.masquee %}archive-masquee{% endif %}" 
+                <div class="archive-card {% if archive.masquee %}archive-masquee{% endif %}"
                      data-archive-id="{{ archive.idArchive }}"
                      data-total-revenus="{{ '%.2f'|format(archive.total_revenus) }}"
                      data-total-depenses="{{ '%.2f'|format(archive.total_depenses) }}"
@@ -88,7 +86,7 @@
                         <a href="{{ url_for('archives.voir_archive', id=archive.idArchive) }}" class="btn-voir" style="{% if archive.masquee %}display:none;{% endif %}">
                             Voir les détails
                         </a>
-                        <button type="button" class="btn-masquer" 
+                        <button type="button" class="btn-masquer"
                                 data-archive-id="{{ archive.idArchive }}"
                                 data-masquee="{{ 'true' if archive.masquee else 'false' }}"
                                 onclick="toggleMasquerArchive(this)"
@@ -107,7 +105,7 @@
                         </button>
                         <form method="post" action="{{ url_for('archives.supprimer_archive', id=archive.idArchive) }}" style="display:{% if archive.masquee %}none{% else %}inline{% endif %};" onsubmit="return confirm('Supprimer définitivement cette archive ? Cette action est irréversible.');" class="form-supprimer">
                             <button type="submit" class="btn-supprimer" title="Supprimer l'archive">
-                                🗑️
+                                <img src="{{ url_for('static', filename='widget/widget_trash_can.png') }}" alt="Supprimer" class="btn-delete-icon">
                             </button>
                         </form>
                     </div>
@@ -153,20 +151,20 @@
                 // Mettre à jour l'état du bouton
                 button.dataset.masquee = data.masquee ? 'true' : 'false';
                 button.title = data.masquee ? 'Afficher l\'archive' : 'Masquer l\'archive';
-                
+
                 // Mettre à jour la classe de la carte
                 if (data.masquee) {
                     card.classList.add('archive-masquee');
                 } else {
                     card.classList.remove('archive-masquee');
                 }
-                
+
                 // Afficher/masquer les éléments
                 const archiveDate = card.querySelector('.archive-date');
                 const archiveStats = card.querySelector('.archive-stats');
                 const btnVoir = card.querySelector('.btn-voir');
                 const formSupprimer = card.querySelector('.form-supprimer');
-                
+
                 if (data.masquee) {
                     // Masquer
                     if (archiveDate) archiveDate.style.display = 'none';
@@ -180,7 +178,7 @@
                     if (btnVoir) btnVoir.style.display = '';
                     if (formSupprimer) formSupprimer.style.display = 'inline';
                 }
-                
+
                 // Mettre à jour l'icône
                 const svg = button.querySelector('svg');
                 if (data.masquee) {
