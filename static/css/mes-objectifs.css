@@ -335,11 +335,21 @@
     cursor: pointer;
     transition: all 0.2s ease;
     font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .btn-delete:hover {
     background: rgba(239, 68, 68, 0.2);
 }
+
+.btn-delete-icon {
+    width: 18px;
+    height: 18px;
+    object-fit: contain;
+}
+
 @media (max-width: 640px) {
     .content-container {
         padding: 1rem;

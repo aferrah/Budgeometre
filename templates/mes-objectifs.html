@@ -116,7 +116,7 @@
 
                             <form action="{{ url_for('objectifs.supprimer_objectif', id=obj.idObjectif) }}" method="POST" class="delete-form">
                                 <button type="submit" class="btn-delete" title="Supprimer l'objectif" onclick="return confirm('Supprimer cet objectif d\'épargne ?')">
-                                    🗑️
+                                    <img src="{{ url_for('static', filename='widget/widget_trash_can.png') }}" alt="Supprimer" class="btn-delete-icon">
                                 </button>
                             </form>
                         </div>
