@@ -1,0 +1,222 @@
+{% extends "base.html" %}
+
+{% block title %}Catégories - Budgeomètre{% endblock %}
+
+{% block head_extra %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/categories.css') }}">
+{% endblock %}
+
+{% block header_content %}
+    <h1>Catégories des dépenses</h1>
+{% endblock %}
+
+{% block content %}
+    <div class="categories-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+        <h2>Catégories</h2>
+        <a href="{{ url_for('home.home') }}" class="btn-back">← Retour à l'accueil</a>
+    </div>
+
+    <div class="add-category-form glass-card">
+        <h3> Ajouter une catégorie</h3>
+        <form method="post" action="{{ url_for('categories.categories') }}">
+            <div class="form-row">
+                <input type="text" name="nom" placeholder="Nom de la catégorie" required>
+                <input type="text" name="description" placeholder="Description (optionnel)">
+                <input type="color" name="couleur" value="#8b5cf6" title="Couleur de la catégorie">
+            </div>
+            <div class="form-row" style="margin-top: 10px;">
+                <label style="display: flex; align-items: center; gap: 10px; color: white; cursor: pointer; flex: 0 0 auto; margin-right: 16px;">
+                    <input type="checkbox" id="has_limit" onchange="toggleLimitInput()" style="width: 20px; height: 20px; cursor: pointer;">
+                    <span style="white-space: nowrap;">Définir une limite de budget mensuel</span>
+                </label>
+                <input type="number" id="limite_budget_input" name="limite_budget" placeholder="Limite budget (€)" min="0" step="0.01" style="display: none;">
+                <button type="submit" class="btn-add" title="Ajouter la catégorie">+</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="categories-list">
+        {% if categories %}
+            {% for cat in categories %}
+                <div class="category-card" style="border-left-color: {{ cat.couleur or '#8b5cf6' }};">
+                    <div class="category-header">
+                        <div class="category-info">
+                            <div class="category-name">
+                                {{ cat.nom }}
+                            </div>
+                            <div class="category-description">{{ cat.description or 'Aucune description' }}</div>
+                        </div>
+                        <div class="category-stats">
+                            <div class="count">{{ cat.transactions|length }}</div>
+                            <div class="label">transaction(s)</div>
+                        </div>
+                        <div class="category-actions">
+                            <button type="button" class="btn-toggle" onclick="toggleTransactions(this, 'transactions-{{ cat.idCategorie }}')">
+                                ▼ Voir
+                            </button>
+                            <a href="{{ url_for('categories.modifier_categorie', id=cat.idCategorie) }}" class="btn-edit" title="Modifier">
+                                <img src="{{ url_for('static', filename='widget/widget_pencil.png') }}" alt="Modifier" class="btn-edit-icon">
+                            </a>
+                            <button type="button" class="btn-delete"
+                                    data-category-id="{{ cat.idCategorie }}"
+                                    data-category-name="{{ cat.nom }}"
+                                    onclick="deleteCategory(this)"
+                                    title="Supprimer">
+                                <img src="{{ url_for('static', filename='widget/widget_trash_can.png') }}" alt="Supprimer" class="btn-delete-icon">
+                            </button>
+                        </div>
+                    </div>
+
+                    {% if cat.limite_budget and cat.limite_budget > 0 %}
+                    <div class="category-budget-section">
+                        <div class="budget-info">
+                            <span class="budget-label">Budget mensuel:</span>
+                            <div class="budget-bar-container">
+                                {% set pct = cat.pourcentage|default(0) %}
+                                {% if pct < 80 %}
+                                    {% set bar_class = 'ok' %}
+                                {% elif pct < 100 %}
+                                    {% set bar_class = 'warning' %}
+                                {% else %}
+                                    {% set bar_class = 'danger' %}
+                                {% endif %}
+                                <div class="budget-bar {{ bar_class }}" style="width: {{ [pct, 100]|min }}%;"></div>
+                            </div>
+                            <div class="budget-amounts">
+                                <span class="budget-spent">{{ '%.2f'|format(cat.depenses_mois|default(0)) }}€</span>
+                                <span class="budget-limit">/ {{ '%.2f'|format(cat.limite_budget) }}€</span>
+                            </div>
+                        </div>
+                        {% if pct >= 80 and pct < 100 %}
+                            <div class="budget-alert warning">
+                                Attention : vous avez utilisé {{ '%.0f'|format(pct) }}% de votre budget
+                            </div>
+                        {% elif pct >= 100 %}
+                            {% set depassement = cat.depenses_mois - cat.limite_budget|float %}
+                            <div class="budget-alert danger">
+                                {% if depassement == 0 %}
+                                    Budget atteint !
+                                {% else %}
+                                    Budget dépassé de {{ '%.2f'|format(depassement) }}€ !
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+
+                    <div class="transactions-dropdown" id="transactions-{{ cat.idCategorie }}">
+                        <div class="transactions-list">
+                            {% set derniers_transactions = cat.transactions|sort(attribute='dateTransaction', reverse=true)|list %}
+                            {% if derniers_transactions %}
+                                {% for t in derniers_transactions[:3] %}
+                                    <div class="transaction-item">
+                                        <div class="transaction-info">
+                                            <div class="transaction-titre">{{ t.titre }}</div>
+                                            <div class="transaction-date">{{ t.dateTransaction.strftime('%d/%m/%Y') }}</div>
+                                        </div>
+                                        <div class="transaction-montant {{ 'positif' if t.montant >= 0 else 'negatif' }}">
+                                            {{ '+' if t.montant >= 0 else '' }}{{ '%.2f'|format(t.montant) }} €
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            {% else %}
+                                <div class="no-transactions">Aucune transaction dans cette catégorie</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state glass-card">
+                <p>Aucune catégorie pour l'instant.</p>
+                <p>Ajoutez-en une ci-dessus !</p>
+            </div>
+        {% endif %}
+    </div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function toggleTransactions(btn, id) {
+        const dropdown = document.getElementById(id);
+        dropdown.classList.toggle('open');
+        btn.classList.toggle('active');
+
+        if (dropdown.classList.contains('open')) {
+            btn.textContent = '▲ Masquer';
+        } else {
+            btn.textContent = '▼ Voir';
+        }
+    }
+
+    function toggleLimitInput() {
+        const checkbox = document.getElementById('has_limit');
+        const input = document.getElementById('limite_budget_input');
+
+        if (checkbox.checked) {
+            input.style.display = 'block';
+            input.required = true;
+        } else {
+            input.style.display = 'none';
+            input.required = false;
+            input.value = '';
+        }
+    }
+
+    function deleteCategory(button) {
+        const categoryId = button.dataset.categoryId;
+        const categoryName = button.dataset.categoryName;
+
+        if (!confirm(`Supprimer la catégorie "${categoryName}" ?`)) {
+            return;
+        }
+
+        const card = button.closest('.category-card');
+
+        fetch(`/categories/delete/${categoryId}`, {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            const message = document.createElement('div');
+            message.className = `flash-message ${data.success ? 'success' : 'error'}`;
+            message.textContent = data.message;
+            message.style.cssText = `position: fixed; top: 20px; right: 20px; background: ${data.success ? '#10b981' : '#ef4444'}; color: white; padding: 12px 20px; border-radius: 8px; z-index: 9999; animation: slideIn 0.3s ease;`;
+            document.body.appendChild(message);
+
+            if (data.success) {
+                card.style.animation = 'fadeOut 0.3s ease';
+                setTimeout(() => card.remove(), 300);
+            }
+
+            setTimeout(() => {
+                message.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => message.remove(), 300);
+            }, 3000);
+        })
+        .catch(error => {
+            console.error('Erreur:', error);
+            alert('Une erreur est survenue');
+        });
+    }
+</script>
+<style>
+    @keyframes slideIn {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+    @keyframes slideOut {
+        from { transform: translateX(0); opacity: 1; }
+        to { transform: translateX(100%); opacity: 0; }
+    }
+    @keyframes fadeOut {
+        from { opacity: 1; transform: scale(1); }
+        to { opacity: 0; transform: scale(0.95); }
+    }
+</style>
+{% endblock %}

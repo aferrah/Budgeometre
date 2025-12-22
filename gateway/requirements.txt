@@ -1,6 +1,7 @@
 # Dependencies for Budgeometre (no pinned versions)
 # Core packages (latest available will be installed)
-Flask
 Flask-SQLAlchemy
 SQLAlchemy
 datetime
+Flask==3.0.0
+requests==2.31.0

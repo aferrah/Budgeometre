@@ -1,0 +1,207 @@
+.archive-detail-page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.page-header h2 {
+    color: white;
+    margin: 0;
+}
+
+.header-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.btn-back {
+    padding: 10px 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 8px;
+    color: white;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.btn-back:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.btn-masquer, .btn-supprimer {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.btn-masquer {
+    background: rgba(99, 102, 241, 0.3);
+    border: 2px solid rgba(99, 102, 241, 0.5);
+}
+
+.btn-masquer:hover {
+    background: #6366f1;
+    transform: translateY(-2px);
+}
+
+.btn-supprimer {
+    background: rgba(239, 68, 68, 0.3);
+    border: 2px solid rgba(239, 68, 68, 0.5);
+}
+
+.btn-supprimer:hover {
+    background: #ef4444;
+    transform: translateY(-2px);
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.stat-card {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    padding: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    text-align: center;
+}
+
+.stat-label {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.9rem;
+    margin-bottom: 10px;
+}
+
+.stat-value {
+    font-size: 1.8rem;
+    font-weight: 700;
+}
+
+.stat-value.revenus {
+    color: #10b981;
+}
+
+.stat-value.depenses {
+    color: #ef4444;
+}
+
+.stat-value.solde {
+    color: #8b5cf6;
+}
+
+.stat-value.epargne {
+    color: #f59e0b;
+}
+
+.section-card {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    padding: 25px;
+    margin-bottom: 30px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.section-card h3 {
+    color: white;
+    margin-bottom: 20px;
+}
+
+.categories-grid {
+    display: grid;
+    gap: 15px;
+}
+
+.category-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    border-left: 4px solid;
+}
+
+.category-info {
+    flex: 1;
+}
+
+.category-name {
+    font-weight: 600;
+    color: white;
+    margin-bottom: 5px;
+}
+
+.category-count {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.category-amounts {
+    text-align: right;
+}
+
+.category-depenses {
+    color: #ef4444;
+    font-weight: 600;
+}
+
+.category-revenus {
+    color: #10b981;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.transactions-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.transactions-table th {
+    color: rgba(255, 255, 255, 0.7);
+    font-weight: 600;
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.transactions-table td {
+    color: white;
+    padding: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.montant-positif {
+    color: #10b981;
+}
+
+.montant-negatif {
+    color: #ef4444;
+}
+
+.badge-categorie {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.1);
+    font-size: 0.85rem;
+}
