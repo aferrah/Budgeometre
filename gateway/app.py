@@ -14,5 +14,11 @@ app.register_blueprint(objectifs_bp)
 app.register_blueprint(archives_bp)
 app.register_blueprint(dashboard_bp)
 
+# Endpoint de health check pour Kubernetes
+@app.route('/health')
+def health():
+    return {'status': 'healthy'}, 200
+
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
