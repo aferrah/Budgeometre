@@ -2,7 +2,7 @@
 
 set -e
 
-echo "🚀 Déploiement de Budgeomètre sur Kubernetes/Minikube"
+echo " Déploiement de Budgeomètre sur Kubernetes/Minikube"
 echo "======================================================"
 
 # Couleurs pour les messages
@@ -26,7 +26,7 @@ log_error() {
 
 # Vérifier que minikube est démarré
 echo ""
-echo "📋 Vérification des prérequis..."
+echo " Vérification des prérequis..."
 if ! minikube status &> /dev/null; then
     log_warn "Minikube n'est pas démarré. Démarrage..."
     minikube start --driver=docker
@@ -37,13 +37,13 @@ fi
 
 # Configurer Docker pour utiliser le daemon Minikube
 echo ""
-echo "🔧 Configuration de Docker..."
+echo " Configuration de Docker..."
 eval $(minikube docker-env)
 log_info "Docker configuré pour utiliser le daemon Minikube"
 
 # Build des images Docker
 echo ""
-echo "🏗️  Build des images Docker..."
+echo "  Build des images Docker..."
 
 echo "  - Build gateway..."
 docker build -t gateway:latest ./gateway
@@ -59,7 +59,7 @@ log_info "Image lecture-service:latest créée"
 
 # Vérifier les images
 echo ""
-echo "🔍 Vérification des images..."
+echo " Vérification des images..."
 docker images | grep -E "gateway|ecriture|lecture" || log_error "Aucune image trouvée"
 
 # Créer le dossier k8s s'il n'existe pas
@@ -67,7 +67,7 @@ mkdir -p k8s
 
 # Déploiement Kubernetes
 echo ""
-echo "☸️  Déploiement sur Kubernetes..."
+echo "  Déploiement sur Kubernetes..."
 
 echo "  1. Création du namespace..."
 kubectl apply -f k8s/namespace.yaml
@@ -118,7 +118,7 @@ log_info "Gateway est prêt"
 
 # Afficher le statut
 echo ""
-echo "📊 Statut du déploiement:"
+echo "Statut du déploiement:"
 echo "========================"
 kubectl get pods -n budgeometre
 echo ""
@@ -126,15 +126,15 @@ kubectl get services -n budgeometre
 
 # Obtenir l'URL d'accès
 echo ""
-echo "🌐 Accès à l'application:"
+echo " Accès à l'application:"
 echo "========================="
 APP_URL=$(minikube service gateway -n budgeometre --url)
 log_info "Application accessible sur: $APP_URL"
 
 echo ""
-echo "✅ Déploiement terminé avec succès!"
+echo "Déploiement terminé avec succès!"
 echo ""
-echo "💡 Commandes utiles:"
+echo " Commandes utiles:"
 echo "   - Voir les logs du gateway:    kubectl logs -f deployment/gateway -n budgeometre"
 echo "   - Voir les logs de l'écriture: kubectl logs -f deployment/ecriture-service -n budgeometre"
 echo "   - Voir les logs de la lecture: kubectl logs -f deployment/lecture-service -n budgeometre"
