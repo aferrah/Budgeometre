@@ -2,7 +2,7 @@
 
 set -e
 
-echo "🗑️  Nettoyage du déploiement Budgeomètre"
+echo "  Nettoyage du déploiement Budgeomètre"
 echo "=========================================="
 
 # Couleurs pour les messages
@@ -38,7 +38,7 @@ log_info "Namespace budgeometre supprimé"
 
 # Vérifier qu'il n'y a plus de ressources
 echo ""
-echo "🔍 Vérification..."
+echo "Vérification..."
 REMAINING=$(kubectl get all -n budgeometre 2>&1 || true)
 if [[ $REMAINING == *"No resources found"* ]] || [[ $REMAINING == *"not found"* ]]; then
     log_info "Toutes les ressources ont été supprimées"
@@ -47,9 +47,9 @@ else
 fi
 
 echo ""
-echo "✅ Nettoyage terminé!"
+echo " Nettoyage terminé!"
 echo ""
-echo "💡 Pour redéployer: ./deploy.sh"
-echo "💡 Pour arrêter Minikube: minikube stop"
-echo "💡 Pour supprimer Minikube: minikube delete"
+echo " Pour redéployer: ./deploy.sh"
+echo " Pour arrêter Minikube: minikube stop"
+echo " Pour supprimer Minikube: minikube delete"
 echo ""
