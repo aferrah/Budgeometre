@@ -42,28 +42,26 @@ eval $(minikube docker-env)
 log_info "Docker configuré pour utiliser le daemon Minikube"
 
 # Build des images Docker
+# Note : on build depuis la racine (.) pour que le dossier 'shared' soit accessible
 echo ""
 echo "  Build des images Docker..."
 
 echo "  - Build gateway..."
-docker build -t gateway:latest ./gateway
+docker build -t gateway:latest -f gateway/Dockerfile .
 log_info "Image gateway:latest créée"
 
 echo "  - Build ecriture-service..."
-docker build -t ecriture-service:latest ./services/ecriture
+docker build -t ecriture-service:latest -f services/ecriture/Dockerfile .
 log_info "Image ecriture-service:latest créée"
 
 echo "  - Build lecture-service..."
-docker build -t lecture-service:latest ./services/lecture
+docker build -t lecture-service:latest -f services/lecture/Dockerfile .
 log_info "Image lecture-service:latest créée"
 
 # Vérifier les images
 echo ""
 echo " Vérification des images..."
 docker images | grep -E "gateway|ecriture|lecture" || log_error "Aucune image trouvée"
-
-# Créer le dossier k8s s'il n'existe pas
-mkdir -p k8s
 
 # Déploiement Kubernetes
 echo ""
@@ -75,13 +73,19 @@ log_info "Namespace créé"
 
 echo "  2. Création des ConfigMaps et Secrets..."
 kubectl apply -f k8s/configmap.yaml
-kubectl apply -f k8s/secret.yaml
+# Si secret.yaml n'existe pas encore, cette ligne peut être adaptée ou créée manuellement
+kubectl apply -f k8s/secret.yaml 2>/dev/null || log_warn "Fichier k8s/secret.yaml non trouvé, assurez-vous qu'il existe si nécessaire"
 kubectl apply -f k8s/postgres-init-configmap.yaml
-log_info "ConfigMaps et Secrets créés"
+log_info "ConfigMaps et Secrets appliqués"
 
 echo "  3. Création du PVC PostgreSQL..."
-kubectl apply -f k8s/postgres-pvc.yaml
-log_info "PVC créé"
+# Vérifie si le fichier existe avant d'appliquer
+if [ -f k8s/postgres-pvc.yaml ]; then
+    kubectl apply -f k8s/postgres-pvc.yaml
+    log_info "PVC créé"
+else
+    log_warn "Fichier k8s/postgres-pvc.yaml absent"
+fi
 
 echo "  4. Déploiement de PostgreSQL..."
 kubectl apply -f k8s/postgres-deployment.yaml
@@ -118,7 +122,7 @@ log_info "Gateway est prêt"
 
 # Afficher le statut
 echo ""
-echo "Statut du déploiement:"
+echo " Statut du déploiement:"
 echo "========================"
 kubectl get pods -n budgeometre
 echo ""
@@ -132,12 +136,9 @@ APP_URL=$(minikube service gateway -n budgeometre --url)
 log_info "Application accessible sur: $APP_URL"
 
 echo ""
-echo "Déploiement terminé avec succès!"
+echo " Déploiement terminé avec succès!"
 echo ""
 echo " Commandes utiles:"
 echo "   - Voir les logs du gateway:    kubectl logs -f deployment/gateway -n budgeometre"
 echo "   - Voir les logs de l'écriture: kubectl logs -f deployment/ecriture-service -n budgeometre"
 echo "   - Voir les logs de la lecture: kubectl logs -f deployment/lecture-service -n budgeometre"
-echo "   - Dashboard Kubernetes:        minikube dashboard"
-echo "   - Port-forward (alt):          kubectl port-forward service/gateway 5000:5000 -n budgeometre"
-echo ""

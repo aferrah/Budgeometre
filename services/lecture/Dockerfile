@@ -5,10 +5,14 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc libpq-dev && rm -rf /var/lib/apt/lists/*
 
-COPY requirements.txt .
+# 1. On copie le dossier partagé
+COPY shared /app/shared
+
+# 2. On copie les fichiers spécifiques au service lecture
+COPY services/lecture/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY . .
+COPY services/lecture/ .
 
 EXPOSE 5002
 

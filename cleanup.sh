@@ -29,7 +29,7 @@ if [[ ! $REPLY =~ ^[Yy]$ ]]; then
 fi
 
 echo ""
-echo "🧹 Suppression des ressources Kubernetes..."
+echo " Suppression des ressources Kubernetes..."
 
 # Supprimer le namespace (cela supprime tout ce qui est dedans)
 kubectl delete namespace budgeometre --timeout=60s
