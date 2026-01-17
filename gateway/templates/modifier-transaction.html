@@ -17,7 +17,7 @@
     <section class="form-card">
         <h2>Modifier la transaction</h2>
 
-        <form id="expense-form" method="post" action="{{ url_for('transactions.modifier_transaction', id=transaction.idTransaction) }}">
+        <form id="expense-form" method="post" action="{{ url_for('modifier_transaction', id=transaction.idTransaction) }}">
 
             <div class="form-row">
                 <label>Type de transaction</label>
@@ -38,7 +38,9 @@
             <div class="form-row">
                 <label for="amount">Montant (€)</label>
                 <div class="input-wrapper" id="amount-wrapper">
-                    <input type="text" id="amount" name="amount" value="{{ '%.2f'|format(transaction.montant|abs) }}" placeholder="Ex : 45.90" required autocomplete="off">
+                    <input type="text" id="amount" name="amount" value="{{ '%.2f'|format(transaction.montant|abs) }}" placeholder="Ex : 45.90" required
+                           autocomplete="off">
+
                     <p class="error-message">Veuillez entrer un nombre valide (ex: 45.90)</p>
                 </div>
             </div>
@@ -62,15 +64,18 @@
 
             <div class="form-row">
                 <label for="comment">Commentaire</label>
-                <textarea id="comment" name="comment" rows="3" placeholder="Optionnel : détails de la transaction...">{{ transaction.commentaire or '' }}</textarea>
+                <textarea id="comment" name="comment" rows="3"
+                          placeholder="Optionnel : détails de la transaction...">{{ transaction.commentaire or '' }}</textarea>
             </div>
 
             <div class="form-actions">
-                <a href="{{ url_for('home.home') }}" class="btn-secondary">Annuler</a>
+                <a href="{{ url_for('home') }}" class="btn-secondary">Annuler</a>
                 <button type="submit" class="btn-primary" id="submit-btn">Enregistrer les modifications</button>
             </div>
 
-            <p id="form-message" class="form-message" hidden>Transaction modifiée</p>
+            <p id="form-message" class="form-message" hidden>
+                 Transaction modifiée
+            </p>
         </form>
     </section>
 </main>
@@ -82,15 +87,25 @@
     const message = document.getElementById('form-message');
     const amountInput = document.getElementById('amount');
     const amountWrapper = document.getElementById('amount-wrapper');
+    const submitBtn = document.getElementById('submit-btn');
 
+    // Fonction de validation du montant
     function validateAmount(value) {
+        // Remplacer la virgule par un point
         value = value.replace(',', '.');
+
+        // Vérifier si c'est un nombre valide (positif)
         const regex = /^\d+(\.\d{0,2})?$/;
-        return regex.test(value) && parseFloat(value) > 0;
+        const isValid = regex.test(value) && parseFloat(value) > 0;
+
+        return isValid;
     }
 
+    // Validation en temps réel
     amountInput.addEventListener('input', function() {
         let value = this.value.trim();
+
+        // Remplacer automatiquement la virgule par un point
         this.value = value.replace(',', '.');
 
         if (value === '') {
@@ -107,6 +122,7 @@
         }
     });
 
+    // Validation à la soumission
     form.addEventListener('submit', function(event) {
         const value = amountInput.value.trim();
 
@@ -118,6 +134,33 @@
         }
 
         message.hidden = false;
+    });
+
+    // Empêcher les caractères non valides
+    amountInput.addEventListener('keypress', function(event) {
+        const char = String.fromCharCode(event.which);
+        const currentValue = this.value;
+
+        // Autoriser uniquement : chiffres, point, virgule
+        if (!/[\d.,]/.test(char)) {
+            event.preventDefault();
+            return;
+        }
+
+        // Empêcher plusieurs points/virgules
+        if ((char === '.' || char === ',') && (currentValue.includes('.') || currentValue.includes(','))) {
+            event.preventDefault();
+            return;
+        }
+
+        // Empêcher plus de 2 décimales
+        if (currentValue.includes('.')) {
+            const decimals = currentValue.split('.')[1];
+            if (decimals && decimals.length >= 2 && char !== '.' && char !== ',') {
+                event.preventDefault();
+                return;
+            }
+        }
     });
 </script>
 {% endblock %}

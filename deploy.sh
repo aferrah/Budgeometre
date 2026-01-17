@@ -1,144 +1,109 @@
 #!/bin/bash
 
-set -e
+echo "=========================================="
+echo "  Déploiement Budgeomètre sur Minikube"
+echo "=========================================="
 
-echo " Déploiement de Budgeomètre sur Kubernetes/Minikube"
-echo "======================================================"
-
-# Couleurs pour les messages
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-RED='\033[0;31m'
-NC='\033[0m' # No Color
-
-# Fonction pour afficher les messages
-log_info() {
-    echo -e "${GREEN}✓${NC} $1"
-}
-
-log_warn() {
-    echo -e "${YELLOW}⚠${NC} $1"
-}
-
-log_error() {
-    echo -e "${RED}✗${NC} $1"
-}
-
-# Vérifier que minikube est démarré
+# 1. Démarrer Minikube
 echo ""
-echo " Vérification des prérequis..."
-if ! minikube status &> /dev/null; then
-    log_warn "Minikube n'est pas démarré. Démarrage..."
-    minikube start --driver=docker
-    log_info "Minikube démarré"
-else
-    log_info "Minikube est déjà démarré"
-fi
+echo ">>> Démarrage de Minikube..."
+minikube start --driver=docker
 
-# Configurer Docker pour utiliser le daemon Minikube
+# 2. Activer Ingress
 echo ""
-echo " Configuration de Docker..."
+echo ">>> Activation de l'Ingress..."
+minikube addons enable ingress
+minikube addons enable metrics-server
+
+# 3. Configurer Docker pour Minikube
+echo ""
+echo ">>> Configuration de Docker..."
 eval $(minikube docker-env)
-log_info "Docker configuré pour utiliser le daemon Minikube"
 
-# Build des images Docker
-# Note : on build depuis la racine (.) pour que le dossier 'shared' soit accessible
+# 4. Build des images
 echo ""
-echo "  Build des images Docker..."
+echo ">>> Build des images Docker..."
 
-echo "  - Build gateway..."
+echo "  - Gateway..."
 docker build -t gateway:latest -f gateway/Dockerfile .
-log_info "Image gateway:latest créée"
 
-echo "  - Build ecriture-service..."
+echo "  - Ecriture..."
 docker build -t ecriture-service:latest -f services/ecriture/Dockerfile .
-log_info "Image ecriture-service:latest créée"
 
-echo "  - Build lecture-service..."
+echo "  - Lecture..."
 docker build -t lecture-service:latest -f services/lecture/Dockerfile .
-log_info "Image lecture-service:latest créée"
 
-# Vérifier les images
+# 5. Vérifier les images
 echo ""
-echo " Vérification des images..."
-docker images | grep -E "gateway|ecriture|lecture" || log_error "Aucune image trouvée"
+echo ">>> Images créées :"
+docker images | grep -E "gateway|ecriture|lecture"
 
-# Déploiement Kubernetes
+# 6. Déployer sur Kubernetes
 echo ""
-echo "  Déploiement sur Kubernetes..."
+echo ">>> Déploiement Kubernetes..."
 
-echo "  1. Création du namespace..."
+echo "  - Namespace..."
 kubectl apply -f k8s/namespace.yaml
-log_info "Namespace créé"
 
-echo "  2. Création des ConfigMaps et Secrets..."
+echo "  - ConfigMap & Secret..."
 kubectl apply -f k8s/configmap.yaml
-# Si secret.yaml n'existe pas encore, cette ligne peut être adaptée ou créée manuellement
-kubectl apply -f k8s/secret.yaml 2>/dev/null || log_warn "Fichier k8s/secret.yaml non trouvé, assurez-vous qu'il existe si nécessaire"
+kubectl apply -f k8s/secret.yaml
 kubectl apply -f k8s/postgres-init-configmap.yaml
-log_info "ConfigMaps et Secrets appliqués"
 
-echo "  3. Création du PVC PostgreSQL..."
-# Vérifie si le fichier existe avant d'appliquer
-if [ -f k8s/postgres-pvc.yaml ]; then
-    kubectl apply -f k8s/postgres-pvc.yaml
-    log_info "PVC créé"
-else
-    log_warn "Fichier k8s/postgres-pvc.yaml absent"
-fi
+echo "  - PostgreSQL..."
+kubectl apply -f k8s/postgres-statefulset.yaml
 
-echo "  4. Déploiement de PostgreSQL..."
-kubectl apply -f k8s/postgres-deployment.yaml
-kubectl apply -f k8s/postgres-service.yaml
-log_info "PostgreSQL déployé"
+echo "  - Attente PostgreSQL..."
+kubectl wait --for=condition=ready pod -l app=postgres -n budgeometre --timeout=180s
 
-echo "  5. Attente du démarrage de PostgreSQL..."
-kubectl wait --for=condition=ready pod -l app=postgres -n budgeometre --timeout=120s
-log_info "PostgreSQL est prêt"
-
-echo "  6. Déploiement du service Écriture..."
+echo "  - Services Ecriture & Lecture..."
 kubectl apply -f k8s/ecriture-deployment.yaml
-kubectl apply -f k8s/ecriture-service.yaml
-log_info "Service Écriture déployé"
-
-echo "  7. Déploiement du service Lecture..."
 kubectl apply -f k8s/lecture-deployment.yaml
-kubectl apply -f k8s/lecture-service.yaml
-log_info "Service Lecture déployé"
 
-echo "  8. Attente du démarrage des services..."
-kubectl wait --for=condition=ready pod -l app=ecriture-service -n budgeometre --timeout=120s
-kubectl wait --for=condition=ready pod -l app=lecture-service -n budgeometre --timeout=120s
-log_info "Services Écriture et Lecture sont prêts"
+echo "  - Attente services..."
+kubectl wait --for=condition=ready pod -l app=ecriture-service -n budgeometre --timeout=180s
+kubectl wait --for=condition=ready pod -l app=lecture-service -n budgeometre --timeout=180s
 
-echo "  9. Déploiement du Gateway..."
+echo "  - Gateway..."
 kubectl apply -f k8s/gateway-deployment.yaml
-kubectl apply -f k8s/gateway-service.yaml
-log_info "Gateway déployé"
 
-echo "  10. Attente du démarrage du Gateway..."
-kubectl wait --for=condition=ready pod -l app=gateway -n budgeometre --timeout=120s
-log_info "Gateway est prêt"
+echo "  - Attente Gateway..."
+kubectl wait --for=condition=ready pod -l app=gateway -n budgeometre --timeout=180s
 
-# Afficher le statut
+echo "  - Ingress..."
+kubectl apply -f k8s/ingress.yaml
+
+echo "  - HPA..."
+kubectl apply -f k8s/hpa.yaml
+
+echo "  - Network Policy..."
+kubectl apply -f k8s/network-policy.yaml
+
+# 7. Afficher le statut
 echo ""
-echo " Statut du déploiement:"
-echo "========================"
+echo "=========================================="
+echo "  Statut du déploiement"
+echo "=========================================="
+echo ""
 kubectl get pods -n budgeometre
 echo ""
 kubectl get services -n budgeometre
+echo ""
+kubectl get ingress -n budgeometre
 
-# Obtenir l'URL d'accès
+# 8. Configurer /etc/hosts
 echo ""
-echo " Accès à l'application:"
-echo "========================="
-APP_URL=$(minikube service gateway -n budgeometre --url)
-log_info "Application accessible sur: $APP_URL"
-
+echo "=========================================="
+echo "  Configuration accès"
+echo "=========================================="
+MINIKUBE_IP=$(minikube ip)
 echo ""
-echo " Déploiement terminé avec succès!"
+echo ">>> Exécutez cette commande pour ajouter l'entrée DNS :"
 echo ""
-echo " Commandes utiles:"
-echo "   - Voir les logs du gateway:    kubectl logs -f deployment/gateway -n budgeometre"
-echo "   - Voir les logs de l'écriture: kubectl logs -f deployment/ecriture-service -n budgeometre"
-echo "   - Voir les logs de la lecture: kubectl logs -f deployment/lecture-service -n budgeometre"
+echo "echo \"$MINIKUBE_IP budgeometre.local\" | sudo tee -a /etc/hosts"
+echo ""
+echo ">>> Puis accédez à : http://budgeometre.local"
+echo ""
+echo "=========================================="
+echo "  Déploiement terminé !"
+echo "=========================================="
