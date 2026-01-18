@@ -184,6 +184,46 @@ echo "<MINIKUBE_IP> budgeometre.local" | sudo tee -a /etc/hosts
 
 Ouvrez votre navigateur et accédez à : **http://budgeometre.local**
 
+#### Peupler la base de données avec 6 mois de données de test
+
+Pour faciliter les tests et la démonstration, un script Python permet d'injecter automatiquement 6 mois de données réalistes dans la base PostgreSQL.
+
+**Contenu injecté :**
+- 9 catégories (Alimentation, Transport, Loisirs, Logement, Santé, Shopping, Abonnements, Salaire, Autre)
+- Transactions mensuelles variées (revenus, dépenses fixes et variables)
+- 3 objectifs d'épargne avec progression
+- Archives mensuelles pour chaque mois
+
+**Exécuter le script :**
+
+```bash
+# 1. Identifier le pod du service écriture
+kubectl get pods -n budgeometre | grep ecriture
+
+# 2. Exécuter le script de seed
+kubectl exec -it <nom-du-pod-ecriture> -n budgeometre -- python seed_data.py
+```
+
+Exemple :
+```bash
+kubectl exec -it ecriture-service-7d9f8b5c4-xk2m9 -n budgeometre -- python seed_data.py
+```
+
+Le script affiche sa progression et confirme la création de chaque élément :
+```
+[SEED] Début de l'injection des données de test sur 6 mois...
+  ✓ Catégorie créée: Alimentation
+  ✓ Catégorie créée: Transport
+  ...
+[SEED] Mois 12/2025...
+  ✓ 156 transactions créées
+  ✓ Objectif créé: Vacances été
+  ...
+[SEED] Injection terminée !
+```
+
+Rafraîchissez ensuite l'application dans votre navigateur pour voir les données.
+
 #### Vérifier le déploiement
 
 ```bash
