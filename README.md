@@ -13,9 +13,7 @@ Application web de gestion de budget personnel développée avec Flask. Suivez v
 - [À propos](#à-propos)
 - [Fonctionnalités principales](#fonctionnalités-principales)
 - [Technologies utilisées](#technologies-utilisées)
-- [Installation](#installation)
-  - [Déploiement local](#déploiement-local)
-  - [Déploiement Kubernetes](#déploiement-kubernetes)
+- [Déploiement Kubernetes](#déploiement-kubernetes)
 - [Guide d'utilisation](#guide-dutilisation)
   - [Gestion des catégories](#1-gestion-des-catégories)
   - [Gestion des transactions](#2-gestion-des-transactions)
@@ -26,7 +24,7 @@ Application web de gestion de budget personnel développée avec Flask. Suivez v
 
 ## À propos
 
-**Budgeomètre** est une application web de gestion budgétaire qui permet de gérer efficacement vos finances personnelles. L'application stocke vos données dans une base SQLite locale (`budget.db`) incluant les catégories, transactions et objectifs d'épargne.
+**Budgeomètre** est une application web de gestion budgétaire qui permet de gérer efficacement vos finances personnelles. L'application utilise une architecture microservices déployée sur Kubernetes avec PostgreSQL pour stocker les catégories, transactions et objectifs d'épargne.
 
 ## Fonctionnalités principales
 
@@ -41,7 +39,7 @@ Application web de gestion de budget personnel développée avec Flask. Suivez v
 ## Technologies utilisées
 
 - **Backend** : Flask (Python)
-- **Base de données** : SQLite (local) / PostgreSQL (Kubernetes)
+- **Base de données** : PostgreSQL
 - **Frontend** : HTML5, CSS3, JavaScript
 - **Visualisation** : Graphiques interactifs (Chart.js ou équivalent)
 - **Orchestration** : Kubernetes / Minikube
@@ -49,91 +47,7 @@ Application web de gestion de budget personnel développée avec Flask. Suivez v
 
 ---
 
-## Installation
-
-### Déploiement local
-
-#### Prérequis
-
-- Python 3.8 ou version supérieure
-- pip (gestionnaire de paquets Python)
-- Git (optionnel)
-
-#### 1) Installer les dépendances
-
-
-```bash
-
-pip install -r requirements.txt --break-system-packages
-```
-
-#### 2) Démarrer l'application (création automatique de la BD)
-
-```bash
-
-python3 app.py
-
-```
-
-La commande ci-dessus crée automatiquement les tables SQLite (fichier `budget.db`) et démarre un serveur de développement sur `http://127.0.0.1:5000`.
-
-
-#### 3) Importer des données de test
-
-
-Pour peupler rapidement la base avec des catégories, transactions et objectifs d'exemple, ouvrez dans votre navigateur :
-
-```
-
-http://127.0.0.1:5000/init-test-archives
-
-```
-
-
-
-Le point d'entrée `/init-test-archives` ajoute plusieurs catégories, transactions et objectifs sur 6 mois.
-
-
-
-#### 4) Voir le site
-
-
-
-Après avoir importé les données, visitez :
-
-
-```
-
-http://127.0.0.1:5000/
-
-```
-
-
-
-La page affiche les dernières transactions calculées à partir des valeurs passées par le backend.
-
-
-#### 5) Réinitialiser la base
-
-
-Pour repartir de zéro, arrêtez le serveur et supprimez le fichier `budget.db` puis relancez `python3 app.py` et (optionnel) `/init-test-archives`.
-
-
-```bash
-
-rm budget.db
-
-python3 app.py
-
-```
-
-Il vous est également possible de réinitialiser la base de donnés en cliquant sur le menu hamburger, puis de cliquer sur l'option **Réinitialiser la BDD** :
-
-<img width="250" height="577" alt="image" src="https://github.com/user-attachments/assets/b3e8e2c5-184f-45f8-a3a0-39a1ba3844da" />
-
----
-
-### Déploiement Kubernetes
+## Déploiement Kubernetes
 
 #### Prérequis
 
