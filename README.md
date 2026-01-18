@@ -14,6 +14,8 @@ Application web de gestion de budget personnel développée avec Flask. Suivez v
 - [Fonctionnalités principales](#fonctionnalités-principales)
 - [Technologies utilisées](#technologies-utilisées)
 - [Installation](#installation)
+  - [Déploiement local](#déploiement-local)
+  - [Déploiement Kubernetes](#déploiement-kubernetes)
 - [Guide d'utilisation](#guide-dutilisation)
   - [Gestion des catégories](#1-gestion-des-catégories)
   - [Gestion des transactions](#2-gestion-des-transactions)
@@ -39,15 +41,19 @@ Application web de gestion de budget personnel développée avec Flask. Suivez v
 ## Technologies utilisées
 
 - **Backend** : Flask (Python)
-- **Base de données** : SQLite
+- **Base de données** : SQLite (local) / PostgreSQL (Kubernetes)
 - **Frontend** : HTML5, CSS3, JavaScript
 - **Visualisation** : Graphiques interactifs (Chart.js ou équivalent)
+- **Orchestration** : Kubernetes / Minikube
+- **Architecture** : Microservices (Gateway, Service Écriture, Service Lecture)
 
 ---
 
 ## Installation
 
-### Prérequis
+### Déploiement local
+
+#### Prérequis
 
 - Python 3.8 ou version supérieure
 - pip (gestionnaire de paquets Python)
@@ -125,6 +131,89 @@ Il vous est également possible de réinitialiser la base de donnés en cliquant
 
 <img width="250" height="577" alt="image" src="https://github.com/user-attachments/assets/b3e8e2c5-184f-45f8-a3a0-39a1ba3844da" />
 
+---
+
+### Déploiement Kubernetes
+
+#### Prérequis
+
+- Minikube installé
+- Docker installé
+- kubectl installé et configuré
+
+#### Déploiement automatique avec le script
+
+Le script `deploy.sh` automatise l'ensemble du déploiement sur Kubernetes :
+
+```bash
+./deploy.sh
+```
+
+Ce script effectue les opérations suivantes :
+
+1. Démarre Minikube avec le driver Docker
+2. Active les addons Ingress et metrics-server
+3. Configure Docker pour utiliser le daemon Minikube
+4. Build les images Docker des microservices :
+   - Gateway
+   - Service Écriture
+   - Service Lecture
+5. Déploie les ressources Kubernetes dans l'ordre :
+   - Namespace `budgeometre`
+   - ConfigMap et Secret
+   - PostgreSQL (StatefulSet)
+   - Services Écriture et Lecture
+   - Gateway
+   - Ingress
+   - HPA (Horizontal Pod Autoscaler)
+   - Network Policy
+6. Attend que tous les pods soient prêts
+7. Affiche le statut du déploiement
+
+#### Accéder à l'application
+
+Après le déploiement, configurez votre fichier `/etc/hosts` (Linux/Mac) ou `C:\Windows\System32\drivers\etc\hosts` (Windows) :
+
+```bash
+# Récupérer l'IP de Minikube
+minikube ip
+
+# Ajouter l'entrée (remplacez <MINIKUBE_IP> par l'IP affichée)
+echo "<MINIKUBE_IP> budgeometre.local" | sudo tee -a /etc/hosts
+```
+
+Ouvrez votre navigateur et accédez à : **http://budgeometre.local**
+
+#### Vérifier le déploiement
+
+```bash
+# Voir les pods
+kubectl get pods -n budgeometre
+
+# Voir les services
+kubectl get services -n budgeometre
+
+# Voir l'ingress
+kubectl get ingress -n budgeometre
+
+# Voir les logs d'un pod
+kubectl logs <nom-du-pod> -n budgeometre
+```
+
+#### Nettoyer le déploiement
+
+Pour supprimer l'application de Kubernetes :
+
+```bash
+./cleanup.sh
+```
+
+Ou manuellement :
+
+```bash
+kubectl delete namespace budgeometre
+minikube stop
+```
 
 ---
 
