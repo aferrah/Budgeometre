@@ -172,17 +172,46 @@ Ce script effectue les opérations suivantes :
 
 #### Accéder à l'application
 
-Après le déploiement, configurez votre fichier `/etc/hosts` (Linux/Mac) ou `C:\Windows\System32\drivers\etc\hosts` (Windows) :
+**Option 1 : Port forwarding (recommandé pour Windows)**
+
+La méthode la plus simple sur Windows est d'utiliser le port forwarding kubectl :
 
 ```bash
-# Récupérer l'IP de Minikube
-minikube ip
-
-# Ajouter l'entrée (remplacez <MINIKUBE_IP> par l'IP affichée)
-echo "<MINIKUBE_IP> budgeometre.local" | sudo tee -a /etc/hosts
+# Forward le port 80 du gateway vers le port 8080 local
+kubectl port-forward -n budgeometre service/gateway 8080:80
 ```
 
-Ouvrez votre navigateur et accédez à : **http://budgeometre.local**
+Ouvrez ensuite votre navigateur et accédez à : **http://localhost:8080**
+
+**Option 2 : Configuration DNS avec le fichier hosts**
+
+Sur Windows, vous devez modifier le fichier hosts en tant qu'administrateur :
+
+```powershell
+# 1. Récupérer l'IP de Minikube
+minikube ip
+
+# 2. Ouvrir le fichier hosts en administrateur
+notepad C:\Windows\System32\drivers\etc\hosts
+
+# 3. Ajouter cette ligne à la fin (remplacez <MINIKUBE_IP> par l'IP affichée) :
+# <MINIKUBE_IP> budgeometre.local
+```
+
+Exemple :
+```
+192.168.49.2 budgeometre.local
+```
+
+Sauvegardez le fichier et accédez à : **http://budgeometre.local**
+
+**Option 3 : Accès direct via minikube service (alternative)**
+
+```bash
+minikube service gateway -n budgeometre
+```
+
+Cette commande ouvre automatiquement votre navigateur avec l'URL correcte.
 
 #### Peupler la base de données avec 6 mois de données de test
 
