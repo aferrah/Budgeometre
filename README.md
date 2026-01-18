@@ -186,27 +186,36 @@ kubectl port-forward -n budgeometre service/gateway 8080:80
 
 Ouvrez ensuite votre navigateur et accédez à : **http://localhost:8080**
 
-**Option 2 : Configuration DNS avec le fichier hosts**
+**Option 2 : Configuration DNS avec le fichier hosts et minikube tunnel**
 
-Sur Windows, vous devez modifier le fichier hosts en tant qu'administrateur :
+Sur Windows avec le driver Docker, l'IP de Minikube n'est pas directement accessible. Il faut utiliser `minikube tunnel` pour créer un pont réseau :
 
 ```powershell
-# 1. Récupérer l'IP de Minikube
-minikube ip
+# 1. Activer l'addon Ingress (si ce n'est pas déjà fait)
+minikube addons enable ingress
 
-# 2. Ouvrir le fichier hosts en administrateur
+# 2. Lancer minikube tunnel dans un terminal séparé (en administrateur)
+minikube tunnel
+```
+
+**Important** : Laissez ce terminal ouvert tant que vous voulez accéder à l'application.
+
+```powershell
+# 3. Ouvrir le fichier hosts en administrateur
 notepad C:\Windows\System32\drivers\etc\hosts
 
-# 3. Ajouter cette ligne à la fin (remplacez <MINIKUBE_IP> par l'IP affichée) :
-# <MINIKUBE_IP> budgeometre.local
+# 4. Ajouter cette ligne à la fin (notez 127.0.0.1, pas l'IP de Minikube)
+127.0.0.1 budgeometre.local
 ```
 
-Exemple :
-```
-192.168.49.2 budgeometre.local
+```powershell
+# 5. Vider le cache DNS
+ipconfig /flushdns
 ```
 
-Sauvegardez le fichier et accédez à : **http://budgeometre.local**
+Accédez ensuite à : **http://budgeometre.local**
+
+> **Note** : Cette méthode nécessite de laisser `minikube tunnel` actif en arrière-plan. Si vous préférez une solution sans tunnel, utilisez l'Option 1 (port-forwarding) qui est plus simple et tout aussi efficace.
 
 **Option 3 : Accès direct via minikube service (alternative)**
 
