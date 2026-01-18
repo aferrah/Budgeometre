@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lecture-service
+  labels:
+    app: lecture-service
+spec:
+  replicas: {{ .Values.lecture.replicaCount }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: lecture-service
+  template:
+    metadata:
+      labels:
+        app: lecture-service
+    spec:
+      initContainers:
+      - name: wait-for-postgres
+        image: {{ .Values.busybox.image }}
+        command: ['sh', '-c', 'until nc -z postgres-service 5432; do echo waiting for postgres; sleep 2; done;']
+      containers:
+      - name: lecture-service
+        image: {{ .Values.lecture.image }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        ports:
+        - containerPort: 5002
+          name: http
+        env:
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: budgeometre-secrets
+              key: DATABASE_URL
+        - name: SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: budgeometre-secrets
+              key: SECRET_KEY
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 5002
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 5002
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        resources:
+          requests:
+            cpu: {{ .Values.lecture.resources.requests.cpu }}
+            memory: {{ .Values.lecture.resources.requests.memory }}
+          limits:
+            cpu: {{ .Values.lecture.resources.limits.cpu }}
+            memory: {{ .Values.lecture.resources.limits.memory }}

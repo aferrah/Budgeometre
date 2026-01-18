@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gateway
+  labels:
+    app: gateway
+spec:
+  replicas: {{ .Values.gateway.replicaCount }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: gateway
+  template:
+    metadata:
+      labels:
+        app: gateway
+    spec:
+      initContainers:
+      - name: wait-for-services
+        image: {{ .Values.busybox.image }}
+        command: ['sh', '-c', 'until nc -z ecriture-service 5001 && nc -z lecture-service 5002; do echo waiting for services; sleep 2; done;']
+      containers:
+      - name: gateway
+        image: {{ .Values.gateway.image }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        ports:
+        - containerPort: 5000
+          name: http
+        env:
+        - name: SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: budgeometre-secrets
+              key: SECRET_KEY
+        - name: ECRITURE_SERVICE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: budgeometre-config
+              key: ECRITURE_SERVICE_URL
+        - name: LECTURE_SERVICE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: budgeometre-config
+              key: LECTURE_SERVICE_URL
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 5000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 5000
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        resources:
+          requests:
+            cpu: {{ .Values.gateway.resources.requests.cpu }}
+            memory: {{ .Values.gateway.resources.requests.memory }}
+          limits:
+            cpu: {{ .Values.gateway.resources.limits.cpu }}
+            memory: {{ .Values.gateway.resources.limits.memory }}

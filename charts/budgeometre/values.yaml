@@ -1,0 +1,68 @@
+namespace: budgeometre
+
+image:
+  pullPolicy: Never
+
+busybox:
+  image: busybox:latest
+
+postgres:
+  image: postgres:15-alpine
+  user: "budgeometre_user"
+  database: "budgeometre_db"
+  db: "budgeometre_db"
+  password: "budgeometre_pass_2024"
+  persistence:
+    storage: 5Gi
+    size: 5Gi
+    storageClass: "standard"
+  resources:
+    requests:
+      cpu: 100m
+      memory: 100Mi
+    limits:
+      cpu: 200m
+      memory: 200Mi
+
+gateway:
+  replicaCount: 3
+  image: gateway:latest
+  service:
+    port: 5000
+    nodePort: 30000
+  resources:
+    requests:
+      cpu: 100m
+      memory: 100Mi
+    limits:
+      cpu: 200m
+      memory: 200Mi
+
+ecriture:
+  replicaCount: 3
+  image: ecriture-service:latest
+  service:
+    port: 5001
+  resources:
+    requests:
+      cpu: 100m
+      memory: 100Mi
+    limits:
+      cpu: 200m
+      memory: 200Mi
+
+lecture:
+  replicaCount: 3
+  image: lecture-service:latest
+  service:
+    port: 5002
+  resources:
+    requests:
+      cpu: 100m
+      memory: 100Mi
+    limits:
+      cpu: 200m
+      memory: 200Mi
+
+ingress:
+  host: budgeometre.local

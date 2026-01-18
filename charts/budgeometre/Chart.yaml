@@ -1,0 +1,6 @@
+apiVersion: v2
+name: budgeometre
+description: Un graphique Helm pour le projet Budgeomètre
+type: application
+version: 0.1.0
+appVersion: "1.0.0"

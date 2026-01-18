@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: ecriture-service
+  labels:
+    app: ecriture-service
+spec:
+  type: ClusterIP
+  ports:
+  - port: {{ .Values.ecriture.service.port }}
+    targetPort: 5001
+    protocol: TCP
+    name: http
+  selector:
+    app: ecriture-service

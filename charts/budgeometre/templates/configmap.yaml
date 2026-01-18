@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: budgeometre-config
+data:
+  POSTGRES_USER: {{ .Values.postgres.user | quote }}
+  POSTGRES_DB: {{ .Values.postgres.db | quote }}
+  ECRITURE_SERVICE_URL: "http://ecriture-service:{{ .Values.ecriture.service.port }}"
+  LECTURE_SERVICE_URL: "http://lecture-service:{{ .Values.lecture.service.port }}"
