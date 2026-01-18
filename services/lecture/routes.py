@@ -8,14 +8,6 @@ import json
 
 lecture_bp = Blueprint('lecture', __name__)
 
-# Catégories à exclure des calculs revenus/dépenses
-CATEGORIES_EXCLUES = ['Épargne', 'Solde précédent']
-
-
-def get_ids_exclus():
-    """Retourne les IDs des catégories à exclure"""
-    return [c.idCategorie for c in Categorie.query.filter(Categorie.nom.in_(CATEGORIES_EXCLUES)).all()]
-
 
 @lecture_bp.route('/home')
 def get_home():
@@ -25,36 +17,34 @@ def get_home():
     transactions = Transaction.query.filter(Transaction.dateTransaction >= date_limite).order_by(
         Transaction.dateTransaction.desc()).all()
 
-    ids_exclus = get_ids_exclus()
+    # Exclure la catégorie Épargne des calculs revenus/dépenses affichés
+    cat_epargne = Categorie.query.filter_by(nom='Épargne').first()
+    epargne_id = cat_epargne.idCategorie if cat_epargne else -1
 
-    # Revenus = transactions positives hors catégories exclues
+    # Revenus = transactions positives hors épargne
     total_revenus = float(db.session.query(db.func.coalesce(db.func.sum(Transaction.montant), 0)).filter(
         Transaction.montant > 0,
         Transaction.dateTransaction >= start_of_month,
-        ~Transaction.idCategorie.in_(ids_exclus) if ids_exclus else True
+        Transaction.idCategorie != epargne_id
     ).scalar() or 0)
 
-    # Dépenses = transactions négatives hors catégories exclues
+    # Dépenses = transactions négatives hors épargne
     total_depenses_raw = float(db.session.query(db.func.coalesce(db.func.sum(Transaction.montant), 0)).filter(
         Transaction.montant < 0,
         Transaction.dateTransaction >= start_of_month,
-        ~Transaction.idCategorie.in_(ids_exclus) if ids_exclus else True
+        Transaction.idCategorie != epargne_id
     ).scalar() or 0)
 
-    # Argent actuel = TOUTES les transactions du mois
+    # Argent actuel = TOUTES les transactions du mois (y compris épargne)
     argent_actuel = float(db.session.query(db.func.coalesce(db.func.sum(Transaction.montant), 0)).filter(
         Transaction.dateTransaction >= start_of_month
     ).scalar() or 0)
 
     total_epargne = float(db.session.query(db.func.coalesce(db.func.sum(Objectif.epargne_actuelle), 0)).scalar() or 0)
-    return jsonify({
-        'transactions': [t.to_dict() for t in transactions],
-        'argentActuel': argent_actuel,
-        'total_revenus': total_revenus,
-        'total_depenses': abs(total_depenses_raw),
-        'total_epargne': total_epargne,
-        'nb_anciennes': Transaction.query.filter(Transaction.dateTransaction < date_limite).count()
-    })
+    return jsonify({'transactions': [t.to_dict() for t in transactions], 'argentActuel': argent_actuel,
+                    'total_revenus': total_revenus, 'total_depenses': abs(total_depenses_raw),
+                    'total_epargne': total_epargne,
+                    'nb_anciennes': Transaction.query.filter(Transaction.dateTransaction < date_limite).count()})
 
 
 @lecture_bp.route('/categories')
@@ -72,14 +62,13 @@ def get_categories():
         d['pourcentage'] = (dep / float(cat.limite_budget) * 100) if cat.limite_budget and float(
             cat.limite_budget) > 0 else 0
         d['nb_transactions'] = len(cat.transactions)
+        # Inclure les transactions pour l'affichage dans le dropdown
         d['transactions'] = [t.to_dict() for t in
                              sorted(cat.transactions, key=lambda x: x.dateTransaction, reverse=True)]
         result.append(d)
-    return jsonify({
-        'categories': result,
-        'total_revenus': float(db.session.query(db.func.coalesce(db.func.sum(Transaction.montant), 0)).filter(
-            Transaction.montant > 0).scalar() or 0)
-    })
+    return jsonify({'categories': result, 'total_revenus': float(
+        db.session.query(db.func.coalesce(db.func.sum(Transaction.montant), 0)).filter(
+            Transaction.montant > 0).scalar() or 0)})
 
 
 @lecture_bp.route('/categories/<int:id>')
@@ -98,6 +87,8 @@ def get_depenses_categorie(id):
     trans = Transaction.query.filter(Transaction.idCategorie == id, Transaction.montant < 0).order_by(
         Transaction.dateTransaction.desc()).all()
     now = datetime.utcnow()
+
+    # Données par mois (12 derniers mois)
     par_mois = defaultdict(float)
     for t in trans:
         par_mois[t.dateTransaction.strftime('%Y-%m')] += float(-t.montant)
@@ -106,16 +97,47 @@ def get_depenses_categorie(id):
         d = now - timedelta(days=i * 30)
         mois_labels.append(d.strftime('%b %Y'))
         mois_data.append(par_mois.get(d.strftime('%Y-%m'), 0))
+
+    # Données par trimestre (8 derniers trimestres)
+    par_trimestre = defaultdict(float)
+    for t in trans:
+        q = (t.dateTransaction.month - 1) // 3 + 1
+        key = f"{t.dateTransaction.year}-T{q}"
+        par_trimestre[key] += float(-t.montant)
+
+    trimestre_labels, trimestre_data = [], []
+    for i in range(7, -1, -1):
+        current_quarter = (now.month - 1) // 3
+        target_quarter = current_quarter - i
+        target_year = now.year
+        while target_quarter < 0:
+            target_quarter += 4
+            target_year -= 1
+        key = f"{target_year}-T{target_quarter + 1}"
+        trimestre_labels.append(f"T{target_quarter + 1} {target_year}")
+        trimestre_data.append(par_trimestre.get(key, 0))
+
+    # Données par année (5 dernières années)
+    par_annee = defaultdict(float)
+    for t in trans:
+        par_annee[t.dateTransaction.year] += float(-t.montant)
+
+    annee_labels, annee_data = [], []
+    for i in range(4, -1, -1):
+        year = now.year - i
+        annee_labels.append(str(year))
+        annee_data.append(par_annee.get(year, 0))
+
     return jsonify({
         'categorie': cat.to_dict(),
         'transactions': [t.to_dict() for t in trans[:10]],
         'total_depenses': sum(float(-t.montant) for t in trans),
         'mois_labels': mois_labels,
         'mois_data': mois_data,
-        'trimestre_labels': [],
-        'trimestre_data': [],
-        'annee_labels': [],
-        'annee_data': []
+        'trimestre_labels': trimestre_labels,
+        'trimestre_data': trimestre_data,
+        'annee_labels': annee_labels,
+        'annee_data': annee_data
     })
 
 
@@ -126,10 +148,8 @@ def get_transactions():
 
 @lecture_bp.route('/transactions/<int:id>')
 def get_transaction(id):
-    return jsonify({
-        'transaction': Transaction.query.get_or_404(id).to_dict(),
-        'categories': [c.to_dict() for c in Categorie.query.order_by(Categorie.nom).all()]
-    })
+    return jsonify({'transaction': Transaction.query.get_or_404(id).to_dict(),
+                    'categories': [c.to_dict() for c in Categorie.query.order_by(Categorie.nom).all()]})
 
 
 @lecture_bp.route('/objectifs')
@@ -142,10 +162,7 @@ def get_objectifs():
         d['pourcentage'] = (d['epargne'] / d['montant_cible'] * 100) if d['montant_cible'] > 0 else 0
         d['status'] = 'Atteint' if d['epargne'] >= d['montant_cible'] else 'En cours'
         result.append(d)
-    return jsonify({
-        'objectifs_status': result,
-        'categories': [c.to_dict() for c in Categorie.query.all()]
-    })
+    return jsonify({'objectifs_status': result, 'categories': [c.to_dict() for c in Categorie.query.all()]})
 
 
 @lecture_bp.route('/archives')
@@ -156,10 +173,7 @@ def get_archives():
     dispo = [{'annee': y, 'mois': m} for y, m in
              sorted({(t.dateTransaction.year, t.dateTransaction.month) for t in Transaction.query.all()}, reverse=True)
              if (y, m) not in existantes and (y < now.year or m < now.month)]
-    return jsonify({
-        'archives': [a.to_dict() for a in archives],
-        'mois_disponibles': dispo
-    })
+    return jsonify({'archives': [a.to_dict() for a in archives], 'mois_disponibles': dispo})
 
 
 @lecture_bp.route('/archives/<int:id>')
@@ -167,68 +181,67 @@ def get_archive(id):
     a = ArchiveMensuelle.query.get_or_404(id)
     noms = ['', 'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre',
             'Novembre', 'Décembre']
-    return jsonify({
-        'archive': a.to_dict(),
-        'donnees': json.loads(a.donnees_json or '{}'),
-        'nom_mois': noms[a.mois]
-    })
+    return jsonify({'archive': a.to_dict(), 'donnees': json.loads(a.donnees_json or '{}'), 'nom_mois': noms[a.mois]})
 
 
 @lecture_bp.route('/dashboard')
 def get_dashboard():
     now = datetime.utcnow()
-    ids_exclus = get_ids_exclus()
+
+    # Exclure la catégorie Épargne
+    cat_epargne = Categorie.query.filter_by(nom='Épargne').first()
+    epargne_id = cat_epargne.idCategorie if cat_epargne else -1
 
     def stats(start, end=None):
         qd = db.session.query(func.coalesce(func.sum(Transaction.montant), 0)).filter(
             Transaction.montant < 0,
-            Transaction.dateTransaction >= start
+            Transaction.dateTransaction >= start,
+            Transaction.idCategorie != epargne_id
         )
         qr = db.session.query(func.coalesce(func.sum(Transaction.montant), 0)).filter(
             Transaction.montant > 0,
-            Transaction.dateTransaction >= start
+            Transaction.dateTransaction >= start,
+            Transaction.idCategorie != epargne_id
         )
-        if ids_exclus:
-            qd = qd.filter(~Transaction.idCategorie.in_(ids_exclus))
-            qr = qr.filter(~Transaction.idCategorie.in_(ids_exclus))
         if end:
-            qd = qd.filter(Transaction.dateTransaction < end)
-            qr = qr.filter(Transaction.dateTransaction < end)
+            qd, qr = qd.filter(Transaction.dateTransaction < end), qr.filter(Transaction.dateTransaction < end)
         return float(-(qd.scalar() or 0)), float(qr.scalar() or 0)
 
-    def cat_dep(start):
+    def cat_dep(start, end=None):
         q = db.session.query(Categorie.nom, func.coalesce(func.sum(Transaction.montant), 0)).join(Transaction).filter(
             Transaction.montant < 0,
-            Transaction.dateTransaction >= start
+            Transaction.dateTransaction >= start,
+            Transaction.idCategorie != epargne_id
         )
-        if ids_exclus:
-            q = q.filter(~Transaction.idCategorie.in_(ids_exclus))
+        if end:
+            q = q.filter(Transaction.dateTransaction < end)
         r = q.group_by(Categorie.idCategorie).all()
         return {n: float(-m) for n, m in r}
 
+    # Périodes pour les stats principales
+    # Mois : ce mois calendaire
     sm = datetime(now.year, now.month, 1)
-    sq = datetime(now.year, ((now.month - 1) // 3) * 3 + 1, 1)
-    sy = datetime(now.year, 1, 1)
+
+    # Trimestre : les 3 derniers mois (période glissante pour avoir des données significatives)
+    sq = now - timedelta(days=90)
+
+    # Année : les 12 derniers mois (période glissante)
+    sy = now - timedelta(days=365)
 
     dm, rm = stats(sm)
     dt, rt = stats(sq)
     da, ra = stats(sy)
-
     cats = Categorie.query.all()
-    ids = {c.nom: c.idCategorie for c in cats}
-    colors = {c.nom: c.couleur or '#8b5cf6' for c in cats}
-
+    ids, colors = {c.nom: c.idCategorie for c in cats}, {c.nom: c.couleur or '#8b5cf6' for c in cats}
     nb, ok, alerts = 0, 0, []
     for c in cats:
-        if c.nom in CATEGORIES_EXCLUES:
-            continue
+        if c.nom == 'Épargne':
+            continue  # Ignorer la catégorie Épargne
         if c.limite_budget and float(c.limite_budget) > 0:
             nb += 1
             d = float(-(db.session.query(func.coalesce(func.sum(Transaction.montant), 0)).filter(
-                Transaction.idCategorie == c.idCategorie,
-                Transaction.montant < 0,
-                Transaction.dateTransaction >= sm
-            ).scalar() or 0))
+                Transaction.idCategorie == c.idCategorie, Transaction.montant < 0,
+                Transaction.dateTransaction >= sm).scalar() or 0))
             if d <= float(c.limite_budget):
                 ok += 1
             p = d / float(c.limite_budget) * 100
@@ -236,43 +249,60 @@ def get_dashboard():
                 alerts.append({'type': 'danger', 'category': c.nom, 'message': f'Dépassé ({p:.0f}%)'})
             elif p >= 80:
                 alerts.append({'type': 'warning', 'category': c.nom, 'message': f'{p:.0f}% utilisé'})
-
+    # Évolution par mois (6 derniers mois)
     el, ed, er = [], [], []
     for i in range(5, -1, -1):
         d = now - timedelta(days=i * 30)
-        s = datetime(d.year, d.month, 1)
-        e = datetime(d.year + (1 if d.month == 12 else 0), (d.month % 12) + 1, 1)
+        s, e = datetime(d.year, d.month, 1), datetime(d.year + (1 if d.month == 12 else 0), (d.month % 12) + 1, 1)
         dep, rev = stats(s, e)
         el.append(d.strftime('%b'))
         ed.append(dep)
         er.append(rev)
 
+    # Évolution par trimestre (4 derniers trimestres)
+    tl, td, tr = [], [], []
+    for i in range(3, -1, -1):
+        # Calculer le trimestre i trimestres avant le trimestre actuel
+        current_quarter = (now.month - 1) // 3  # 0, 1, 2, ou 3
+        target_quarter = current_quarter - i
+        target_year = now.year
+        while target_quarter < 0:
+            target_quarter += 4
+            target_year -= 1
+        # Premier mois du trimestre: 1, 4, 7, ou 10
+        start_month = target_quarter * 3 + 1
+        s = datetime(target_year, start_month, 1)
+        # Fin du trimestre
+        end_month = start_month + 3
+        end_year = target_year
+        if end_month > 12:
+            end_month = 1
+            end_year += 1
+        e = datetime(end_year, end_month, 1)
+        dep, rev = stats(s, e)
+        tl.append(f'T{target_quarter + 1} {target_year}')
+        td.append(dep)
+        tr.append(rev)
+
+    # Évolution par année (3 dernières années)
+    yl, yd, yr = [], [], []
+    for i in range(2, -1, -1):
+        target_year = now.year - i
+        s = datetime(target_year, 1, 1)
+        e = datetime(target_year + 1, 1, 1)
+        dep, rev = stats(s, e)
+        yl.append(str(target_year))
+        yd.append(dep)
+        yr.append(rev)
+
     return jsonify({
-        'dep_mois': dm,
-        'rev_mois': rm,
-        'solde_mois': rm - dm,
-        'cat_mois': cat_dep(sm),
-        'dep_trim': dt,
-        'rev_trim': rt,
-        'solde_trim': rt - dt,
-        'cat_trim': cat_dep(sq),
-        'dep_annee': da,
-        'rev_annee': ra,
-        'solde_annee': ra - da,
-        'cat_annee': cat_dep(sy),
-        'objectifs_respectes': ok,
-        'nb_objectifs': nb,
+        'dep_mois': dm, 'rev_mois': rm, 'solde_mois': rm - dm, 'cat_mois': cat_dep(sm),
+        'dep_trim': dt, 'rev_trim': rt, 'solde_trim': rt - dt, 'cat_trim': cat_dep(sq),
+        'dep_annee': da, 'rev_annee': ra, 'solde_annee': ra - da, 'cat_annee': cat_dep(sy),
+        'objectifs_respectes': ok, 'nb_objectifs': nb,
         'ratio_objectifs': int(100 * ok / nb) if nb else 0,
-        'evol_mois_labels': el,
-        'evol_mois_dep': ed,
-        'evol_mois_rev': er,
-        'evol_trim_labels': [],
-        'evol_trim_dep': [],
-        'evol_trim_rev': [],
-        'evol_annee_labels': [],
-        'evol_annee_dep': [],
-        'evol_annee_rev': [],
-        'categories_ids': ids,
-        'categories_colors': colors,
-        'budget_alerts': alerts
+        'evol_mois_labels': el, 'evol_mois_dep': ed, 'evol_mois_rev': er,
+        'evol_trim_labels': tl, 'evol_trim_dep': td, 'evol_trim_rev': tr,
+        'evol_annee_labels': yl, 'evol_annee_dep': yd, 'evol_annee_rev': yr,
+        'categories_ids': ids, 'categories_colors': colors, 'budget_alerts': alerts
     })

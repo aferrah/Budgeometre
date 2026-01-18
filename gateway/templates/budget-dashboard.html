@@ -1,3 +1,4 @@
+
 {% extends "base.html" %}
 {% block title %}Budgeomètre - Dashboard{% endblock %}
 {% block head_extra %}
@@ -115,7 +116,7 @@
         "evolutionLabels": {{ evol_trim_labels | tojson }},
         "evolutionDep": {{ evol_trim_dep | tojson }},
         "evolutionRev": {{ evol_trim_rev | tojson }},
-        "label": "ce trimestre",
+        "label": "3 derniers mois",
         "evolutionTitle": "Évolution (4 derniers trimestres)"
       },
       "year": {
@@ -126,7 +127,7 @@
         "evolutionLabels": {{ evol_annee_labels | tojson }},
         "evolutionDep": {{ evol_annee_dep | tojson }},
         "evolutionRev": {{ evol_annee_rev | tojson }},
-        "label": "cette année",
+        "label": "12 derniers mois",
         "evolutionTitle": "Évolution (3 dernières années)"
       }
     },

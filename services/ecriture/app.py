@@ -95,6 +95,7 @@ with app.app_context():
         print(f"[INIT] Erreur lors de l'initialisation du report: {e}")
 
 
+
 # Endpoint de health check pour Kubernetes
 @app.route('/health')
 def health():
