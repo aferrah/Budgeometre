@@ -13,6 +13,7 @@ Application web de gestion de budget personnel développée avec Flask. Suivez v
 - [À propos](#à-propos)
 - [Fonctionnalités principales](#fonctionnalités-principales)
 - [Technologies utilisées](#technologies-utilisées)
+- [Structure du projet](#structure-du-projet)
 - [Déploiement Kubernetes](#déploiement-kubernetes)
 - [Guide d'utilisation](#guide-dutilisation)
   - [Gestion des catégories](#1-gestion-des-catégories)
@@ -44,6 +45,94 @@ Application web de gestion de budget personnel développée avec Flask. Suivez v
 - **Visualisation** : Graphiques interactifs (Chart.js ou équivalent)
 - **Orchestration** : Kubernetes / Minikube
 - **Architecture** : Microservices (Gateway, Service Écriture, Service Lecture)
+
+---
+
+## Structure du projet
+
+Le projet Budgeomètre suit une architecture microservices organisée en plusieurs modules distincts. Le **gateway** gère l'interface utilisateur et orchestre les requêtes, le **service écriture** traite toutes les opérations de création, modification et suppression, tandis que le **service lecture** optimise les requêtes de consultation. Cette séparation permet une meilleure scalabilité et maintenabilité du code.
+
+```
+Budgeometre/
+├── cleanup.sh                    
+├── deploy.sh                     
+├── docker-compose.yml            
+├── README.md                    
+├── requirements.txt              
+│
+├── database/                    
+│   ├── init.sql                 
+│   └── seed_data.sql           
+│
+├── gateway/                    
+│   ├── app.py                 
+│   ├── config.py                
+│   ├── Dockerfile              
+│   ├── requirements.txt          
+│   ├── routes/                   
+│   │   ├── __init__.py
+│   │   └── views.py             
+│   ├── static/                  
+│   │   ├── css/                
+│   │   ├── js/                   
+│   │   └── widget/              
+│   └── templates/                
+│       ├── base.html           
+│       ├── index.html            
+│       ├── add-expense.html      
+│       ├── archive-detail.html   
+│       ├── archives.html         
+│       ├── budget-dashboard.html 
+│       ├── categories.html      
+│       ├── detail-depense.html 
+│       ├── mes-depenses.html    
+│       ├── mes-objectifs.html    
+│       ├── modifier-categorie.html    
+│       └── modifier-transaction.html  
+│
+├── services/                    
+│   ├── ecriture/                 
+│   │   ├── app.py                
+│   │   ├── routes.py            
+│   │   ├── seed_data.py        
+│   │   ├── Dockerfile            
+│   │   └── requirements.txt      
+│   └── lecture/                  
+│       ├── app.py                
+│       ├── routes.py             
+│       ├── Dockerfile            
+│       └── requirements.txt   
+│
+├── shared/                      
+│   ├── config.py                 
+│   ├── extensions.py             
+│   └── models/                   
+│       ├── __init__.py
+│       ├── archive.py            
+│       ├── categorie.py         
+│       ├── objectif.py           
+│       └── transaction.py        
+│
+└── k8s/                          
+    ├── README.md                
+    ├── namespace.yaml           
+    ├── configmap.yaml            
+    ├── secret.yaml               
+    ├── postgres-init-configmap.yaml   
+    ├── postgres-statefulset.yaml      
+    ├── postgres-deployment.yaml      
+    ├── postgres-service.yaml         
+    ├── postgres-pvc.yaml             
+    ├── ecriture-deployment.yaml      
+    ├── ecriture-service.yaml        
+    ├── lecture-deployment.yaml       
+    ├── lecture-service.yaml         
+    ├── gateway-deployment.yaml       
+    ├── gateway-service.yaml          
+    ├── ingress.yaml                 
+    ├── hpa.yaml                      
+    └── network-policy.yaml           
+```
 
 ---
 
