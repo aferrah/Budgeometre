@@ -255,7 +255,7 @@ def seed_6_mois():
         print(f"  ✓ Archive créée: {mois:02d}/{annee} ({len(trans_mois)} transactions, solde: {solde:.2f}€)")
 
     db.session.commit()
-    print("\n[SEED] ✅ Injection terminée !")
+    print("\n[SEED] Injection terminée !")
 
 
 if __name__ == '__main__':
