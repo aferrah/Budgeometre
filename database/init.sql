@@ -48,13 +48,3 @@ CREATE TABLE IF NOT EXISTS "ARCHIVE_MENSUELLE" (
 CREATE INDEX IF NOT EXISTS idx_transaction_date ON "TRANSACTION"("dateTransaction");
 CREATE INDEX IF NOT EXISTS idx_transaction_categorie ON "TRANSACTION"("idCategorie");
 CREATE INDEX IF NOT EXISTS idx_archive_date ON "ARCHIVE_MENSUELLE"("annee", "mois");
-
--- Catégories par défaut
-INSERT INTO "CATEGORIE" ("nom", "description", "couleur", "limite_budget") VALUES
-    ('Alimentation', 'Courses et restaurants', '#ef4444', 400),
-    ('Transport', 'Déplacements', '#3b82f6', 150),
-    ('Loisirs', 'Sorties et activités', '#a855f7', 200),
-    ('Logement', 'Loyer et charges', '#f59e0b', 800),
-    ('Santé', 'Soins médicaux', '#14b8a6', 100),
-    ('Autre', 'Catégorie par défaut', '#64748b', 0)
-ON CONFLICT DO NOTHING;
