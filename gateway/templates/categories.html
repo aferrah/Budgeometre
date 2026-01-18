@@ -47,7 +47,7 @@
                             <div class="category-description">{{ cat.description or 'Aucune description' }}</div>
                         </div>
                         <div class="category-stats">
-                            <div class="count">{{ cat.transactions|length }}</div>
+                            <div class="count">{{ cat.nb_transactions|default(0) }}</div>
                             <div class="label">transaction(s)</div>
                         </div>
                         <div class="category-actions">

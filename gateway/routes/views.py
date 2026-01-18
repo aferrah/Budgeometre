@@ -12,30 +12,42 @@ dashboard_bp = Blueprint('dashboard', __name__)
 def api_get(endpoint):
     try:
         r = requests.get(f"{current_app.config['LECTURE_URL']}/api{endpoint}", timeout=10)
+        if not r.ok:
+            current_app.logger.error(f"GET {endpoint} failed: {r.status_code} - {r.text}")
         return r.json() if r.ok else {}
-    except:
+    except Exception as e:
+        current_app.logger.error(f"GET {endpoint} error: {e}")
         return {}
 
 def api_post(endpoint, data=None):
     try:
         r = requests.post(f"{current_app.config['ECRITURE_URL']}/api{endpoint}", json=data or {}, timeout=10)
+        if not r.ok:
+            current_app.logger.error(f"POST {endpoint} failed: {r.status_code} - {r.text}")
         return r.json()
-    except:
-        return {'success': False, 'message': 'Erreur connexion'}
+    except Exception as e:
+        current_app.logger.error(f"POST {endpoint} error: {e}")
+        return {'success': False, 'message': f'Erreur connexion: {str(e)}'}
 
 def api_put(endpoint, data):
     try:
         r = requests.put(f"{current_app.config['ECRITURE_URL']}/api{endpoint}", json=data, timeout=10)
+        if not r.ok:
+            current_app.logger.error(f"PUT {endpoint} failed: {r.status_code} - {r.text}")
         return r.json()
-    except:
-        return {'success': False, 'message': 'Erreur connexion'}
+    except Exception as e:
+        current_app.logger.error(f"PUT {endpoint} error: {e}")
+        return {'success': False, 'message': f'Erreur connexion: {str(e)}'}
 
 def api_delete(endpoint):
     try:
         r = requests.delete(f"{current_app.config['ECRITURE_URL']}/api{endpoint}", timeout=10)
+        if not r.ok:
+            current_app.logger.error(f"DELETE {endpoint} failed: {r.status_code} - {r.text}")
         return r.json()
-    except:
-        return {'success': False, 'message': 'Erreur connexion'}
+    except Exception as e:
+        current_app.logger.error(f"DELETE {endpoint} error: {e}")
+        return {'success': False, 'message': f'Erreur connexion: {str(e)}'}
 
 class Proxy:
     def __init__(self, d):

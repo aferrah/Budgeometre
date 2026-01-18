@@ -16,3 +16,16 @@ class Objectif(db.Model):
 
     def __repr__(self):
         return f"<Objectif {self.description} {self.montant}>"
+
+    def to_dict(self):
+        return {
+            'idObjectif': self.idObjectif,
+            'montant': float(self.montant) if self.montant else 0,
+            'epargne_actuelle': float(self.epargne_actuelle) if self.epargne_actuelle else 0,
+            'description': self.description,
+            'frequence': self.frequence,
+            'dateDebut': self.dateDebut.isoformat() if self.dateDebut else None,
+            'dateFin': self.dateFin.isoformat() if self.dateFin else None,
+            'idCategorie': self.idCategorie,
+            'categorie': self.categorie.to_dict() if self.categorie else None
+        }
