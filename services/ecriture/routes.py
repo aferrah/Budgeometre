@@ -187,3 +187,116 @@ def delete_archive(id):
     db.session.delete(a)
     db.session.commit()
     return jsonify({'success': True, 'message': 'Archive supprimée'})
+
+@ecriture_bp.route('/init-test-db', methods=['POST'])
+def init_test_db():
+    """Initialise la base avec des données de test sur 6 mois"""
+    from dateutil.relativedelta import relativedelta
+    import random
+    
+    now = datetime.utcnow()
+    
+    # Vérifier si des transactions existent déjà
+    if Transaction.query.count() > 0:
+        return jsonify({'success': False, 'message': 'La base contient déjà des données'}), 400
+    
+    # Catégories (déjà créées par postgres-init-configmap.yaml)
+    categories = {
+        'Alimentation': Categorie.query.filter_by(nom='Alimentation').first(),
+        'Transport': Categorie.query.filter_by(nom='Transport').first(),
+        'Loisirs': Categorie.query.filter_by(nom='Loisirs').first(),
+        'Logement': Categorie.query.filter_by(nom='Logement').first(),
+        'Santé': Categorie.query.filter_by(nom='Santé').first(),
+        'Autre': Categorie.query.filter_by(nom='Autre').first(),
+    }
+    
+    # Créer catégorie Salaire si elle n'existe pas
+    salaire_cat = Categorie.query.filter_by(nom='Salaire').first()
+    if not salaire_cat:
+        salaire_cat = Categorie(nom='Salaire', description='Revenus mensuels', couleur='#10b981')
+        db.session.add(salaire_cat)
+        db.session.commit()
+    
+    transactions_data = []
+    
+    # Générer 6 mois de données
+    for mois_offset in range(6, 0, -1):
+        date_mois = now - relativedelta(months=mois_offset)
+        
+        # Salaire mensuel (début de mois)
+        trans_salaire = Transaction(
+            montant=2500.0,
+            titre='Salaire mensuel',
+            dateTransaction=date_mois.replace(day=1, hour=9, minute=0),
+            idCategorie=salaire_cat.idCategorie
+        )
+        transactions_data.append(trans_salaire)
+        
+        # Loyer (5 du mois)
+        trans_loyer = Transaction(
+            montant=-800.0,
+            titre='Loyer',
+            dateTransaction=date_mois.replace(day=5, hour=10, minute=0),
+            idCategorie=categories['Logement'].idCategorie
+        )
+        transactions_data.append(trans_loyer)
+        
+        # Transactions aléatoires (15-25 par mois)
+        nb_transactions = random.randint(15, 25)
+        for _ in range(nb_transactions):
+            jour = random.randint(1, 28)
+            cat_nom = random.choice(['Alimentation', 'Transport', 'Loisirs', 'Santé', 'Autre'])
+            
+            # Montants typiques par catégorie
+            montants = {
+                'Alimentation': (-random.uniform(5, 80), ['Courses', 'Restaurant', 'Café', 'Boulangerie', 'Marché']),
+                'Transport': (-random.uniform(2, 50), ['Essence', 'Parking', 'Train', 'Bus', 'Taxi']),
+                'Loisirs': (-random.uniform(10, 100), ['Cinéma', 'Concert', 'Sport', 'Livre', 'Sortie']),
+                'Santé': (-random.uniform(20, 80), ['Pharmacie', 'Médecin', 'Mutuelle', 'Dentiste']),
+                'Autre': (-random.uniform(5, 60), ['Divers', 'Cadeau', 'Vêtements', 'Électronique'])
+            }
+            
+            montant, titres = montants[cat_nom]
+            titre = random.choice(titres)
+            
+            trans = Transaction(
+                montant=round(montant, 2),
+                titre=titre,
+                commentaire=f'Transaction de test - {cat_nom}',
+                dateTransaction=date_mois.replace(day=jour, hour=random.randint(8, 20), minute=random.randint(0, 59)),
+                idCategorie=categories[cat_nom].idCategorie
+            )
+            transactions_data.append(trans)
+    
+    # Ajouter toutes les transactions
+    db.session.bulk_save_objects(transactions_data)
+    db.session.commit()
+    
+    # Créer quelques objectifs
+    obj1 = Objectif(
+        montant=1000.0,
+        epargne_actuelle=0.0,
+        description='Vacances d\'été',
+        frequence='mensuel',
+        dateDebut=now - relativedelta(months=3),
+        idCategorie=categories['Loisirs'].idCategorie
+    )
+    
+    obj2 = Objectif(
+        montant=500.0,
+        epargne_actuelle=0.0,
+        description='Fonds d\'urgence',
+        frequence='mensuel',
+        dateDebut=now - relativedelta(months=2),
+        idCategorie=categories['Autre'].idCategorie
+    )
+    
+    db.session.add(obj1)
+    db.session.add(obj2)
+    db.session.commit()
+    
+    nb_total = len(transactions_data)
+    return jsonify({
+        'success': True, 
+        'message': f'Base initialisée : {nb_total} transactions sur 6 mois + 2 objectifs créés'
+    })

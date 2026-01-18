@@ -221,3 +221,10 @@ def supprimer_archive(id):
 def budget_dashboard():
     d = api_get('/dashboard')
     return render_template('budget-dashboard.html', **d)
+
+@home_bp.route('/init-test-db')
+def init_test_db():
+    """Initialise la base avec des données de test sur 6 mois"""
+    r = api_post('/init-test-db')
+    flash(r.get('message', 'OK'), 'success' if r.get('success') else 'error')
+    return redirect(url_for('home.home'))
