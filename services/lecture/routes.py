@@ -245,7 +245,7 @@ def get_dashboard():
             if d <= float(c.limite_budget):
                 ok += 1
             p = d / float(c.limite_budget) * 100
-            if p >= 100:
+            if p > 100:
                 alerts.append({'type': 'danger', 'category': c.nom, 'message': f'Dépassé ({p:.0f}%)'})
             elif p >= 80:
                 alerts.append({'type': 'warning', 'category': c.nom, 'message': f'{p:.0f}% utilisé'})

@@ -298,6 +298,8 @@ minikube addons enable ingress
 # 2- Lancer minikube tunnel dans un terminal séparé (en administrateur)
 minikube tunnel
 ```
+<img width="548" height="223" alt="image" src="https://github.com/user-attachments/assets/0891f80a-81f3-439e-8c2e-c607299c5218" />
+
 
 **Important** : Laissez ce terminal ouvert tant que vous voulez accéder à l'application.
 
@@ -315,6 +317,9 @@ ipconfig /flushdns
 ```
 
 Accédez ensuite à : **http://budgeometre.local**
+</br>
+<img width="628" height="482" alt="image" src="https://github.com/user-attachments/assets/2aebcaec-afb5-47d2-ab09-a1174e3dfeee" />
+
 
 > **Note** : Cette méthode nécessite de laisser `minikube tunnel` actif en arrière-plan. Si vous préférez une solution sans tunnel, utilisez l'Option 1 (port-forwarding) qui est plus simple et tout aussi efficace.
 
@@ -563,6 +568,7 @@ Ce projet est sous licence MIT.
 - FERRAH Anas
 
 *Projet réalisé en 2025-2026*
+
 
 
 
