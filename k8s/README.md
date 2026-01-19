@@ -9,6 +9,18 @@
 - Docker installé
 - kubectl installé et configuré
 
+## Fonctionnalités
+
+- Transfert du solde d’un mois vers le mois suivant  
+- Recherche d’une dépense via la barre de recherche  
+- Modification d’une transaction  
+- Affichage des dépenses en vue mensuelle, trimestrielle ou annuelle  
+
+### Exemple : modification d’une transaction
+
+L’utilisateur peut modifier une transaction existante directement depuis l’interface (montant, libellé, catégorie, etc.).
+
+![Modification d'une transaction](images/modification-transaction.png)
 
 
 ## Déploiement
