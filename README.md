@@ -256,7 +256,7 @@ La méthode la plus simple sur Windows est d'utiliser le port forwarding kubectl
 
 ```bash
 # Forward le port 80 du gateway vers le port 8080 local
-kubectl port-forward -n budgeometre service/gateway 8080:80
+kubectl port-forward -n budgeometre service/gateway 8080:5000
 ```
 
 Ouvrez ensuite votre navigateur et accédez à : **http://localhost:8080**
