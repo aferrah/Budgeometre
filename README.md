@@ -65,6 +65,16 @@ Le projet Budgeomètre utilise une **architecture microservices** basée sur le 
 </p>
 
 ---
+### Architecture Kubernetes
+<p align="center">
+  <img
+    width="482" 
+    height="1501" 
+    alt="archi_microservices" 
+    src="https://github.com/user-attachments/assets/a1b9e0b9-db52-4d06-a7de-fbe5dc0492cc"
+    style="border-radius: 16px;"
+    />
+</p>
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
@@ -94,26 +104,20 @@ Le projet Budgeomètre utilise une **architecture microservices** basée sur le 
 ### Composants
 
 #### Gateway
-- Point d'entrée unique de l'application
-- Gère l'interface utilisateur (templates HTML)
-- Orchestre les requêtes vers les services appropriés
-- Expose le port 5000
+
+La Gateway constitue le **point d’entrée unique** de l’application. Elle est responsable de la gestion de l’interface utilisateur, notamment le rendu des templates HTML, et joue un rôle central dans l’orchestration des requêtes en les redirigeant vers les services appropriés. Elle expose le **port 5000** afin de permettre l’accès à l’application.
 
 #### Service Écriture
-- Gère toutes les opérations d'écriture (CREATE, UPDATE, DELETE)
-- Traite les modifications de catégories, transactions et objectifs
-- Expose le port 5001
+
+Ce service est dédié à la gestion de toutes les **opérations d’écriture**, incluant la création, la mise à jour et la suppression des données (CREATE, UPDATE, DELETE). Il traite les modifications liées aux catégories, aux transactions et aux objectifs, garantissant ainsi la cohérence des données métier. Il est accessible via le **port 5001**.
 
 #### Service Lecture
-- Optimisé pour les opérations de consultation (READ)
-- Génère les statistiques et dashboards
-- Gère les archives et l'historique
-- Expose le port 5002
+
+Optimisé pour les **opérations de consultation (READ)**, ce service se concentre sur la lecture des données et la génération des statistiques ainsi que des tableaux de bord. Il prend également en charge la gestion des archives et de l’historique, offrant une vue analytique complète des données. Il expose le **port 5002**.
 
 #### Base de données PostgreSQL
-- Stockage persistant de toutes les données
-- StatefulSet pour garantir la persistance
-- Expose le port 5432
+
+La base de données PostgreSQL assure le **stockage persistant** de l’ensemble des données de l’application. Elle est déployée sous forme de **StatefulSet** afin de garantir la persistance et la stabilité des données, même en cas de redémarrage des pods. Elle expose le **port 5432**.
 
 ---
 
@@ -536,6 +540,7 @@ Ce projet est sous licence MIT.
 - FERRAH Anas
 
 *Projet réalisé en 2025-2026*
+
 
 
 
