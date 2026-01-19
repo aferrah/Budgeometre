@@ -214,8 +214,10 @@ Budgeometre/
 #### Prérequis
 
 - Minikube installé
-- Docker installé (Docker Desktop sur Windows)
+- Docker installé (Docker Desktop sur Windows)e
 - kubectl installé et configuré
+
+Si vous êtes sur Windows, assurez-vous que Docker Desktop est installé et lancé avant de lancer le script de déploiement.
 
 #### Déploiement automatique avec le script
 
@@ -323,23 +325,9 @@ kubectl get pods -n budgeometre | grep ecriture
 kubectl exec -it <nom-du-pod-ecriture> -n budgeometre -- python seed_data.py
 ```
 
-Exemple :
-```bash
-kubectl exec -it ecriture-service-7d9f8b5c4-xk2m9 -n budgeometre -- python seed_data.py
-```
-
 Le script affiche sa progression et confirme la création de chaque élément :
-```
-[SEED] Début de l'injection des données de test sur 6 mois...
-  ✓ Catégorie créée: Alimentation
-  ✓ Catégorie créée: Transport
-  ...
-[SEED] Mois 12/2025...
-  ✓ 156 transactions créées
-  ✓ Objectif créé: Vacances été
-  ...
-[SEED] Injection terminée !
-```
+
+<img width="490" height="365" alt="image" src="https://github.com/user-attachments/assets/d6705b9f-2168-4c8f-baf1-7965ff7483c0" />
 
 Rafraîchissez ensuite l'application dans votre navigateur pour voir les données.
 
@@ -540,6 +528,7 @@ Ce projet est sous licence MIT.
 - FERRAH Anas
 
 *Projet réalisé en 2025-2026*
+
 
 
 
