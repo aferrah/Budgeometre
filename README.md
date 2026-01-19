@@ -4,7 +4,7 @@ Application web de gestion de budget personnel développée avec Flask. Suivez v
 
 ![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)
 ![Flask](https://img.shields.io/badge/Flask-Latest-green.svg)
-![SQLite](https://img.shields.io/badge/Database-SQLite-lightgrey.svg)
+![PostgreSQL](https://img.shields.io/badge/Database-PostgreSQL-336791.svg)
 
 ---
 
@@ -68,7 +68,7 @@ Le projet Budgeomètre utilise une **architecture microservices** basée sur le 
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
-│                   RÉSUMÉ DU DÉPLOIEMENT KUBERNETES                           │
+│                   RÉSUMÉ DU DÉPLOIEMENT KUBERNETES                  │
 ├─────────────────────────────────────────────────────────────────────┤
 │  • Namespace: budgeometre                                           │
 │  • Deployments: Gateway, Lecture, Écriture                          │
@@ -536,6 +536,7 @@ Ce projet est sous licence MIT.
 - FERRAH Anas
 
 *Projet réalisé en 2025-2026*
+
 
 
 
