@@ -71,27 +71,12 @@ Le projet Budgeomètre utilise une **architecture microservices** basée sur le 
     width="482" 
     height="1501" 
     alt="archi_microservices" 
-    src="https://github.com/user-attachments/assets/a1b9e0b9-db52-4d06-a7de-fbe5dc0492cc"
-    style="border-radius: 16px;"
-    />
+    src="https://github.com/user-attachments/assets/d3d3c88d-513b-49f8-8888-114f6f94cc20"
+    style="border-radius: 16px;3
 </p>
 
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│                   RÉSUMÉ DU DÉPLOIEMENT KUBERNETES                  │
-├─────────────────────────────────────────────────────────────────────┤
-│  • Namespace: budgeometre                                           │
-│  • Deployments: Gateway, Lecture, Écriture                          │
-│  • StatefulSet: PostgreSQL                                          │
-│  • Services: ClusterIP pour communication interne                   │
-│  • Ingress: Exposition externe                                      │
-│  • ConfigMaps: Configuration des services                           │
-│  • Secrets: Credentials DB                                          │
-│  • PVC: Stockage persistant PostgreSQL                              │
-│  • HPA: Auto-scaling horizontal                                     │
-│  • NetworkPolicy: Sécurité réseau                                   │
-└─────────────────────────────────────────────────────────────────────┘
-```
+<br><br>
+
 
 ### Flux de données
 
@@ -528,6 +513,7 @@ Ce projet est sous licence MIT.
 - FERRAH Anas
 
 *Projet réalisé en 2025-2026*
+
 
 
 
