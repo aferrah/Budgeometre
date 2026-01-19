@@ -55,63 +55,31 @@ Le projet Budgeomètre utilise une **architecture microservices** basée sur le 
 
 ### Schéma d'architecture
 
+<p align="center">
+  <img
+    src="https://github.com/user-attachments/assets/237feff4-17f7-4608-96ef-86cfed2a3815"
+    alt="archi_Budgeometre_k8s"
+    width="400"
+    style="border-radius: 16px;"
+  />
+</p>
+
+---
+
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
-│                         UTILISATEUR                                  │
-│                             (Web)                                    │
-└────────────────────────────────┬────────────────────────────────────┘
-                                 │ HTTP (Port 5000)
-                                 ▼
-┌─────────────────────────────────────────────────────────────────────┐
-│                      GATEWAY (Flask)                                 │
-│  ┌──────────────────────────────────────────────────────┐           │
-│  │  • Interface utilisateur (HTML/CSS/JS)                │           │
-│  │  • Templates (Dashboard, Catégories, Transactions)    │           │
-│  │  • Orchestration des requêtes                         │           │
-│  │  • Routage vers les microservices                     │           │
-│  └──────────────────────────────────────────────────────┘           │
-└───────────────────┬──────────────────────┬──────────────────────────┘
-                    │                      │
-         Port 5001  │                      │  Port 5002
-                    ▼                      ▼
-    ┌───────────────────────┐    ┌───────────────────────┐
-    │   SERVICE ÉCRITURE    │    │   SERVICE LECTURE     │
-    │       (Flask)         │    │       (Flask)         │
-    ├───────────────────────┤    ├───────────────────────┤
-    │ • Créer transaction   │    │ • Consulter données   │
-    │ • Modifier données    │    │ • Générer stats       │
-    │ • Supprimer données   │    │ • Filtrer/Rechercher  │
-    │ • Gérer catégories    │    │ • Archives mensuelles │
-    │ • Gérer objectifs     │    │ • Dashboards          │
-    └───────────┬───────────┘    └───────────┬───────────┘
-                │                            │
-                └────────────┬───────────────┘
-                             │ Port 5432
-                             ▼
-            ┌─────────────────────────────────────┐
-            │   BASE DE DONNÉES PostgreSQL        │
-            ├─────────────────────────────────────┤
-            │  Tables:                             │
-            │  • categories                        │
-            │  • transactions                      │
-            │  • objectifs_epargne                 │
-            │  • archives_mensuelles               │
-            │  • archives_transactions             │
-            └─────────────────────────────────────┘
-
-┌─────────────────────────────────────────────────────────────────────┐
-│                    DÉPLOIEMENT KUBERNETES                            │
+│                   RÉSUMÉ DU DÉPLOIEMENT KUBERNETES                           │
 ├─────────────────────────────────────────────────────────────────────┤
-│  • Namespace: budgeometre                                            │
-│  • Deployments: Gateway, Lecture, Écriture                           │
-│  • StatefulSet: PostgreSQL                                           │
-│  • Services: ClusterIP pour communication interne                    │
-│  • Ingress: Exposition externe                                       │
-│  • ConfigMaps: Configuration des services                            │
-│  • Secrets: Credentials DB                                           │
-│  • PVC: Stockage persistant PostgreSQL                               │
-│  • HPA: Auto-scaling horizontal                                      │
-│  • NetworkPolicy: Sécurité réseau                                    │
+│  • Namespace: budgeometre                                           │
+│  • Deployments: Gateway, Lecture, Écriture                          │
+│  • StatefulSet: PostgreSQL                                          │
+│  • Services: ClusterIP pour communication interne                   │
+│  • Ingress: Exposition externe                                      │
+│  • ConfigMaps: Configuration des services                           │
+│  • Secrets: Credentials DB                                          │
+│  • PVC: Stockage persistant PostgreSQL                              │
+│  • HPA: Auto-scaling horizontal                                     │
+│  • NetworkPolicy: Sécurité réseau                                   │
 └─────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -568,6 +536,7 @@ Ce projet est sous licence MIT.
 - FERRAH Anas
 
 *Projet réalisé en 2025-2026*
+
 
 
 
