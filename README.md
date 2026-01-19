@@ -13,6 +13,7 @@ Application web de gestion de budget personnel développée avec Flask. Suivez v
 - [À propos](#à-propos)
 - [Fonctionnalités principales](#fonctionnalités-principales)
 - [Technologies utilisées](#technologies-utilisées)
+- [Architecture](#architecture)
 - [Structure du projet](#structure-du-projet)
 - [Déploiement Kubernetes](#déploiement-kubernetes)
 - [Guide d'utilisation](#guide-dutilisation)
@@ -45,6 +46,106 @@ Application web de gestion de budget personnel développée avec Flask. Suivez v
 - **Visualisation** : Graphiques interactifs (Chart.js ou équivalent)
 - **Orchestration** : Kubernetes / Minikube
 - **Architecture** : Microservices (Gateway, Service Écriture, Service Lecture)
+
+---
+
+## Architecture
+
+Le projet Budgeomètre utilise une **architecture microservices** basée sur le pattern **CQRS** (Command Query Responsibility Segregation) qui sépare les opérations de lecture et d'écriture pour optimiser les performances et la scalabilité.
+
+### Schéma d'architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                         UTILISATEUR                                  │
+│                             (Web)                                    │
+└────────────────────────────────┬────────────────────────────────────┘
+                                 │ HTTP (Port 5000)
+                                 ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│                      GATEWAY (Flask)                                 │
+│  ┌──────────────────────────────────────────────────────┐           │
+│  │  • Interface utilisateur (HTML/CSS/JS)                │           │
+│  │  • Templates (Dashboard, Catégories, Transactions)    │           │
+│  │  • Orchestration des requêtes                         │           │
+│  │  • Routage vers les microservices                     │           │
+│  └──────────────────────────────────────────────────────┘           │
+└───────────────────┬──────────────────────┬──────────────────────────┘
+                    │                      │
+         Port 5001  │                      │  Port 5002
+                    ▼                      ▼
+    ┌───────────────────────┐    ┌───────────────────────┐
+    │   SERVICE ÉCRITURE    │    │   SERVICE LECTURE     │
+    │       (Flask)         │    │       (Flask)         │
+    ├───────────────────────┤    ├───────────────────────┤
+    │ • Créer transaction   │    │ • Consulter données   │
+    │ • Modifier données    │    │ • Générer stats       │
+    │ • Supprimer données   │    │ • Filtrer/Rechercher  │
+    │ • Gérer catégories    │    │ • Archives mensuelles │
+    │ • Gérer objectifs     │    │ • Dashboards          │
+    └───────────┬───────────┘    └───────────┬───────────┘
+                │                            │
+                └────────────┬───────────────┘
+                             │ Port 5432
+                             ▼
+            ┌─────────────────────────────────────┐
+            │   BASE DE DONNÉES PostgreSQL        │
+            ├─────────────────────────────────────┤
+            │  Tables:                             │
+            │  • categories                        │
+            │  • transactions                      │
+            │  • objectifs_epargne                 │
+            │  • archives_mensuelles               │
+            │  • archives_transactions             │
+            └─────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────┐
+│                    DÉPLOIEMENT KUBERNETES                            │
+├─────────────────────────────────────────────────────────────────────┤
+│  • Namespace: budgeometre                                            │
+│  • Deployments: Gateway, Lecture, Écriture                           │
+│  • StatefulSet: PostgreSQL                                           │
+│  • Services: ClusterIP pour communication interne                    │
+│  • Ingress: Exposition externe                                       │
+│  • ConfigMaps: Configuration des services                            │
+│  • Secrets: Credentials DB                                           │
+│  • PVC: Stockage persistant PostgreSQL                               │
+│  • HPA: Auto-scaling horizontal                                      │
+│  • NetworkPolicy: Sécurité réseau                                    │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+### Flux de données
+
+1. **L'utilisateur** accède à l'interface via le **Gateway** (port 5000)
+2. Le **Gateway** affiche l'interface web (HTML/CSS/JS)
+3. Pour les **opérations de lecture** : Gateway → Service Lecture → PostgreSQL → Retour
+4. Pour les **opérations d'écriture** : Gateway → Service Écriture → PostgreSQL → Retour
+5. Tous les services communiquent sur le réseau **budgeometre-network**
+
+### Composants
+
+#### Gateway
+- Point d'entrée unique de l'application
+- Gère l'interface utilisateur (templates HTML)
+- Orchestre les requêtes vers les services appropriés
+- Expose le port 5000
+
+#### Service Écriture
+- Gère toutes les opérations d'écriture (CREATE, UPDATE, DELETE)
+- Traite les modifications de catégories, transactions et objectifs
+- Expose le port 5001
+
+#### Service Lecture
+- Optimisé pour les opérations de consultation (READ)
+- Génère les statistiques et dashboards
+- Gère les archives et l'historique
+- Expose le port 5002
+
+#### Base de données PostgreSQL
+- Stockage persistant de toutes les données
+- StatefulSet pour garantir la persistance
+- Expose le port 5432
 
 ---
 
