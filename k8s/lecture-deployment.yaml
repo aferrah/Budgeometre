@@ -22,6 +22,10 @@ spec:
       labels:
         app: lecture-service
     spec:
+      initContainers:
+      - name: wait-for-postgres
+        image: busybox:1.35
+        command: ['sh', '-c', 'until nc -z postgres-service 5432; do echo waiting for postgres; sleep 2; done;']
       containers:
       - name: lecture-service
         image: eclairz422/budgeometre-lecture:latest
