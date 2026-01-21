@@ -211,10 +211,116 @@ Budgeometre/
 
 ## Déploiement Kubernetes
 
+### Déploiement sur Rancher (Branche `rancher`)
+
+#### Prérequis
+
+- Cluster Kubernetes Rancher accessible
+- `kubectl` configuré pour le cluster Rancher
+- Docker installé (pour rebuild les images si nécessaire)
+- Python 3.8+ installé
+- Accès au namespace `u-grp5` sur le cluster
+
+#### Scripts Python de déploiement
+
+La branche `rancher` contient des scripts Python pour automatiser le déploiement :
+
+**1. `cleanup.py` - Nettoyage du namespace**
+```bash
+python cleanup.py
+```
+Supprime tous les deployments et le StatefulSet postgres du namespace `u-grp5`.
+
+**2. `deploy-rancher.py` - Déploiement automatisé**
+```bash
+python deploy-rancher.py
+```
+Ce script effectue les opérations suivantes :
+- Vérifie la connexion au cluster Rancher
+- Optionnel : Build et push des images Docker vers Docker Hub
+- Déploie tous les manifests Kubernetes (ConfigMap, Deployments, Services, Ingress, etc.)
+- Attend que les pods démarrent
+- Affiche le statut final du déploiement
+
+**3. `populate_db.py` - Population de la base de données**
+```bash
+# D'abord, créer un port-forward vers le gateway
+kubectl port-forward -n u-grp5 service/gateway 8080:5000
+
+# Puis exécuter le script dans un autre terminal
+python populate_db.py
+```
+Ce script :
+- Supprime toutes les données existantes dans PostgreSQL
+- Crée les catégories nécessaires (Alimentation, Transport, Logement, etc.)
+- Génère 3 mois de transactions cohérentes :
+  - Salaire fixe de 2500€/mois (le 1er)
+  - Dépenses fixes mensuelles (loyer 850€, factures, abonnements)
+  - Dépenses variables quotidiennes réalistes
+- Insère toutes les transactions dans la base
+
+#### Configuration spécifique Rancher
+
+**Namespace** : `u-grp5`
+
+**Ressources limitées** :
+- CPU : `10m` par pod (cluster très contraint)
+- Memory : `64Mi` par pod
+- Pas d'initContainers (économie de ressources)
+
+**Images Docker Hub** :
+- `eclairz422/budgeometre-gateway:latest`
+- `eclairz422/budgeometre-ecriture:latest`
+- `eclairz422/budgeometre-lecture:latest`
+
+**Ingress** :
+- Host: `budgeometre.local`
+- Classe: `nginx`
+- IP externe: `157.159.11.201`
+
+**Services** :
+- Gateway : NodePort `30000` (accès externe)
+- Ecriture/Lecture/Postgres : ClusterIP (accès interne)
+
+#### Accès à l'application
+
+**Via port-forward** (recommandé pour développement) :
+```bash
+kubectl port-forward -n u-grp5 service/gateway 8080:5000
+```
+Puis accéder à http://localhost:8080
+
+**Via Ingress** (si DNS configuré) :
+```bash
+# Ajouter à /etc/hosts (Linux/Mac) ou C:\Windows\System32\drivers\etc\hosts (Windows)
+157.159.11.201 budgeometre.local
+```
+Puis accéder à http://budgeometre.local
+
+#### Vérification du déploiement
+
+```bash
+# Vérifier les pods
+kubectl get pods -n u-grp5
+
+# Vérifier les services
+kubectl get svc -n u-grp5
+
+# Vérifier l'ingress
+kubectl get ingress -n u-grp5
+
+# Logs d'un pod
+kubectl logs -n u-grp5 <nom-du-pod>
+```
+
+---
+
+### Déploiement sur Minikube (Branche principale)
+
 #### Prérequis
 
 - Minikube installé
-- Docker installé (Docker Desktop sur Windows)e
+- Docker installé (Docker Desktop sur Windows)
 - kubectl installé et configuré
 
 Si vous êtes sur Windows, assurez-vous que Docker Desktop est installé et lancé avant de lancer le script de déploiement.
