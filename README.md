@@ -68,12 +68,11 @@ Le projet Budgeomètre utilise une **architecture microservices** basée sur le 
 ### Architecture Kubernetes
 <p align="center">
   <img
-    width="482" 
+    width="400" 
     height="1501" 
     alt="archi_microservices" 
-    src="https://github.com/user-attachments/assets/d3d3c88d-513b-49f8-8888-114f6f94cc20"
+    src="https://github.com/user-attachments/assets/5ca83c26-3966-4b9d-9d0c-c7b51b8dc15c"
     style="border-radius: 16px;"
-    >
 </p>
 
 ### Flux de données
@@ -511,6 +510,7 @@ Ce projet est sous licence MIT.
 - FERRAH Anas
 
 *Projet réalisé en 2025-2026*
+
 
 
 
