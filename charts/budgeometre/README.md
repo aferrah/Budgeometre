@@ -48,7 +48,7 @@ eval $(minikube docker-env)
 #### 3) Déploiement du Chart
 
 ```bash
-helm install budgeometre ./budgeometre-chart
+helm install budgeometre ./charts/budgeometre
 ```
 
 #### 4) Accès à l'application
