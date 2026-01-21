@@ -5,3 +5,4 @@ Flask-SQLAlchemy
 SQLAlchemy
 datetime
 python-dateutil
+requests  # Pour populate_db.py

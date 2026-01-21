@@ -9,7 +9,7 @@ def run_command(cmd, description="", check=True):
     if description:
         print(f"\n>>> {description}...")
     try:
-        result = subprocess.run(cmd, shell=True, check=False, capture_output=True, text=True)
+        result = subprocess.run(cmd, shell=True, check=False, capture_output=True, text=True, encoding='utf-8', errors='replace')
         if result.stdout:
             print(result.stdout.strip())
         if result.stderr and "forbidden" not in result.stderr.lower():
@@ -51,7 +51,7 @@ def main():
         print("❌ Impossible de se connecter au cluster Kubernetes")
         return 1
     
-    result = subprocess.run("kubectl config current-context", shell=True, capture_output=True, text=True)
+    result = subprocess.run("kubectl config current-context", shell=True, capture_output=True, text=True, encoding='utf-8', errors='replace')
     CURRENT_CONTEXT = result.stdout.strip()
     print(f"✓ Connecté au cluster: {CURRENT_CONTEXT}")
     
@@ -75,14 +75,25 @@ def main():
         print("\n>>> Build et push des images Docker...")
         
         images = [
-            ("gateway/Dockerfile", f"{DOCKER_USERNAME}/budgeometre-gateway:{IMAGE_TAG}", "Gateway"),
-            ("services/ecriture/Dockerfile", f"{DOCKER_USERNAME}/budgeometre-ecriture:{IMAGE_TAG}", "Service Écriture"),
-            ("services/lecture/Dockerfile", f"{DOCKER_USERNAME}/budgeometre-lecture:{IMAGE_TAG}", "Service Lecture")
+            ("./gateway", f"{DOCKER_USERNAME}/budgeometre-gateway:{IMAGE_TAG}", "Gateway"),
+            (".", f"{DOCKER_USERNAME}/budgeometre-ecriture:{IMAGE_TAG}", "Service Écriture", "services/ecriture/Dockerfile"),
+            (".", f"{DOCKER_USERNAME}/budgeometre-lecture:{IMAGE_TAG}", "Service Lecture", "services/lecture/Dockerfile")
         ]
         
-        for dockerfile, image_name, description in images:
+        for item in images:
+            if len(item) == 3:
+                build_context, image_name, description = item
+                dockerfile = ""
+            else:
+                build_context, image_name, description, dockerfile = item
+            
             print(f"\n  - {description}...")
-            if not run_command(f"docker build -t {image_name} -f {dockerfile} ."):
+            cmd = f"docker build -t {image_name}"
+            if dockerfile:
+                cmd += f" -f {dockerfile}"
+            cmd += f" {build_context}"
+            
+            if not run_command(cmd):
                 return 1
             if not run_command(f"docker push {image_name}"):
                 return 1

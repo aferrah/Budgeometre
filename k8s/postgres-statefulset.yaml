@@ -3,7 +3,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: postgres-headless
-  namespace: budgeometre
+  namespace: u-grp5
   labels:
     app: postgres
 spec:
@@ -20,7 +20,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: postgres-service
-  namespace: budgeometre
+  namespace: u-grp5
   labels:
     app: postgres
 spec:
