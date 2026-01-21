@@ -14,6 +14,7 @@ Application web de gestion de budget personnel développée avec Flask. Suivez v
 - [Fonctionnalités principales](#fonctionnalités-principales)
 - [Technologies utilisées](#technologies-utilisées)
 - [Installation](#installation)
+- [Déploiement Kubernetes/Rancher](#déploiement-kubernetesrancher)
 - [Guide d'utilisation](#guide-dutilisation)
   - [Gestion des catégories](#1-gestion-des-catégories)
   - [Gestion des transactions](#2-gestion-des-transactions)
@@ -125,6 +126,26 @@ Il vous est également possible de réinitialiser la base de donnés en cliquant
 
 <img width="250" height="577" alt="image" src="https://github.com/user-attachments/assets/b3e8e2c5-184f-45f8-a3a0-39a1ba3844da" />
 
+
+---
+
+## Déploiement Kubernetes/Rancher
+
+> **Déploiement sur cluster Rancher disponible !**  
+> Une version microservices avec architecture CQRS est disponible sur la branche **`rancher`**.
+> 
+> **Fonctionnalités :**
+> - Architecture microservices (Gateway, Service Écriture, Service Lecture)
+> - Déploiement Kubernetes avec PostgreSQL
+> - Scripts Python automatisés (`cleanup.py`, `deploy-rancher.py`, `populate_db.py`)
+> - Configuration pour cluster Rancher avec ressources minimales (10m CPU)
+> - Images Docker Hub disponibles
+> 
+> **Documentation complète :** Consultez le README de la branche `rancher` pour les instructions détaillées de déploiement.
+>
+> ```bash
+> git checkout rancher
+> ```
 
 ---
 
