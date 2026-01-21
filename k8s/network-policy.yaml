@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: postgres-network-policy
+  namespace: budgeometre
+spec:
+  podSelector:
+    matchLabels:
+      app: postgres
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    # Autoriser seulement ecriture-service
+    - podSelector:
+        matchLabels:
+          app: ecriture-service
+    # Autoriser seulement lecture-service
+    - podSelector:
+        matchLabels:
+          app: lecture-service
+    ports:
+    - protocol: TCP
+      port: 5432

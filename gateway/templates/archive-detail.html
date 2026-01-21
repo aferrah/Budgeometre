@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block title %}Archive {{ nom_mois }} {{ archive.annee }} - Budgeomètre{% endblock %}
+
+{% block head_extra %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/archive-detail.css') }}">
+{% endblock %}
+
+{% block header_content %}
+    <h1>Archive {{ nom_mois }} {{ archive.annee }}</h1>
+{% endblock %}
+
+{% block content %}
+<main class="archive-detail-page">
+
+    <div class="page-header">
+        <h2>{{ nom_mois }} {{ archive.annee }}</h2>
+        <div class="header-actions">
+            <a href="{{ url_for('archives.archives') }}" class="btn-back">← Retour aux archives</a>
+            <form method="post" action="{{ url_for('archives.toggle_masquer_archive', id=archive.idArchive) }}" style="display:inline;">
+                <button type="submit" class="btn-masquer" title="{% if archive.masquee %}Afficher l'archive{% else %}Masquer l'archive{% endif %}">
+                    {% if archive.masquee %}
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                        Afficher
+                    {% else %}
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
+                        Masquer
+                    {% endif %}
+                </button>
+            </form>
+            <form method="post" action="{{ url_for('archives.supprimer_archive', id=archive.idArchive) }}" style="display:inline;" onsubmit="return confirm('Supprimer définitivement cette archive ?');">
+                <button type="submit" class="btn-supprimer" title="Supprimer l'archive">🗑️ Supprimer</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-label">Revenus du mois</div>
+            <div class="stat-value revenus">+{{ '%.2f'|format(archive.total_revenus) }} €</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Dépenses du mois</div>
+            <div class="stat-value depenses">-{{ '%.2f'|format(archive.total_depenses) }} €</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Solde final</div>
+            <div class="stat-value solde">{{ '%.2f'|format(archive.solde_final) }} €</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Épargne totale</div>
+            <div class="stat-value epargne">{{ '%.2f'|format(archive.total_epargne) }} €</div>
+        </div>
+    </div>
+
+    <div class="section-card">
+        <h3>Résumé</h3>
+        <p style="color: rgba(255,255,255,0.7);">
+            Ce mois compte <strong style="color: white;">{{ donnees.stats.nb_transactions }}</strong> transactions
+            ({{ donnees.stats.nb_revenus }} revenus, {{ donnees.stats.nb_depenses }} dépenses).
+        </p>
+    </div>
+
+    {% if donnees.categories %}
+    <div class="section-card">
+        <h3>Par catégorie</h3>
+        <div class="categories-grid">
+            {% for cat_id, cat_data in donnees.categories.items() %}
+                <div class="category-item" style="border-left-color: {{ cat_data.couleur }};">
+                    <div class="category-info">
+                        <div class="category-name">{{ cat_data.nom }}</div>
+                        <div class="category-count">{{ cat_data.nb_transactions }} transaction(s)</div>
+                    </div>
+                    <div class="category-amounts">
+                        {% if cat_data.depenses > 0 %}
+                            <div class="category-depenses">-{{ '%.2f'|format(cat_data.depenses) }} €</div>
+                        {% endif %}
+                        {% if cat_data.revenus > 0 %}
+                            <div class="category-revenus">+{{ '%.2f'|format(cat_data.revenus) }} €</div>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="section-card">
+        <h3>Toutes les transactions ({{ donnees.transactions|length }})</h3>
+        {% if donnees.transactions %}
+            <table class="transactions-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Libellé</th>
+                        <th>Catégorie</th>
+                        <th>Montant</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for t in donnees.transactions %}
+                        <tr>
+                            <td>{{ t.date[:10] }}</td>
+                            <td>
+                                {{ t.titre }}
+                                {% if t.commentaire %}
+                                    <div style="font-size: 0.85rem; color: rgba(255,255,255,0.5);">{{ t.commentaire }}</div>
+                                {% endif %}
+                            </td>
+                            <td><span class="badge-categorie">{{ t.categorie }}</span></td>
+                            <td class="{{ 'montant-positif' if t.montant >= 0 else 'montant-negatif' }}">
+                                {{ '+' if t.montant >= 0 else '' }}{{ '%.2f'|format(t.montant) }} €
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p style="color: rgba(255,255,255,0.5); text-align: center; padding: 20px;">Aucune transaction ce mois-ci</p>
+        {% endif %}
+    </div>
+
+</main>
+{% endblock %}

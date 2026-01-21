@@ -1,0 +1,467 @@
+.solde-card {
+    text-align: center;
+    padding: 30px;
+}
+.home-card {
+    margin-bottom: 20px;
+}
+
+.solde-circle-container {
+    position: relative;
+    width: 250px;
+    height: 250px;
+    margin: 0 auto 20px;
+}
+
+.solde-circle {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    z-index: 2;
+}
+
+.progress-ring {
+    transform: rotate(-90deg);
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.progress-ring-circle {
+    transition: stroke-dashoffset 0.8s ease;
+    transform-origin: 50% 50%;
+}
+
+.solde-circle.excellent {
+    border-color: #10b981;
+    background: rgba(16, 185, 129, 0.1);
+}
+
+.solde-circle.bon {
+    border-color: #22c55e;
+    background: rgba(34, 197, 94, 0.1);
+}
+
+.solde-circle.moyen {
+    border-color: #eab308;
+    background: rgba(234, 179, 8, 0.1);
+}
+
+.solde-circle.faible {
+    border-color: #f97316;
+    background: rgba(249, 115, 22, 0.1);
+}
+
+.solde-circle.critique {
+    border-color: #ef4444;
+    background: rgba(239, 68, 68, 0.1);
+}
+
+.solde-circle .montant {
+    font-size: 1.8rem;
+    font-weight: 700;
+}
+
+.solde-circle.excellent .montant {
+    color: #10b981;
+}
+
+.solde-circle.bon .montant {
+    color: #22c55e;
+}
+
+.solde-circle.moyen .montant {
+    color: #eab308;
+}
+
+.solde-circle.faible .montant {
+    color: #f97316;
+}
+
+.solde-circle.critique .montant {
+    color: #ef4444;
+}
+
+.solde-circle .label {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.stats-row {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+}
+
+.stat-item {
+    text-align: center;
+}
+
+.stat-item .value {
+    font-size: 1.3rem;
+    font-weight: 700;
+}
+
+.stat-item .value.revenus {
+    color: #10b981;
+}
+
+.stat-item .value.depenses {
+    color: #ef4444;
+}
+
+.stat-item .value.epargne {
+    color: #f59e0b;
+}
+
+.stat-item .label {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.recent-expenses h2 {
+    margin-bottom: 15px;
+    color: white;
+}
+
+.recent-expenses table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+.recent-expenses th,
+.recent-expenses td {
+    padding: 8px 12px;
+    text-align: left;
+}
+
+.recent-expenses th {
+    color: rgba(255, 255, 255, 0.7);
+    font-weight: 600;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 0.85rem;
+    cursor: pointer;
+    user-select: none;
+}
+.recent-expenses .actions-column {
+    width: 90px;
+    text-align: center;
+    cursor: default;
+    user-select: none;
+}
+.recent-expenses th:last-child {
+    cursor: default;
+    user-select: none;
+}
+
+.recent-expenses td {
+    color: white;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+.recent-expenses .actions-cell {
+    text-align: center;
+}
+
+.recent-expenses tr:last-child td {
+    border-bottom: none;
+}
+
+.montant-cell.positif {
+    color: #10b981;
+}
+
+.montant-cell.negatif {
+    color: #ef4444;
+}
+
+.montant-cell.epargne {
+    color: #f59e0b !important;
+}
+
+.categorie-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.15);
+    font-size: 0.8rem;
+}
+
+.categorie-badge.epargne {
+    background: rgba(245, 158, 11, 0.2);
+    color: #f59e0b;
+    border: 1px solid rgba(245, 158, 11, 0.4);
+}
+
+.transaction-row.epargne {
+    background: rgba(245, 158, 11, 0.05);
+    border-left: 3px solid #f59e0b;
+}
+
+.transaction-row.epargne:hover {
+    background: rgba(245, 158, 11, 0.1);
+}
+
+.sortable:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.sort-icon {
+    font-size: 0.8rem;
+    opacity: 0.5;
+    margin-left: 5px;
+}
+
+.sortable.active-sort .sort-icon {
+    opacity: 1;
+}
+
+.action-buttons-row {
+    margin-bottom: 30px;
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.action-buttons-row .archives-btn,
+.dashboard-link {
+    opacity: 0.8;
+}
+
+.filters-container {
+    margin-bottom: 20px;
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    align-items: flex-end;
+}
+
+.filter-group {
+    flex: 1;
+    min-width: 200px;
+}
+.filter-category-group,
+.filter-type-group {
+    flex: 0 0 auto;
+    min-width: 150px;
+}
+.filter-type-group {
+    min-width: 130px;
+}
+
+.filter-label {
+    display: block;
+    margin-bottom: 5px;
+    color: rgba(255,255,255,0.7);
+    font-size: 0.85rem;
+}
+
+.filter-input {
+    width: 100%;
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid rgba(255,255,255,0.2);
+    background: rgba(255,255,255,0.1);
+    color: white;
+}
+
+input[type="text"]::placeholder,
+select option {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+select option {
+    background: #1f2937;
+    color: white;
+}
+
+.reset-filters-btn {
+    padding: 8px 16px;
+    border-radius: 6px;
+    border: none;
+    background: rgba(255,255,255,0.15);
+    color: white;
+    cursor: pointer;
+    font-size: 0.9rem;
+    height: 38px;
+}
+
+#resetBtn:hover {
+    background: rgba(255, 255, 255, 0.25);
+}
+
+.no-results-message {
+    display: none;
+    text-align: center;
+    padding: 30px;
+    color: rgba(255,255,255,0.6);
+}
+
+.no-transactions-message {
+    color: rgba(255, 255, 255, 0.7);
+    text-align: center;
+    padding: 20px;
+}
+
+.archive-message-box {
+    text-align: center;
+    margin-top: 20px;
+    padding: 15px;
+    background: rgba(139, 92, 246, 0.1);
+    border: 1px solid rgba(139, 92, 246, 0.3);
+    border-radius: 8px;
+}
+.archive-message-text {
+    color: #a78bfa;
+    margin: 0;
+}
+.archive-icon {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    line-height: 20px;
+    text-align: center;
+    background: rgba(139, 92, 246, 0.3);
+    border-radius: 50%;
+    font-weight: bold;
+    font-size: 0.85rem;
+    margin-right: 8px;
+}
+.archive-link {
+    color: #c4b5fd;
+    text-decoration: underline;
+}
+
+.transaction-actions {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+}
+
+.btn-action {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    font-size: 0.85rem;
+    display: inline-block;
+}
+
+
+.btn-action.btn-edit {
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-action.btn-edit:hover {
+    background: rgba(139, 92, 246, 0.3);
+    border-color: rgba(139, 92, 246, 0.5);
+    transform: scale(1.1);
+}
+
+.btn-edit-icon {
+    width: 100%;
+    height: 100%;
+    max-width: 16px;
+    max-height: 16px;
+    object-fit: contain;
+}
+
+.btn-action.btn-delete {
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+}
+
+.btn-action.btn-delete:hover {
+    background: rgba(239, 68, 68, 0.3);
+    border-color: rgba(239, 68, 68, 0.5);
+    transform: scale(1.1);
+}
+
+.btn-delete-icon {
+    width: 100%;
+    height: 100%;
+    max-width: 16px;
+    max-height: 16px;
+    object-fit: contain;
+}
+
+.pagination {
+    user-select: none;
+}
+.pagination-container {
+    margin-top: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+.pagination-info {
+    text-align: center;
+    margin-top: 15px;
+    color: rgba(255,255,255,0.5);
+    font-size: 0.9rem;
+}
+.page-ellipsis {
+    color: rgba(255,255,255,0.3);
+    padding: 8px 0;
+    line-height: 1.5;
+}
+
+.page-btn {
+    display: inline-block;
+    padding: 8px 12px;
+    min-width: 40px;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+    color: white;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.page-btn:hover:not(.disabled):not(.active) {
+    background: rgba(139, 92, 246, 0.3);
+    border-color: rgba(139, 92, 246, 0.5);
+    transform: translateY(-2px);
+}
+
+.page-btn.active {
+    background: linear-gradient(135deg, #8b5cf6, #6366f1);
+    border-color: transparent;
+    font-weight: 700;
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+}
+
+.page-btn.disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.pagination-hidden {
+    display: none !important;
+}

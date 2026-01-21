@@ -1,0 +1,88 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lecture-service
+  namespace: budgeometre
+  labels:
+    app: lecture-service
+spec:
+  # Défi 2 & 5 : 3 répliques
+  replicas: 3
+  selector:
+    matchLabels:
+      app: lecture-service
+  # Défi 8 : Rolling Update Strategy
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: lecture-service
+    spec:
+      initContainers:
+      - name: wait-for-postgres
+        image: busybox:1.35
+        command: ['sh', '-c', 'until nc -z postgres-service 5432; do echo waiting for postgres; sleep 2; done;']
+      containers:
+      - name: lecture-service
+        image: lecture-service:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 5002
+          name: http
+        env:
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: budgeometre-secrets
+              key: DATABASE_URL
+        - name: SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: budgeometre-secrets
+              key: SECRET_KEY
+        # Défi 10 : Liveness Probe
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 5002
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        # Défi 10 : Readiness Probe
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 5002
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        # Défi 2 & 5 : Resources
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "100Mi"
+          limits:
+            cpu: "200m"
+            memory: "200Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: lecture-service
+  namespace: budgeometre
+  labels:
+    app: lecture-service
+spec:
+  type: ClusterIP
+  selector:
+    app: lecture-service
+  ports:
+  - port: 5002
+    targetPort: 5002
+    name: http

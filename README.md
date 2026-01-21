@@ -4,7 +4,7 @@ Application web de gestion de budget personnel développée avec Flask. Suivez v
 
 ![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)
 ![Flask](https://img.shields.io/badge/Flask-Latest-green.svg)
-![SQLite](https://img.shields.io/badge/Database-SQLite-lightgrey.svg)
+![PostgreSQL](https://img.shields.io/badge/Database-PostgreSQL-336791.svg)
 
 ---
 
@@ -13,8 +13,9 @@ Application web de gestion de budget personnel développée avec Flask. Suivez v
 - [À propos](#à-propos)
 - [Fonctionnalités principales](#fonctionnalités-principales)
 - [Technologies utilisées](#technologies-utilisées)
-- [Installation](#installation)
-- [Déploiement Kubernetes/Rancher](#déploiement-kubernetesrancher)
+- [Architecture](#architecture)
+- [Structure du projet](#structure-du-projet)
+- [Déploiement Kubernetes](#déploiement-kubernetes)
 - [Guide d'utilisation](#guide-dutilisation)
   - [Gestion des catégories](#1-gestion-des-catégories)
   - [Gestion des transactions](#2-gestion-des-transactions)
@@ -25,7 +26,7 @@ Application web de gestion de budget personnel développée avec Flask. Suivez v
 
 ## À propos
 
-**Budgeomètre** est une application web de gestion budgétaire qui permet de gérer efficacement vos finances personnelles. L'application stocke vos données dans une base SQLite locale (`budget.db`) incluant les catégories, transactions et objectifs d'épargne.
+**Budgeomètre** est une application web de gestion budgétaire qui permet de gérer efficacement vos finances personnelles. L'application utilise une architecture microservices déployée sur Kubernetes avec PostgreSQL pour stocker les catégories, transactions et objectifs d'épargne.
 
 ## Fonctionnalités principales
 
@@ -40,112 +41,309 @@ Application web de gestion de budget personnel développée avec Flask. Suivez v
 ## Technologies utilisées
 
 - **Backend** : Flask (Python)
-- **Base de données** : SQLite
+- **Base de données** : PostgreSQL
 - **Frontend** : HTML5, CSS3, JavaScript
 - **Visualisation** : Graphiques interactifs (Chart.js ou équivalent)
+- **Orchestration** : Kubernetes / Minikube
+- **Architecture** : Microservices (Gateway, Service Écriture, Service Lecture)
 
 ---
 
-## Installation
+## Architecture
 
-### Prérequis
+Le projet Budgeomètre utilise une **architecture microservices** basée sur le pattern **CQRS** (Command Query Responsibility Segregation) qui sépare les opérations de lecture et d'écriture pour optimiser les performances et la scalabilité.
 
-- Python 3.8 ou version supérieure
-- pip (gestionnaire de paquets Python)
-- Git (optionnel)
+### Schéma d'architecture
 
-#### 1) Installer les dépendances
+<p align="center">
+  <img
+    src="https://github.com/user-attachments/assets/237feff4-17f7-4608-96ef-86cfed2a3815"
+    alt="archi_Budgeometre_k8s"
+    width="400"
+    style="border-radius: 16px;"
+  />
+</p>
 
+---
+### Architecture Kubernetes
+<p align="center">
+  <img
+    width="482" 
+    height="1501" 
+    alt="archi_microservices" 
+    src="https://github.com/user-attachments/assets/d3d3c88d-513b-49f8-8888-114f6f94cc20"
+    style="border-radius: 16px;"
+    >
+</p>
 
-```bash
+### Flux de données
 
-pip install -r requirements.txt --break-system-packages
-```
+1. **L'utilisateur** accède à l'interface via le **Gateway** (port 5000)
+2. Le **Gateway** affiche l'interface web (HTML/CSS/JS)
+3. Pour les **opérations de lecture** : Gateway → Service Lecture → PostgreSQL → Retour
+4. Pour les **opérations d'écriture** : Gateway → Service Écriture → PostgreSQL → Retour
+5. Tous les services communiquent sur le réseau **budgeometre-network**
 
-#### 2) Démarrer l'application (création automatique de la BD)
+### Composants
 
-```bash
+#### Gateway
 
-python3 app.py
+La Gateway constitue le **point d’entrée unique** de l’application. Elle est responsable de la gestion de l’interface utilisateur, notamment le rendu des templates HTML, et joue un rôle central dans l’orchestration des requêtes en les redirigeant vers les services appropriés. Elle expose le **port 5000** afin de permettre l’accès à l’application.
 
-```
+#### Service Écriture
 
-La commande ci-dessus crée automatiquement les tables SQLite (fichier `budget.db`) et démarre un serveur de développement sur `http://127.0.0.1:5000`.
+Ce service est dédié à la gestion de toutes les **opérations d’écriture**, incluant la création, la mise à jour et la suppression des données (CREATE, UPDATE, DELETE). Il traite les modifications liées aux catégories, aux transactions et aux objectifs, garantissant ainsi la cohérence des données métier. Il est accessible via le **port 5001**.
 
+#### Service Lecture
 
-#### 3) Importer des données de test
+Optimisé pour les **opérations de consultation (READ)**, ce service se concentre sur la lecture des données et la génération des statistiques ainsi que des tableaux de bord. Il prend également en charge la gestion des archives et de l’historique, offrant une vue analytique complète des données. Il expose le **port 5002**.
 
+#### Base de données PostgreSQL
 
-Pour peupler rapidement la base avec des catégories, transactions et objectifs d'exemple, ouvrez dans votre navigateur :
-
-```
-
-http://127.0.0.1:5000/init-test-archives
-
-```
-
-
-
-Le point d'entrée `/init-test-archives` ajoute plusieurs catégories, transactions et objectifs sur 6 mois.
-
-
-
-#### 4) Voir le site
-
-
-
-Après avoir importé les données, visitez :
-
-
-```
-
-http://127.0.0.1:5000/
-
-```
-
-
-
-La page affiche les dernières transactions calculées à partir des valeurs passées par le backend.
-
-
-#### 5) Réinitialiser la base
-
-
-Pour repartir de zéro, arrêtez le serveur et supprimez le fichier `budget.db` puis relancez `python3 app.py` et (optionnel) `/init-test-archives`.
-
-
-```bash
-
-rm budget.db
-
-python3 app.py
-
-```
-
-Il vous est également possible de réinitialiser la base de donnés en cliquant sur le menu hamburger, puis de cliquer sur l'option **Réinitialiser la BDD** :
-
-<img width="250" height="577" alt="image" src="https://github.com/user-attachments/assets/b3e8e2c5-184f-45f8-a3a0-39a1ba3844da" />
-
+La base de données PostgreSQL assure le **stockage persistant** de l’ensemble des données de l’application. Elle est déployée sous forme de **StatefulSet** afin de garantir la persistance et la stabilité des données, même en cas de redémarrage des pods. Elle expose le **port 5432**.
 
 ---
 
-## Déploiement Kubernetes/Rancher
+## Structure du projet
 
-> **Déploiement sur cluster Rancher disponible !**  
-> Une version microservices avec architecture CQRS est disponible sur la branche **`rancher`**.
-> 
-> **Fonctionnalités :**
-> - Architecture microservices (Gateway, Service Écriture, Service Lecture)
-> - Déploiement Kubernetes avec PostgreSQL
-> - Scripts Python automatisés (`cleanup.py`, `deploy-rancher.py`, `populate_db.py`)
-> - Configuration pour cluster Rancher avec ressources minimales (10m CPU)
-> - Images Docker Hub disponibles
-> 
-> **Documentation complète :** Consultez le README de la branche `rancher` pour les instructions détaillées de déploiement.
->
-> ```bash
-> git checkout rancher
-> ```
+Le projet Budgeomètre suit une architecture microservices organisée en plusieurs modules distincts. Le **gateway** gère l'interface utilisateur et orchestre les requêtes, le **service écriture** traite toutes les opérations de création, modification et suppression, tandis que le **service lecture** optimise les requêtes de consultation. Cette séparation permet une meilleure scalabilité et maintenabilité du code.
+
+```
+Budgeometre/
+├── cleanup.sh                    
+├── deploy.sh                     
+├── docker-compose.yml            
+├── README.md                    
+├── requirements.txt              
+│
+├── database/                    
+│   ├── init.sql                 
+│   └── seed_data.sql           
+│
+├── gateway/                    
+│   ├── app.py                 
+│   ├── config.py                
+│   ├── Dockerfile              
+│   ├── requirements.txt          
+│   ├── routes/                   
+│   │   ├── __init__.py
+│   │   └── views.py             
+│   ├── static/                  
+│   │   ├── css/                
+│   │   ├── js/                   
+│   │   └── widget/              
+│   └── templates/                
+│       ├── base.html           
+│       ├── index.html            
+│       ├── add-expense.html      
+│       ├── archive-detail.html   
+│       ├── archives.html         
+│       ├── budget-dashboard.html 
+│       ├── categories.html      
+│       ├── detail-depense.html 
+│       ├── mes-depenses.html    
+│       ├── mes-objectifs.html    
+│       ├── modifier-categorie.html    
+│       └── modifier-transaction.html  
+│
+├── services/                    
+│   ├── ecriture/                 
+│   │   ├── app.py                
+│   │   ├── routes.py            
+│   │   ├── seed_data.py        
+│   │   ├── Dockerfile            
+│   │   └── requirements.txt      
+│   └── lecture/                  
+│       ├── app.py                
+│       ├── routes.py             
+│       ├── Dockerfile            
+│       └── requirements.txt   
+│
+├── shared/                      
+│   ├── config.py                 
+│   ├── extensions.py             
+│   └── models/                   
+│       ├── __init__.py
+│       ├── archive.py            
+│       ├── categorie.py         
+│       ├── objectif.py           
+│       └── transaction.py        
+│
+└── k8s/                          
+    ├── README.md                
+    ├── namespace.yaml           
+    ├── configmap.yaml            
+    ├── secret.yaml               
+    ├── postgres-init-configmap.yaml   
+    ├── postgres-statefulset.yaml      
+    ├── postgres-deployment.yaml      
+    ├── postgres-service.yaml         
+    ├── postgres-pvc.yaml             
+    ├── ecriture-deployment.yaml      
+    ├── ecriture-service.yaml        
+    ├── lecture-deployment.yaml       
+    ├── lecture-service.yaml         
+    ├── gateway-deployment.yaml       
+    ├── gateway-service.yaml          
+    ├── ingress.yaml                 
+    ├── hpa.yaml                      
+    └── network-policy.yaml           
+```
+
+---
+
+## Déploiement Kubernetes
+
+#### Prérequis
+
+- Minikube installé
+- Docker installé (Docker Desktop sur Windows)e
+- kubectl installé et configuré
+
+Si vous êtes sur Windows, assurez-vous que Docker Desktop est installé et lancé avant de lancer le script de déploiement.
+
+#### Déploiement automatique avec le script
+
+Le script `deploy.sh` automatise l'ensemble du déploiement sur Kubernetes :
+
+```bash
+./deploy.sh
+```
+
+Ce script effectue les opérations suivantes :
+
+1. Démarre Minikube avec le driver Docker
+2. Active les addons Ingress et metrics-server
+3. Configure Docker pour utiliser le daemon Minikube
+4. Build les images Docker des microservices :
+   - Gateway
+   - Service Écriture
+   - Service Lecture
+5. Déploie les ressources Kubernetes dans l'ordre :
+   - Namespace `budgeometre`
+   - ConfigMap et Secret
+   - PostgreSQL (StatefulSet)
+   - Services Écriture et Lecture
+   - Gateway
+   - Ingress
+   - HPA (Horizontal Pod Autoscaler)
+   - Network Policy
+6. Attend que tous les pods soient prêts
+7. Affiche le statut du déploiement
+
+#### Accéder à l'application
+
+**Option 1 : Port forwarding (recommandé pour Windows)**
+
+La méthode la plus simple sur Windows est d'utiliser le port forwarding kubectl :
+
+```bash
+# Forward le port 80 du gateway vers le port 8080 local
+kubectl port-forward -n budgeometre service/gateway 8080:5000
+```
+
+Ouvrez ensuite votre navigateur et accédez à : **http://localhost:8080**
+
+**Option 2 : Configuration DNS avec le fichier hosts et minikube tunnel**
+
+Sur Windows avec le driver Docker, l'IP de Minikube n'est pas directement accessible. Il faut utiliser `minikube tunnel` pour créer un pont réseau :
+
+```powershell
+# 1- Activer l'addon Ingress si pas déjà fait
+minikube addons enable ingress
+
+# 2- Lancer minikube tunnel dans un terminal séparé (en administrateur)
+minikube tunnel
+```
+<img width="548" height="223" alt="image" src="https://github.com/user-attachments/assets/0891f80a-81f3-439e-8c2e-c607299c5218" />
+
+
+**Important** : Laissez ce terminal ouvert tant que vous voulez accéder à l'application.
+
+```powershell
+# 3- Ouvrir le fichier hosts en administrateur
+notepad C:\Windows\System32\drivers\etc\hosts
+
+# 4- Ajouter cette ligne à la fin (notez 127.0.0.1, pas l'IP de Minikube)
+127.0.0.1 budgeometre.local
+```
+
+```powershell
+# 5- Vider le cache DNS
+ipconfig /flushdns
+```
+
+Accédez ensuite à : **http://budgeometre.local**
+</br>
+<img width="628" height="482" alt="image" src="https://github.com/user-attachments/assets/2aebcaec-afb5-47d2-ab09-a1174e3dfeee" />
+
+
+> **Note** : Cette méthode nécessite de laisser `minikube tunnel` actif en arrière-plan. Si vous préférez une solution sans tunnel, utilisez l'Option 1 (port-forwarding) qui est plus simple et tout aussi efficace.
+
+**Option 3 : Accès direct via minikube service (alternative)**
+
+```bash
+minikube service gateway -n budgeometre
+```
+
+Cette commande ouvre automatiquement votre navigateur avec l'URL correcte.
+
+#### Peupler la base de données avec 6 mois de données de test
+
+Pour faciliter les tests et la démonstration, un script Python permet d'injecter automatiquement 6 mois de données réalistes dans la base PostgreSQL.
+
+**Contenu injecté :**
+- 9 catégories (Alimentation, Transport, Loisirs, Logement, Santé, Shopping, Abonnements, Salaire, Autre)
+- Transactions mensuelles variées (revenus, dépenses fixes et variables)
+- 3 objectifs d'épargne avec progression
+- Archives mensuelles pour chaque mois
+
+**Exécuter le script :**
+
+```bash
+# 1. Identifier le pod du service écriture
+kubectl get pods -n budgeometre | grep ecriture
+
+# 2. Exécuter le script de seed
+kubectl exec -it <nom-du-pod-ecriture> -n budgeometre -- python seed_data.py
+```
+
+Le script affiche sa progression et confirme la création de chaque élément :
+
+<img width="490" height="365" alt="image" src="https://github.com/user-attachments/assets/d6705b9f-2168-4c8f-baf1-7965ff7483c0" />
+
+Rafraîchissez ensuite l'application dans votre navigateur pour voir les données.
+
+#### Vérifier le déploiement
+
+```bash
+# Voir les pods
+kubectl get pods -n budgeometre
+
+# Voir les services
+kubectl get services -n budgeometre
+
+# Voir l'ingress
+kubectl get ingress -n budgeometre
+
+# Voir les logs d'un pod
+kubectl logs <nom-du-pod> -n budgeometre
+```
+
+#### Nettoyer le déploiement
+
+Pour supprimer l'application de Kubernetes :
+
+```bash
+./cleanup.sh
+```
+
+Ou manuellement :
+
+```bash
+kubectl delete namespace budgeometre
+minikube stop
+```
 
 ---
 
@@ -313,6 +511,15 @@ Ce projet est sous licence MIT.
 - FERRAH Anas
 
 *Projet réalisé en 2025-2026*
+
+
+
+
+
+
+
+
+
 
 
 

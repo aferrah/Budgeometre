@@ -1,0 +1,507 @@
+{% extends "base.html" %}
+
+{% block title %}Budgeomètre - Accueil{% endblock %}
+
+{% block head_extra %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+{% endblock %}
+
+{% block header_content %}
+    <h1>Accueil</h1>
+{% endblock %}
+
+{% block content %}
+    <div class="solde-card glass-card home-card">
+        {% set ratio = (argentActuel / total_revenus * 100) if total_revenus > 0 else 0 %}
+        {% set ratio_capped = [ratio, 100]|min if ratio >= 0 else 0 %}
+        {% if ratio >= 75 %}
+            {% set niveau = 'excellent' %}
+            {% set color = '#10b981' %}
+        {% elif ratio >= 50 %}
+            {% set niveau = 'bon' %}
+            {% set color = '#22c55e' %}
+        {% elif ratio >= 25 %}
+            {% set niveau = 'moyen' %}
+            {% set color = '#eab308' %}
+        {% elif ratio >= 0 %}
+            {% set niveau = 'faible' %}
+            {% set color = '#f97316' %}
+        {% else %}
+            {% set niveau = 'critique' %}
+            {% set color = '#ef4444' %}
+        {% endif %}
+        <div class="solde-circle-container">
+            <svg class="progress-ring" width="250" height="250">
+                <circle
+                    cx="125"
+                    cy="125"
+                    r="110"
+                    stroke="rgba(255, 255, 255, 0.1)"
+                    stroke-width="12"
+                    fill="none"
+                />
+                <circle
+                    class="progress-ring-circle"
+                    cx="125"
+                    cy="125"
+                    r="110"
+                    stroke="{{ color }}"
+                    stroke-width="12"
+                    fill="none"
+                    stroke-dasharray="690.8"
+                    stroke-dashoffset="{{ 690.8 - (690.8 * ratio_capped / 100) }}"
+                    stroke-linecap="round"
+                />
+            </svg>
+            <div class="solde-circle {{ niveau }}">
+                <span class="montant">{{ '%.2f'|format(argentActuel) }} €</span>
+                <span class="label">{{ '%.0f'|format(ratio_capped) }}% des revenus restants</span>
+            </div>
+        </div>
+
+        <div class="stats-row">
+            <div class="stat-item">
+                <div class="value revenus">+{{ '%.2f'|format(total_revenus) }} €</div>
+                <div class="label">Revenus</div>
+            </div>
+            <div class="stat-item">
+                <div class="value depenses">-{{ '%.2f'|format(total_depenses) }} €</div>
+                <div class="label">Dépenses</div>
+            </div>
+            <div class="stat-item">
+                <div class="value epargne">{{ '%.2f'|format(total_epargne) }} €</div>
+                <div class="label">Épargne</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="add-expense-container action-buttons-row">
+        <a class="add-expense-btn" href="{{ url_for('transactions.add_expense') }}">Ajouter une transaction</a>
+        <a class="add-expense-btn" href="{{ url_for('objectifs.mes_objectifs') }}">Ajouter un objectif d'épargne</a>
+        <a class="add-expense-btn" href="{{ url_for('categories.categories') }}">Ajouter une catégorie</a>
+        <a class="add-expense-btn archives-btn" href="{{ url_for('archives.archives') }}">Archives mensuelles</a>
+    </div>
+
+    <section class="recent-expenses glass-card home-card">
+        <h2>Transactions récentes</h2>
+
+        {% if transactions %}
+            <div class="filters-container filters-row">
+                <div class="filter-group filter-search-group">
+                    <label class="filter-label">Recherche</label>
+                    <input type="text" id="searchInput" placeholder="Rechercher..."
+                           class="filter-input">
+                </div>
+
+                <div class="filter-group filter-category-group">
+                    <label class="filter-label">Catégorie</label>
+                    <select id="categoryFilter" class="filter-input filter-select">
+                        <option value="all">Toutes</option>
+                        {% set categories_set = [] %}
+                        {% for t in transactions %}
+                            {% if t.categorie.nom not in categories_set %}
+                                {% set _ = categories_set.append(t.categorie.nom) %}
+                                <option value="{{ t.idCategorie }}">{{ t.categorie.nom }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="filter-group filter-type-group">
+                    <label class="filter-label">Type</label>
+                    <select id="typeFilter" class="filter-input filter-select">
+                        <option value="all">Tout</option>
+                        <option value="revenus">Revenus</option>
+                        <option value="depenses">Dépenses</option>
+                        <option value="epargne">Épargne</option>
+                    </select>
+                </div>
+
+                <button id="resetBtn" class="reset-filters-btn">
+                    Réinitialiser
+                </button>
+            </div>
+
+            <table id="transactionsTable">
+                <thead>
+                    <tr>
+                        <th class="sortable" data-column="date">
+                            Date <span class="sort-icon">⇅</span>
+                        </th>
+                        <th class="sortable" data-column="titre">
+                            Libellé <span class="sort-icon">⇅</span>
+                        </th>
+                        <th class="sortable" data-column="categorie">
+                            Catégorie <span class="sort-icon">⇅</span>
+                        </th>
+                        <th class="sortable" data-column="montant">
+                            Montant <span class="sort-icon">⇅</span>
+                        </th>
+                        <th class="actions-column">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="transactionsBody">
+                    {% for t in transactions %}
+                        {% set is_epargne = t.categorie.nom == 'Épargne' %}
+                        <tr class="transaction-row {% if is_epargne %}epargne{% endif %}"
+                            data-date="{{ t.dateTransaction.timestamp() }}"
+                            data-titre="{{ t.titre|lower }}"
+                            data-categorie="{{ t.idCategorie }}"
+                            data-montant="{{ t.montant }}">
+                            <td>{{ t.dateTransaction.strftime('%d/%m/%Y') }}</td>
+                            <td>{{ t.titre }}</td>
+                            <td>
+                                <span class="categorie-badge {% if is_epargne %}epargne{% endif %}"
+                                      style="background-color: {{ t.categorie.couleur or '#8b5cf6' }}33; border: 1px solid {{ t.categorie.couleur or '#8b5cf6' }}; color: {{ t.categorie.couleur or '#8b5cf6' }};">
+                                    {{ t.categorie.nom }}
+                                </span>
+                            </td>
+                            <td class="montant-cell {% if is_epargne %}epargne{% elif t.montant >= 0 %}positif{% else %}negatif{% endif %}">
+                                {{ '+' if t.montant >= 0 else '' }}{{ '%.2f'|format(t.montant) }} €
+                            </td>
+                            <td class="actions-cell">
+                                {% if not is_epargne %}
+                                <div class="transaction-actions">
+                                    <a href="{{ url_for('transactions.modifier_transaction', id=t.idTransaction) }}" class="btn-action btn-edit" title="Modifier">
+                                        <img src="{{ url_for('static', filename='widget/widget_pencil.png') }}" alt="Modifier" class="btn-edit-icon">
+                                    </a>
+                                    <button class="btn-action btn-delete" onclick="confirmDelete({{ t.idTransaction }}, '{{ t.titre }}')" title="Supprimer">
+                                        <img src="{{ url_for('static', filename='widget/widget_trash_can.png') }}" alt="Supprimer" class="btn-delete-icon">
+                                    </button>
+                                </div>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <div id="noResults" class="no-results-message">
+                Aucune transaction trouvée avec ces critères.
+            </div>
+
+            <div id="paginationContainer" class="pagination pagination-container">
+            </div>
+
+            <div id="paginationInfo" class="pagination-info">
+            </div>
+
+            {% if nb_anciennes > 0 %}
+            <div class="archive-message-box">
+                <p class="archive-message-text">
+                    <span class="archive-icon">i</span>
+                    {{ nb_anciennes }} transaction(s) plus ancienne(s) disponible(s) dans les <a href="{{ url_for('archives.archives') }}" class="archive-link">archives</a>
+                </p>
+            </div>
+            {% endif %}
+
+        {% else %}
+            <p class="no-transactions-message">
+                Aucune transaction enregistrée pour l'instant.
+            </p>
+        {% endif %}
+    </section>
+
+    <div class="add-expense-container">
+        <a href="{{ url_for('dashboard.budget_dashboard') }}" class="dashboard-link">Accéder au dashboard</a>
+    </div>
+
+    <script>
+        let currentSort = { column: 'date', direction: 'desc' };
+        let allRows = [];
+        let currentPage = 1;
+        const itemsPerPage = 10;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const tbody = document.getElementById('transactionsBody');
+            if (tbody) {
+                allRows = Array.from(tbody.querySelectorAll('.transaction-row'));
+                allRows.forEach(row => row.dataset.filteredOut = '');
+                attachEventListeners();
+                // Apply initial sort without changing direction
+                applySortToVisibleRows('date', 'desc');
+                updateSortIcons();
+                updatePagination();
+            }
+        });
+
+        function attachEventListeners() {
+            document.querySelectorAll('.sortable').forEach(header => {
+                header.addEventListener('click', function() {
+                    sortTable(this.dataset.column);
+                });
+            });
+
+            document.getElementById('searchInput').addEventListener('input', applyFilters);
+            document.getElementById('categoryFilter').addEventListener('change', applyFilters);
+            document.getElementById('typeFilter').addEventListener('change', applyFilters);
+            document.getElementById('resetBtn').addEventListener('click', resetFilters);
+        }
+
+        function applySortToVisibleRows(column, direction) {
+            // Trier TOUTES les lignes, pas seulement celles visibles
+            allRows.sort((a, b) => {
+                let aValue, bValue;
+
+                switch(column) {
+                    case 'date':
+                        aValue = parseFloat(a.dataset.date);
+                        bValue = parseFloat(b.dataset.date);
+                        break;
+                    case 'titre':
+                        aValue = a.dataset.titre;
+                        bValue = b.dataset.titre;
+                        break;
+                    case 'categorie':
+                        aValue = a.cells[2].textContent.trim();
+                        bValue = b.cells[2].textContent.trim();
+                        break;
+                    case 'montant':
+                        aValue = parseFloat(a.dataset.montant);
+                        bValue = parseFloat(b.dataset.montant);
+                        break;
+                    default:
+                        return 0;
+                }
+
+                let result = 0;
+                if (typeof aValue === 'string') {
+                    result = aValue.localeCompare(bValue, 'fr');
+                } else {
+                    result = aValue - bValue;
+                }
+
+                return direction === 'asc' ? result : -result;
+            });
+
+            const tbody = document.getElementById('transactionsBody');
+            allRows.forEach(row => tbody.appendChild(row));
+        }
+
+        function sortTable(column) {
+            if (currentSort.column === column) {
+                currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+            } else {
+                currentSort.column = column;
+                currentSort.direction = 'asc';
+            }
+
+            // Trier TOUTES les lignes, pas seulement celles visibles
+            allRows.sort((a, b) => {
+                let aValue, bValue;
+
+                switch(column) {
+                    case 'date':
+                        aValue = parseFloat(a.dataset.date);
+                        bValue = parseFloat(b.dataset.date);
+                        break;
+                    case 'titre':
+                        aValue = a.dataset.titre;
+                        bValue = b.dataset.titre;
+                        break;
+                    case 'categorie':
+                        aValue = a.cells[2].textContent.trim();
+                        bValue = b.cells[2].textContent.trim();
+                        break;
+                    case 'montant':
+                        aValue = parseFloat(a.dataset.montant);
+                        bValue = parseFloat(b.dataset.montant);
+                        break;
+                    default:
+                        return 0;
+                }
+
+                let result = 0;
+                if (typeof aValue === 'string') {
+                    result = aValue.localeCompare(bValue, 'fr');
+                } else {
+                    result = aValue - bValue;
+                }
+
+                return currentSort.direction === 'asc' ? result : -result;
+            });
+
+            const tbody = document.getElementById('transactionsBody');
+            allRows.forEach(row => tbody.appendChild(row));
+
+            updateSortIcons();
+            updatePagination();
+        }
+
+        function updateSortIcons() {
+            document.querySelectorAll('.sortable').forEach(header => {
+                const icon = header.querySelector('.sort-icon');
+                const column = header.dataset.column;
+
+                if (column === currentSort.column) {
+                    icon.textContent = currentSort.direction === 'asc' ? '↑' : '↓';
+                    header.classList.add('active-sort');
+                } else {
+                    icon.textContent = '⇅';
+                    header.classList.remove('active-sort');
+                }
+            });
+        }
+
+        function applyFilters() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const categoryFilter = document.getElementById('categoryFilter').value;
+            const typeFilter = document.getElementById('typeFilter').value;
+
+            let visibleCount = 0;
+
+            allRows.forEach(row => {
+                const titre = row.dataset.titre;
+                const categorie = row.dataset.categorie;
+                const montant = parseFloat(row.dataset.montant);
+                const isEpargne = row.classList.contains('epargne');
+
+                let show = true;
+
+                if (searchTerm && !titre.includes(searchTerm)) {
+                    show = false;
+                }
+
+                if (categoryFilter !== 'all' && categorie !== categoryFilter) {
+                    show = false;
+                }
+
+                if (typeFilter === 'revenus' && (montant <= 0 || isEpargne)) {
+                    show = false;
+                } else if (typeFilter === 'depenses' && (montant >= 0 || isEpargne)) {
+                    show = false;
+                } else if (typeFilter === 'epargne' && !isEpargne) {
+                    show = false;
+                }
+
+                if (show) {
+                    row.dataset.filteredOut = '';
+                    visibleCount++;
+                } else {
+                    row.dataset.filteredOut = 'true';
+                }
+            });
+
+            const noResults = document.getElementById('noResults');
+            const table = document.getElementById('transactionsTable');
+            if (visibleCount === 0) {
+                noResults.style.display = 'block';
+                table.style.display = 'none';
+            } else {
+                noResults.style.display = 'none';
+                table.style.display = 'table';
+            }
+
+            currentPage = 1;
+            updatePagination();
+        }
+
+        function resetFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('categoryFilter').value = 'all';
+            document.getElementById('typeFilter').value = 'all';
+
+            allRows.forEach(row => {
+                row.dataset.filteredOut = '';
+            });
+
+            currentPage = 1;
+            currentSort = { column: 'date', direction: 'desc' };
+            sortTable('date');
+        }
+
+        function updatePagination() {
+            const visibleRows = allRows.filter(row => !row.dataset.filteredOut);
+            const totalPages = Math.ceil(visibleRows.length / itemsPerPage);
+
+            if (currentPage > totalPages && totalPages > 0) {
+                currentPage = totalPages;
+            }
+            if (currentPage < 1) {
+                currentPage = 1;
+            }
+
+            allRows.forEach(row => {
+                if (row.dataset.filteredOut) {
+                    row.style.display = 'none';
+                }
+            });
+
+            const paginationContainer = document.getElementById('paginationContainer');
+            const paginationInfo = document.getElementById('paginationInfo');
+
+            if (totalPages <= 1) {
+                visibleRows.forEach(row => row.style.display = '');
+                paginationContainer.innerHTML = '';
+                paginationInfo.textContent = `${visibleRows.length} transactions récentes (3 derniers mois)`;
+                return;
+            }
+
+            const start = (currentPage - 1) * itemsPerPage;
+            const end = start + itemsPerPage;
+
+            visibleRows.forEach((row, index) => {
+                if (index >= start && index < end) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            let html = '';
+
+            if (currentPage > 1) {
+                html += `<span class="page-btn" onclick="changePage(1)" title="Première page">«</span>`;
+                html += `<span class="page-btn" onclick="changePage(${currentPage - 1})">‹</span>`;
+            } else {
+                html += `<span class="page-btn disabled">«</span>`;
+                html += `<span class="page-btn disabled">‹</span>`;
+            }
+
+            const startPage = Math.max(1, currentPage - 2);
+            const endPage = Math.min(totalPages, currentPage + 2);
+
+            if (startPage > 1) {
+                html += `<span class="page-ellipsis">...</span>`;
+            }
+
+            for (let i = startPage; i <= endPage; i++) {
+                if (i === currentPage) {
+                    html += `<span class="page-btn active">${i}</span>`;
+                } else {
+                    html += `<span class="page-btn" onclick="changePage(${i})">${i}</span>`;
+                }
+            }
+
+            if (endPage < totalPages) {
+                html += `<span class="page-ellipsis">...</span>`;
+            }
+
+            if (currentPage < totalPages) {
+                html += `<span class="page-btn" onclick="changePage(${currentPage + 1})">›</span>`;
+                html += `<span class="page-btn" onclick="changePage(${totalPages})" title="Dernière page">»</span>`;
+            } else {
+                html += `<span class="page-btn disabled">›</span>`;
+                html += `<span class="page-btn disabled">»</span>`;
+            }
+
+            paginationContainer.innerHTML = html;
+            paginationInfo.textContent = `Page ${currentPage} sur ${totalPages} • ${visibleRows.length} transaction(s) récente(s) (3 derniers mois)`;
+        }
+
+        function changePage(page) {
+            currentPage = page;
+            updatePagination();
+        }
+
+        function confirmDelete(transactionId, transactionTitre) {
+            if (confirm(`Êtes-vous sûr de vouloir supprimer la transaction "${transactionTitre}" ?\n\nCette action est irréversible.`)) {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = `/transaction/${transactionId}/supprimer`;
+                document.body.appendChild(form);
+                form.submit();
+            }
+        }
+    </script>
+{% endblock %}

@@ -1,0 +1,50 @@
+-- Table CATEGORIE
+CREATE TABLE IF NOT EXISTS "CATEGORIE" (
+    "idCategorie" SERIAL PRIMARY KEY,
+    "nom" VARCHAR(50) NOT NULL,
+    "description" VARCHAR(255),
+    "couleur" VARCHAR(7) DEFAULT '#8b5cf6',
+    "limite_budget" NUMERIC(15, 2) DEFAULT 0
+);
+
+-- Table TRANSACTION
+CREATE TABLE IF NOT EXISTS "TRANSACTION" (
+    "idTransaction" SERIAL PRIMARY KEY,
+    "montant" NUMERIC(15, 2) NOT NULL,
+    "dateTransaction" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "titre" VARCHAR(100) NOT NULL,
+    "commentaire" VARCHAR(255),
+    "idCategorie" INTEGER NOT NULL REFERENCES "CATEGORIE"("idCategorie") ON DELETE RESTRICT
+);
+
+-- Table OBJECTIF
+CREATE TABLE IF NOT EXISTS "OBJECTIF" (
+    "idObjectif" SERIAL PRIMARY KEY,
+    "montant" NUMERIC(15, 2) NOT NULL,
+    "epargne_actuelle" NUMERIC(15, 2) DEFAULT 0,
+    "description" VARCHAR(255),
+    "frequence" VARCHAR(20),
+    "dateDebut" TIMESTAMP,
+    "dateFin" TIMESTAMP,
+    "idCategorie" INTEGER NOT NULL REFERENCES "CATEGORIE"("idCategorie")
+);
+
+-- Table ARCHIVE_MENSUELLE
+CREATE TABLE IF NOT EXISTS "ARCHIVE_MENSUELLE" (
+    "idArchive" SERIAL PRIMARY KEY,
+    "annee" INTEGER NOT NULL,
+    "mois" INTEGER NOT NULL,
+    "dateArchivage" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "masquee" BOOLEAN DEFAULT FALSE,
+    "total_revenus" NUMERIC(15, 2) DEFAULT 0,
+    "total_depenses" NUMERIC(15, 2) DEFAULT 0,
+    "total_epargne" NUMERIC(15, 2) DEFAULT 0,
+    "solde_final" NUMERIC(15, 2) DEFAULT 0,
+    "donnees_json" TEXT,
+    CONSTRAINT unique_mois_annee UNIQUE ("annee", "mois")
+);
+
+-- Index
+CREATE INDEX IF NOT EXISTS idx_transaction_date ON "TRANSACTION"("dateTransaction");
+CREATE INDEX IF NOT EXISTS idx_transaction_categorie ON "TRANSACTION"("idCategorie");
+CREATE INDEX IF NOT EXISTS idx_archive_date ON "ARCHIVE_MENSUELLE"("annee", "mois");
