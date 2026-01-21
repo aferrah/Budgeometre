@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: postgres-init-script
-  namespace: budgeometre
+  namespace: u-grp5
 data:
   init.sql: |
     -- Table CATEGORIE

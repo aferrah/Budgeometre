@@ -2,12 +2,12 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: gateway
-  namespace: budgeometre
+  namespace: u-grp5
   labels:
     app: gateway
 spec:
   # Défi 2 & 5 : 3 répliques
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
       app: gateway
@@ -22,14 +22,10 @@ spec:
       labels:
         app: gateway
     spec:
-      initContainers:
-      - name: wait-for-services
-        image: busybox:1.35
-        command: ['sh', '-c', 'until nc -z ecriture-service 5001 && nc -z lecture-service 5002; do echo waiting for services; sleep 2; done;']
       containers:
       - name: gateway
-        image: gateway:latest
-        imagePullPolicy: Never
+        image: eclairz422/budgeometre-gateway:latest
+        imagePullPolicy: Always
         ports:
         - containerPort: 5000
           name: http
@@ -70,24 +66,25 @@ spec:
         # Défi 2 & 5 : Resources
         resources:
           requests:
-            cpu: "100m"
-            memory: "100Mi"
+            cpu: "10m"
+            memory: "64Mi"
           limits:
-            cpu: "200m"
-            memory: "200Mi"
+            cpu: "50m"
+            memory: "128Mi"
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: gateway
-  namespace: budgeometre
+  namespace: u-grp5
   labels:
     app: gateway
 spec:
-  type: ClusterIP
+  type: NodePort
   selector:
     app: gateway
   ports:
   - port: 5000
     targetPort: 5000
+    nodePort: 30000
     name: http

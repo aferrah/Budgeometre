@@ -2,7 +2,7 @@ apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
   name: postgres-network-policy
-  namespace: budgeometre
+  namespace: u-grp5
 spec:
   podSelector:
     matchLabels:

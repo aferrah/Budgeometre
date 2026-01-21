@@ -2,7 +2,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: postgres-pvc
-  namespace: budgeometre
+  namespace: u-grp5
 spec:
   accessModes:
     - ReadWriteOnce

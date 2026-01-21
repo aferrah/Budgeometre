@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: budgeometre
+  name: u-grp5
   labels:
-    name: budgeometre
+    name: u-grp5
     app: budgeometre

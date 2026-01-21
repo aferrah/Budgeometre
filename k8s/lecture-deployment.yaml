@@ -2,12 +2,12 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: lecture-service
-  namespace: budgeometre
+  namespace: u-grp5
   labels:
     app: lecture-service
 spec:
   # Défi 2 & 5 : 3 répliques
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
       app: lecture-service
@@ -22,14 +22,10 @@ spec:
       labels:
         app: lecture-service
     spec:
-      initContainers:
-      - name: wait-for-postgres
-        image: busybox:1.35
-        command: ['sh', '-c', 'until nc -z postgres-service 5432; do echo waiting for postgres; sleep 2; done;']
       containers:
       - name: lecture-service
-        image: lecture-service:latest
-        imagePullPolicy: Never
+        image: eclairz422/budgeometre-lecture:latest
+        imagePullPolicy: Always
         ports:
         - containerPort: 5002
           name: http
@@ -65,17 +61,17 @@ spec:
         # Défi 2 & 5 : Resources
         resources:
           requests:
-            cpu: "100m"
-            memory: "100Mi"
+            cpu: "10m"
+            memory: "64Mi"
           limits:
-            cpu: "200m"
-            memory: "200Mi"
+            cpu: "50m"
+            memory: "128Mi"
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: lecture-service
-  namespace: budgeometre
+  namespace: u-grp5
   labels:
     app: lecture-service
 spec:

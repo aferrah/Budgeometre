@@ -2,7 +2,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: budgeometre-ingress
-  namespace: budgeometre
+  namespace: u-grp5
   annotations:
     nginx.ingress.kubernetes.io/proxy-body-size: "10m"
 spec:
