@@ -24,8 +24,19 @@
 
 ## Installation Rapide
 
+#### 1) On lance le cluster
 
-#### 1) Préparation des images
+```bash
+minikube start
+```
+
+```bash
+minikube addons enable ingress
+```
+
+Cette commande active un contrôleur dans Minikube pour transformer les noms de domaine en accès vers les services internes.
+
+#### 2) Préparation des images
 
 A garder ouvert dans un terminal séparé.
 
@@ -34,13 +45,13 @@ eval $(minikube docker-env)
 ```
 
 
-#### 2) Déploiement du Chart
+#### 3) Déploiement du Chart
 
 ```bash
 helm install budgeometre ./budgeometre-chart
 ```
 
-#### 3) Accès à l'application
+#### 4) Accès à l'application
 
 Dans un terminal séparé, lancez le tunnel.
 
