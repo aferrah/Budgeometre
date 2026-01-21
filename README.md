@@ -16,6 +16,7 @@ Application web de gestion de budget personnel développée avec Flask. Suivez v
 - [Architecture](#architecture)
 - [Structure du projet](#structure-du-projet)
 - [Déploiement Kubernetes](#déploiement-kubernetes)
+  - [Déploiement sur cluster Rancher (branche `rancher`)](#déploiement-kubernetes)
 - [Guide d'utilisation](#guide-dutilisation)
   - [Gestion des catégories](#1-gestion-des-catégories)
   - [Gestion des transactions](#2-gestion-des-transactions)
@@ -193,6 +194,18 @@ Budgeometre/
 ---
 
 ## Déploiement Kubernetes
+
+> **Déploiement sur cluster Rancher**  
+> Une configuration spécifique pour le déploiement sur cluster Rancher est disponible sur la branche **`rancher`**.
+> Cette branche contient :
+> - Scripts Python de déploiement automatisé (`cleanup.py`, `deploy-rancher.py`, `populate_db.py`)
+> - Configuration optimisée pour ressources limitées (10m CPU par pod)
+> - Images Docker Hub pré-buildées
+> - Namespace `u-grp5`
+> 
+> ```bash
+> git checkout rancher
+> ```
 
 #### Prérequis
 
