@@ -1,7 +1,7 @@
 namespace: budgeometre
 
 image:
-  pullPolicy: Never
+  pullPolicy: IfNotPresent
 
 busybox:
   image: busybox:latest

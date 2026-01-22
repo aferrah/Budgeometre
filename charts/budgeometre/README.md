@@ -30,11 +30,7 @@
 minikube start
 ```
 
-```bash
-minikube addons enable ingress
-```
 
-Cette commande active un contrôleur dans Minikube pour transformer les noms de domaine en accès vers les services internes.
 
 #### 2) Préparation des images
 
@@ -48,8 +44,22 @@ eval $(minikube docker-env)
 #### 3) Déploiement du Chart
 
 ```bash
-helm install budgeometre ./charts/budgeometre
+helm install budgeometre ./charts/budgeometre -n budgeometre-v2 --create-namespace
 ```
+On injecte ensuite les images (chaque commande doit être lancée seule)
+
+```bash
+minikube image load gateway:latest
+```
+
+```bash
+minikube image load ecriture-service:latest
+```
+
+```bash
+minikube image load lecture-service:latest
+```
+
 
 #### 4) Accès à l'application
 
@@ -58,8 +68,13 @@ Dans un terminal séparé, lancez le tunnel.
 ```bash
 minikube tunnel
 ```
+Dans un second:
 
-L'application est alors accessible sur : **http://budgeometre.local**
+```bash
+kubectl port-forward service/gateway 8080:5000 -n budgeometre-v2
+```
+
+L'application est alors accessible sur : **http://localhost:8080**
 
 
 ---
@@ -69,11 +84,17 @@ L'application est alors accessible sur : **http://budgeometre.local**
 #### 1) État global du cluster
 
 ```bash
-kubectl get all -n budgeometre
+kubectl get all -n budgeometre-v2
 ```
 
 #### 2) Surveiller l'autoscaling
 
 ```bash
-kubectl get hpa -n budgeometre
+kubectl get hpa -n budgeometre-v2
+```
+
+#### 3) Vérifier les services
+
+```bash
+kubectl get pods -n budgeometre-v2
 ```
