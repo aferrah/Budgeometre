@@ -193,8 +193,7 @@ Budgeometre/
 
 ---
 
-## Déploiement Kubernetes
-
+## Déploiement Kubernetes (Le deuxième déploiement, avec helm, est disponible sur la [branche kubernetes-helm](https://github.com/aferrah/Budgeometre/blob/kubernetes-helm/charts/budgeometre/README.md))
 > **Déploiement sur cluster Rancher**  
 > Une configuration spécifique pour le déploiement sur cluster Rancher est disponible sur la branche **`rancher`**.
 > Cette branche contient :
